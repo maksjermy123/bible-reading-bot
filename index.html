@@ -543,8 +543,36 @@ let selectedSlot = 'morning';
 let notifyOn = true;
 
 function renderPlanList() {
+  // Active plans on top
+  const ep = document.getElementById('existing-plans');
+  const existing = Object.entries(app.progress).filter(([id]) => getPlanById(id));
+  if (existing.length) {
+    ep.innerHTML = '<div class="sec">Мои планы</div>' + existing.map(([id, prog]) => {
+      const plan = getPlanById(id);
+      if (!plan) return '';
+      const done = prog.daysDone?.length || 0;
+      const pct = Math.round(done / plan.days * 100);
+      const isActive = id === app.activePlanId;
+      return `<div class="plan-card${isActive?' sel':''}" style="position:relative">
+        <div class="plan-top" onclick="continuePlan('${id}')">
+          <div class="plan-icon">${plan.icon}</div>
+          <div class="plan-info">
+            <div class="plan-title">${plan.title}</div>
+            <div class="plan-meta">${pct}% · ${done}/${plan.days} дней${isActive?' · активный':''}</div>
+          </div>
+          <div class="plan-badge" style="background:var(--acc);color:#fff">→</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button onclick="event.stopPropagation();deletePlan('${id}')" style="flex:1;padding:8px;border:1px solid var(--brd);border-radius:8px;background:none;color:var(--txt2);font-size:13px;cursor:pointer;font-family:var(--fui)">🗑 Удалить</button>
+          <button onclick="event.stopPropagation();continuePlan('${id}')" style="flex:2;padding:8px;border:none;border-radius:8px;background:var(--acc);color:#fff;font-size:13px;cursor:pointer;font-family:var(--fui);font-weight:600">Продолжить →</button>
+        </div>
+      </div>`;
+    }).join('');
+  } else ep.innerHTML = '';
+
+  // Suggested plans
   const el = document.getElementById('plan-list');
-  el.innerHTML = PLANS.map(p => `
+  if (el) el.innerHTML = PLANS.map(p => `
     <div class="plan-card" data-id="${p.id}" onclick="selPlan('${p.id}')">
       <div class="plan-top">
         <div class="plan-icon">${p.icon}</div>
@@ -557,24 +585,16 @@ function renderPlanList() {
       <div class="plan-desc">${p.desc}</div>
     </div>
   `).join('');
-  // Show existing plans
-  const ep = document.getElementById('existing-plans');
-  const existing = Object.entries(app.progress).filter(([id]) => getPlanById(id));
-  if (existing.length) {
-    ep.innerHTML = '<div class="sec">Продолжить</div>' + existing.map(([id, prog]) => {
-      const plan = getPlanById(id);
-      if (!plan) return '';
-      const done = prog.daysDone?.length || 0;
-      const pct = Math.round(done / plan.days * 100);
-      return `<div class="plan-card" onclick="continuePlan('${id}')">
-        <div class="plan-top">
-          <div class="plan-icon">${plan.icon}</div>
-          <div class="plan-info"><div class="plan-title">${plan.title}</div>
-          <div class="plan-meta">${pct}% · ${done}/${plan.days} дней</div></div>
-          <div class="plan-badge" style="background:var(--acc);color:#fff">→</div>
-        </div></div>`;
-    }).join('');
-  } else ep.innerHTML = '';
+}
+
+function deletePlan(id) {
+  if (!confirm('Удалить план? Прогресс будет потерян.')) return;
+  delete app.progress[id];
+  delete app.customPlans[id];
+  if (app.activePlanId === id) app.activePlanId = null;
+  saveApp();
+  haptic('light');
+  renderPlanList();
 }
 
 function selPlan(id) {
@@ -590,6 +610,10 @@ function selSlot(btn) {
   btn.classList.add('sel');
   haptic('light');
 }
+function getNotifyTime() {
+  const el = document.getElementById('notify-time-input');
+  return el ? el.value : '08:00';
+}
 
 function toggleNotify() {
   notifyOn = !notifyOn;
@@ -600,10 +624,11 @@ async function startPlan() {
   if (!selectedPlanId) return;
   const btn = document.getElementById('btn-start');
   btn.disabled = true; btn.textContent = 'Сохраняем...';
+  const notifyTime = getNotifyTime ? getNotifyTime() : '08:00';
   app.activePlanId = selectedPlanId;
   app.progress[selectedPlanId] = {
     startDate: today(), streak:0, maxStreak:0, lastRead:null,
-    daysDone:[], notifySlot:selectedSlot, notifyOn,
+    daysDone:[], notifySlot:selectedSlot, notifyTime, notifyOn,
   };
   saveApp();
   if (userId) {
@@ -685,6 +710,8 @@ function renderRead() {
 
   // Settings panel
   document.querySelectorAll('#settings-panel .slot').forEach(b => b.classList.toggle('sel', b.dataset.slot === prog.notifySlot));
+  const ntEl = document.getElementById('notify-time-settings');
+  if (ntEl) ntEl.value = prog.notifyTime || (prog.notifySlot==='morning'?'08:00':prog.notifySlot==='afternoon'?'13:00':'20:00');
   document.getElementById('notify-tog2').classList.toggle('on', prog.notifyOn !== false);
   document.getElementById('notify-lbl').textContent = 'Напоминания ' + (prog.notifyOn !== false ? 'включены' : 'выключены');
 
@@ -714,8 +741,9 @@ function renderRead() {
   const t = tabs[activeTab];
   document.getElementById('r-trans-link').href = bibleByLink(t.book, t.ch, t.vf);
 
-  // Read button
+  // Read button — "Next" between tabs, "Read" only on last tab
   const btn = document.getElementById('r-read-btn');
+  const isLastTab = activeTab >= tabs.length - 1;
   if (!isCurrentDay) {
     btn.textContent = isDayRead ? `✓ День ${vDay} прочитан` : 'Перейдите к сегодняшнему дню';
     btn.disabled = true;
@@ -724,10 +752,16 @@ function renderRead() {
     btn.textContent = '✓ Прочитано сегодня';
     btn.disabled = true;
     btn.className = 'read-btn done';
+  } else if (!isLastTab) {
+    btn.textContent = `Следующий отрывок → (${activeTab+1}/${tabs.length})`;
+    btn.disabled = false;
+    btn.className = 'read-btn';
+    btn.onclick = () => { setTab(activeTab + 1); window.scrollTo(0,0); };
   } else {
     btn.textContent = '✓ Прочитал';
     btn.disabled = false;
     btn.className = 'read-btn';
+    btn.onclick = markRead;
   }
 }
 
@@ -882,6 +916,19 @@ function setNotifySlot(btn) {
   prog.notifySlot = btn.dataset.slot;
   saveApp();
   document.querySelectorAll('#settings-panel .slot').forEach(b => b.classList.toggle('sel', b.dataset.slot === prog.notifySlot));
+  const ntEl = document.getElementById('notify-time-settings');
+  if (ntEl) ntEl.value = prog.notifyTime || (prog.notifySlot==='morning'?'08:00':prog.notifySlot==='afternoon'?'13:00':'20:00');
+  if (userId) fetch(BACKEND+'/plan/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,notify_slot:prog.notifySlot,notify_on:prog.notifyOn!==false})}).catch(()=>{});
+  haptic('light');
+}
+function setNotifyTime(val) {
+  const prog = app.progress[app.activePlanId];
+  if (!prog) return;
+  prog.notifyTime = val;
+  // Convert HH:MM to slot name for backend
+  const h = parseInt(val.split(':')[0]);
+  prog.notifySlot = h < 11 ? 'morning' : h < 16 ? 'afternoon' : 'evening';
+  saveApp();
   if (userId) fetch(BACKEND+'/plan/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,notify_slot:prog.notifySlot,notify_on:prog.notifyOn!==false})}).catch(()=>{});
   haptic('light');
 }
