@@ -213,21 +213,24 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
     <h1>📖 План чтения Библии</h1>
     <p>Выбери план по силам</p>
   </div>
+  <!-- Active plans on top -->
+  <div id="existing-plans"></div>
+  <!-- Suggested plans -->
+  <div class="sec">Готовые планы</div>
   <div id="plan-list"></div>
   <div class="sec">Время напоминания</div>
-  <div class="slots">
-    <button class="slot sel" data-slot="morning" onclick="selSlot(this)"><span class="slot-em">🌅</span>Утро<br><small>8:00</small></button>
-    <button class="slot" data-slot="afternoon" onclick="selSlot(this)"><span class="slot-em">☀️</span>День<br><small>13:00</small></button>
-    <button class="slot" data-slot="evening" onclick="selSlot(this)"><span class="slot-em">🌙</span>Вечер<br><small>20:00</small></button>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+    <span style="font-size:22px">🔔</span>
+    <input type="time" id="notify-time-input" value="08:00" style="flex:1;padding:12px;border:1px solid var(--brd);border-radius:10px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:16px">
+    <span style="font-size:13px;color:var(--txt2)">по МСК</span>
   </div>
   <div class="tog-row">
     <span>Получать напоминания</span>
     <button class="tog on" id="notify-tog" onclick="toggleNotify()"></button>
   </div>
   <button class="btn btn-acc" id="btn-start" onclick="startPlan()" disabled>Начать план</button>
-  <button class="btn btn-out" onclick="showPage('pg-seq')">📜 Последовательное чтение</button>
+  <button class="btn btn-out" onclick="showPage('pg-seq')">📜 Вся Библия подряд</button>
   <button class="btn btn-out" onclick="showPage('pg-con')">✏️ Составить свой план</button>
-  <div id="existing-plans" style="margin-top:16px"></div>
 </div>
 
 <!-- Reading -->
@@ -264,17 +267,22 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
     </div>
   </div>
 
-  <div id="settings-panel" style="display:none">
+  <<div id="settings-panel" style="display:none">
     <div class="settings-box">
-      <h3>Напоминания</h3>
-      <div class="slots" style="margin-bottom:10px">
-        <button class="slot" data-slot="morning" onclick="setNotifySlot(this)"><span class="slot-em">🌅</span>Утро<br><small>8:00</small></button>
-        <button class="slot" data-slot="afternoon" onclick="setNotifySlot(this)"><span class="slot-em">☀️</span>День<br><small>13:00</small></button>
-        <button class="slot" data-slot="evening" onclick="setNotifySlot(this)"><span class="slot-em">🌙</span>Вечер<br><small>20:00</small></button>
-      </div>
-      <div class="tog-row">
-        <span id="notify-lbl">Напоминания включены</span>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <h3 style="margin:0">Напоминания</h3>
         <button class="tog on" id="notify-tog2" onclick="toggleNotify2()"></button>
+      </div>
+      <div id="notify-lbl" style="font-size:13px;color:var(--txt2);margin-bottom:10px">Напоминания включены</div>
+      <button class="section-toggle" onclick="toggleTimePanel()">
+        🕐 Время напоминания <span id="time-arrow">▼</span>
+      </button>
+      <div id="time-panel" style="display:none;margin-top:8px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:20px">🔔</span>
+          <input type="time" id="notify-time-settings" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:10px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="setNotifyTime(this.value)">
+          <span style="font-size:13px;color:var(--txt2)">МСК</span>
+        </div>
       </div>
     </div>
   </div>
@@ -315,12 +323,12 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
   <button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button>
   <a class="trans-link" id="r-trans-link" target="_blank">Другой перевод ↗</a>
   <div id="r-phrase" style="min-height:32px"></div>
-  <button class="home-link" onclick="showPage('pg-sel')">Главная</button>
+  <div style="text-align:center;margin-top:16px"><button onclick="showPage('pg-sel')" style="font-size:15px;color:var(--txt2);background:none;border:none;cursor:pointer;font-family:var(--fui);text-decoration:underline;padding:8px 20px">← На главную</button></div>
 </div>
 
 <!-- Sequential reading -->
 <div class="page" id="pg-seq">
-  <div class="hdr"><h1>📜 Последовательное чтение</h1></div>
+  <div class="hdr"><h1>📜 Вся Библия подряд</h1></div>
   <div class="seq-nav">
     <select class="seq-sel" id="seq-book" onchange="seqSelectBook()"></select>
     <select class="seq-sel" id="seq-ch" onchange="seqRender()"></select>
@@ -336,7 +344,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
     <button class="btn btn-acc" style="margin-top:0;flex:1" onclick="seqNext()">Далее →</button>
   </div>
   <button class="btn btn-out" onclick="addSeqBookmark()">⭐ Закладка</button>
-  <button class="home-link" onclick="showPage('pg-sel')">Главная</button>
+  <div style="text-align:center;margin-top:16px"><button onclick="showPage('pg-sel')" style="font-size:15px;color:var(--txt2);background:none;border:none;cursor:pointer;font-family:var(--fui);text-decoration:underline;padding:8px 20px">← На главную</button></div>
 </div>
 
 <!-- Plan constructor -->
@@ -367,7 +375,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
   <div id="bm-empty" style="text-align:center;padding:40px;color:var(--txt2);font-size:15px;display:none">
     Нет закладок.<br>Нажми ⭐ во время чтения.
   </div>
-  <button class="home-link" onclick="showPage('pg-sel')">Главная</button>
+  <div style="text-align:center;margin-top:16px"><button onclick="showPage('pg-sel')" style="font-size:15px;color:var(--txt2);background:none;border:none;cursor:pointer;font-family:var(--fui);text-decoration:underline;padding:8px 20px">← На главную</button></div>
 </div>
 
 <!-- Congrats -->
@@ -383,7 +391,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 <!-- Bottom nav (visible on reading pages) -->
 <div class="bnav" id="bnav" style="display:none">
   <button class="bnav-btn on" id="bnav-read" onclick="switchTab('read')"><span class="bnav-em">📖</span>Чтение</button>
-  <button class="bnav-btn" id="bnav-seq" onclick="switchTab('seq')"><span class="bnav-em">📜</span>Подряд</button>
+  <button class="bnav-btn" id="bnav-seq" onclick="switchTab('seq')"><span class="bnav-em">📜</span>Вся Библия</button>
   <button class="bnav-btn" id="bnav-bm" onclick="switchTab('bm')"><span class="bnav-em">⭐</span>Закладки</button>
   <button class="bnav-btn" id="bnav-sel" onclick="switchTab('sel')"><span class="bnav-em">🏠</span>Планы</button>
 </div>
@@ -670,6 +678,26 @@ function effectiveStreak(prog) {
   return (prog.lastRead === t || prog.lastRead === y) ? prog.streak : 0;
 }
 
+function updateReadBtn(tabs, isCurrentDay, isToday, isDayRead, vDay) {
+  const btn = document.getElementById('r-read-btn');
+  const isLastTab = activeTab >= tabs.length - 1;
+  if (!isCurrentDay) {
+    btn.textContent = isDayRead ? `✓ День ${vDay} прочитан` : 'Перейдите к сегодняшнему дню';
+    btn.disabled = true; btn.className = 'read-btn done';
+  } else if (isToday && isDayRead) {
+    btn.textContent = '✓ Прочитано сегодня';
+    btn.disabled = true; btn.className = 'read-btn done';
+  } else if (!isLastTab) {
+    btn.textContent = `Следующий отрывок → (${activeTab+2}/${tabs.length})`;
+    btn.disabled = false; btn.className = 'read-btn';
+    btn.onclick = () => { setTab(activeTab + 1); window.scrollTo(0,0); };
+  } else {
+    btn.textContent = '✓ Прочитал';
+    btn.disabled = false; btn.className = 'read-btn';
+    btn.onclick = markRead;
+  }
+}
+
 function renderRead() {
   const plan = getPlanById(app.activePlanId);
   const prog = app.progress[app.activePlanId];
@@ -742,27 +770,7 @@ function renderRead() {
   document.getElementById('r-trans-link').href = bibleByLink(t.book, t.ch, t.vf);
 
   // Read button — "Next" between tabs, "Read" only on last tab
-  const btn = document.getElementById('r-read-btn');
-  const isLastTab = activeTab >= tabs.length - 1;
-  if (!isCurrentDay) {
-    btn.textContent = isDayRead ? `✓ День ${vDay} прочитан` : 'Перейдите к сегодняшнему дню';
-    btn.disabled = true;
-    btn.className = 'read-btn done';
-  } else if (isToday && isDayRead) {
-    btn.textContent = '✓ Прочитано сегодня';
-    btn.disabled = true;
-    btn.className = 'read-btn done';
-  } else if (!isLastTab) {
-    btn.textContent = `Следующий отрывок → (${activeTab+1}/${tabs.length})`;
-    btn.disabled = false;
-    btn.className = 'read-btn';
-    btn.onclick = () => { setTab(activeTab + 1); window.scrollTo(0,0); };
-  } else {
-    btn.textContent = '✓ Прочитал';
-    btn.disabled = false;
-    btn.className = 'read-btn';
-    btn.onclick = markRead;
-  }
+  updateReadBtn(tabs, isCurrentDay, isToday, isDayRead, vDay);
 }
 
 function buildTabs(refs) {
@@ -811,6 +819,9 @@ function setTab(i) {
   const tabs = buildTabs(dayData.refs);
   renderScripture(tabs[i], plan);
   document.getElementById('r-trans-link').href = bibleByLink(tabs[i].book, tabs[i].ch, tabs[i].vf);
+  const isToday = prog.lastRead === today();
+  const isDayRead = prog.daysDone?.includes(vDay);
+  updateReadBtn(tabs, vDay === curDay, isToday, isDayRead, vDay);
   haptic('light');
 }
 
@@ -882,6 +893,14 @@ function toggleStats() {
   haptic('light');
 }
 
+function toggleTimePanel() {
+  const panel = document.getElementById('time-panel');
+  const arrow = document.getElementById('time-arrow');
+  const visible = panel.style.display !== 'none';
+  panel.style.display = visible ? 'none' : 'block';
+  if (arrow) arrow.textContent = visible ? '▼' : '▲';
+}
+
 function toggleSettings() {
   showSettings = !showSettings;
   document.getElementById('settings-panel').style.display = showSettings ? 'block' : 'none';
@@ -939,7 +958,7 @@ function toggleNotify2() {
   prog.notifyOn = !(prog.notifyOn !== false);
   saveApp();
   document.getElementById('notify-tog2').classList.toggle('on', prog.notifyOn);
-  document.getElementById('notify-lbl').textContent = 'Напоминания ' + (prog.notifyOn ? 'включены' : 'выключены');
+  const nl = document.getElementById('notify-lbl'); if(nl) nl.textContent = 'Напоминания ' + (prog.notifyOn !== false ? 'включены' : 'выключены');
   if (userId) fetch(BACKEND+'/plan/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,notify_slot:prog.notifySlot||'morning',notify_on:prog.notifyOn})}).catch(()=>{});
   haptic('light');
 }
