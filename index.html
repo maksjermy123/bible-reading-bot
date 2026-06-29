@@ -218,16 +218,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
   <!-- Suggested plans -->
   <div class="sec">Готовые планы</div>
   <div id="plan-list"></div>
-  <div class="sec">Время напоминания</div>
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-    <span style="font-size:22px">🔔</span>
-    <input type="time" id="notify-time-input" value="08:00" style="flex:1;padding:12px;border:1px solid var(--brd);border-radius:10px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:16px">
-    <span style="font-size:13px;color:var(--txt2)">по МСК</span>
-  </div>
-  <div class="tog-row">
-    <span>Получать напоминания</span>
-    <button class="tog on" id="notify-tog" onclick="toggleNotify()"></button>
-  </div>
+
   <button class="btn btn-acc" id="btn-start" onclick="startPlan()" disabled>Начать план</button>
   <button class="btn btn-out" onclick="showPage('pg-seq')">📜 Вся Библия подряд</button>
   <button class="btn btn-out" onclick="showPage('pg-con')">✏️ Составить свой план</button>
@@ -244,7 +235,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
     </button>
     <div style="display:flex;gap:6px">
       <button class="icon-btn" onclick="cycleTheme()" id="theme-btn">☀️</button>
-      <button class="icon-btn" onclick="toggleSettings()">⚙️</button>
+      <button class="icon-btn" onclick="switchTab('cfg')">⚙️</button>
     </div>
   </div>
 
@@ -267,25 +258,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
     </div>
   </div>
 
-  <<div id="settings-panel" style="display:none">
-    <div class="settings-box">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <h3 style="margin:0">Напоминания</h3>
-        <button class="tog on" id="notify-tog2" onclick="toggleNotify2()"></button>
-      </div>
-      <div id="notify-lbl" style="font-size:13px;color:var(--txt2);margin-bottom:10px">Напоминания включены</div>
-      <button class="section-toggle" onclick="toggleTimePanel()">
-        🕐 Время напоминания <span id="time-arrow">▼</span>
-      </button>
-      <div id="time-panel" style="display:none;margin-top:8px">
-        <div style="display:flex;align-items:center;gap:10px">
-          <span style="font-size:20px">🔔</span>
-          <input type="time" id="notify-time-settings" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:10px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="setNotifyTime(this.value)">
-          <span style="font-size:13px;color:var(--txt2)">МСК</span>
-        </div>
-      </div>
-    </div>
-  </div>
+  <
 
   <div id="compact-stats" style="font-size:13px;color:var(--txt2);text-align:center;margin-bottom:8px"></div>
   <div class="prog-bar" style="margin-bottom:12px"><div class="prog-fill" id="r-bar" style="width:0%"></div></div>
@@ -391,9 +364,9 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 <!-- Bottom nav (visible on reading pages) -->
 <div class="bnav" id="bnav" style="display:none">
   <button class="bnav-btn on" id="bnav-read" onclick="switchTab('read')"><span class="bnav-em">📖</span>Чтение</button>
-  <button class="bnav-btn" id="bnav-seq" onclick="switchTab('seq')"><span class="bnav-em">📜</span>Вся Библия</button>
   <button class="bnav-btn" id="bnav-bm" onclick="switchTab('bm')"><span class="bnav-em">⭐</span>Закладки</button>
   <button class="bnav-btn" id="bnav-sel" onclick="switchTab('sel')"><span class="bnav-em">🏠</span>Планы</button>
+  <button class="bnav-btn" id="bnav-cfg" onclick="switchTab('cfg')"><span class="bnav-em">⚙️</span>Настройки</button>
 </div>
 
 <script>
@@ -452,10 +425,11 @@ function loadApp() {
   return {
     onboarded: false,
     activePlanId: null,
-    progress: {}, // planId -> {startDate,streak,maxStreak,lastRead,daysDone:[],notifySlot,notifyOn}
+    progress: {},
     customPlans: {},
     bookmarks: [],
     seqPos: {bookIdx:0, chIdx:0},
+    settings: {notifyOn: true, notifyTime: '08:00', notifySlot: 'morning'},
   };
 }
 function saveApp() {
@@ -508,14 +482,20 @@ function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
   document.getElementById(id)?.classList.add('on');
   const bnav = document.getElementById('bnav');
-  const reading = ['pg-read','pg-seq','pg-bm','pg-sel'].includes(id);
+  const reading = ['pg-read','pg-seq','pg-bm','pg-sel','pg-cfg','pg-con'].includes(id);
   bnav.style.display = reading ? 'flex' : 'none';
   // Update bnav active
-  ['read','seq','bm','sel'].forEach(k => {
+  ['read','bm','sel','cfg'].forEach(k => {
     document.getElementById('bnav-' + k)?.classList.toggle('on',
-      (k==='read'&&id==='pg-read')||(k==='seq'&&id==='pg-seq')||
-      (k==='bm'&&id==='pg-bm')||(k==='sel'&&id==='pg-sel'));
+      (k==='read'&&id==='pg-read')||
+      (k==='bm'&&id==='pg-bm')||(k==='sel'&&id==='pg-sel')||
+      (k==='cfg'&&id==='pg-cfg'));
   });
+  // Show bnav on seq page too but without active highlight
+  if (id === 'pg-seq') {
+    document.getElementById('bnav').style.display = 'flex';
+    ['read','bm','sel','cfg'].forEach(k => document.getElementById('bnav-'+k)?.classList.remove('on'));
+  }
   window.scrollTo(0,0);
 }
 function switchTab(tab) {
@@ -523,6 +503,7 @@ function switchTab(tab) {
   if (tab === 'read') { showPage('pg-read'); renderRead(); }
   else if (tab === 'seq') { showPage('pg-seq'); initSeq(); }
   else if (tab === 'bm') { showPage('pg-bm'); renderBookmarks(); }
+  else if (tab === 'cfg') { showPage('pg-cfg'); renderSettings(); }
   else { showPage('pg-sel'); renderPlanList(); }
 }
 
@@ -570,9 +551,10 @@ function renderPlanList() {
           </div>
           <div class="plan-badge" style="background:var(--acc);color:#fff">→</div>
         </div>
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button onclick="event.stopPropagation();deletePlan('${id}')" style="flex:1;padding:8px;border:1px solid var(--brd);border-radius:8px;background:none;color:var(--txt2);font-size:13px;cursor:pointer;font-family:var(--fui)">🗑 Удалить</button>
-          <button onclick="event.stopPropagation();continuePlan('${id}')" style="flex:2;padding:8px;border:none;border-radius:8px;background:var(--acc);color:#fff;font-size:13px;cursor:pointer;font-family:var(--fui);font-weight:600">Продолжить →</button>
+        <div style="display:flex;gap:6px;margin-top:10px">
+          <button onclick="event.stopPropagation();deletePlan('${id}')" style="flex:1;padding:8px;border:1px solid var(--brd);border-radius:8px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">🗑</button>
+          <button onclick="event.stopPropagation();editPlan('${id}')" style="flex:1;padding:8px;border:1px solid var(--brd);border-radius:8px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">✏️</button>
+          <button onclick="event.stopPropagation();continuePlan('${id}')" style="flex:3;padding:8px;border:none;border-radius:8px;background:var(--acc);color:#fff;font-size:13px;cursor:pointer;font-family:var(--fui);font-weight:600">Продолжить →</button>
         </div>
       </div>`;
     }).join('');
@@ -593,6 +575,43 @@ function renderPlanList() {
       <div class="plan-desc">${p.desc}</div>
     </div>
   `).join('');
+}
+
+function editPlan(id) {
+  const plan = getPlanById(id);
+  if (!plan) return;
+  // For custom plans - open constructor with pre-filled data
+  if (app.customPlans[id]) {
+    // Pre-select books from custom plan
+    conSelected = [];
+    const usedBooks = new Set();
+    for (const day of plan.schedule) {
+      for (const ref of day.refs) usedBooks.add(ref.book);
+    }
+    conSelected = [...usedBooks];
+    // Update UI
+    document.querySelectorAll('.book-chip').forEach(btn => {
+      btn.classList.toggle('sel', conSelected.includes(btn.dataset.name));
+    });
+    // Set days
+    document.getElementById('con-days').value = plan.days;
+    updatePreview();
+    // Store editing id
+    window._editingPlanId = id;
+    showPage('pg-con');
+  } else {
+    // Built-in plan - just let user adjust start date or restart
+    if (confirm('Сбросить прогресс и начать план заново?')) {
+      app.progress[id] = {
+        startDate: today(), streak:0, maxStreak:0, lastRead:null,
+        daysDone:[], notifySlot: app.progress[id]?.notifySlot || 'morning',
+        notifyOn: app.progress[id]?.notifyOn !== false,
+      };
+      saveApp();
+      haptic('light');
+      renderPlanList();
+    }
+  }
 }
 
 function deletePlan(id) {
@@ -632,11 +651,12 @@ async function startPlan() {
   if (!selectedPlanId) return;
   const btn = document.getElementById('btn-start');
   btn.disabled = true; btn.textContent = 'Сохраняем...';
-  const notifyTime = getNotifyTime ? getNotifyTime() : '08:00';
+  const s = app.settings || {};
   app.activePlanId = selectedPlanId;
   app.progress[selectedPlanId] = {
     startDate: today(), streak:0, maxStreak:0, lastRead:null,
-    daysDone:[], notifySlot:selectedSlot, notifyTime, notifyOn,
+    daysDone:[], notifySlot:s.notifySlot||'morning',
+    notifyTime:s.notifyTime||'08:00', notifyOn:s.notifyOn!==false,
   };
   saveApp();
   if (userId) {
@@ -737,9 +757,8 @@ function renderRead() {
   renderCal(plan, prog);
 
   // Settings panel
-  document.querySelectorAll('#settings-panel .slot').forEach(b => b.classList.toggle('sel', b.dataset.slot === prog.notifySlot));
-  const ntEl = document.getElementById('notify-time-settings');
-  if (ntEl) ntEl.value = prog.notifyTime || (prog.notifySlot==='morning'?'08:00':prog.notifySlot==='afternoon'?'13:00':'20:00');
+  
+
   document.getElementById('notify-tog2').classList.toggle('on', prog.notifyOn !== false);
   document.getElementById('notify-lbl').textContent = 'Напоминания ' + (prog.notifyOn !== false ? 'включены' : 'выключены');
 
@@ -903,7 +922,7 @@ function toggleTimePanel() {
 
 function toggleSettings() {
   showSettings = !showSettings;
-  document.getElementById('settings-panel').style.display = showSettings ? 'block' : 'none';
+  
   haptic('light');
 }
 
@@ -934,9 +953,8 @@ function setNotifySlot(btn) {
   if (!prog) return;
   prog.notifySlot = btn.dataset.slot;
   saveApp();
-  document.querySelectorAll('#settings-panel .slot').forEach(b => b.classList.toggle('sel', b.dataset.slot === prog.notifySlot));
-  const ntEl = document.getElementById('notify-time-settings');
-  if (ntEl) ntEl.value = prog.notifyTime || (prog.notifySlot==='morning'?'08:00':prog.notifySlot==='afternoon'?'13:00':'20:00');
+  
+
   if (userId) fetch(BACKEND+'/plan/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,notify_slot:prog.notifySlot,notify_on:prog.notifyOn!==false})}).catch(()=>{});
   haptic('light');
 }
@@ -997,7 +1015,17 @@ function shareDay() {
   const curDay = currentDayNum(plan, prog);
   const vDay = viewDay !== null ? viewDay : curDay;
   const dayData = plan.schedule[vDay-1];
-  try { navigator.clipboard.writeText(dayData.label + ' — Синодальный перевод'); } catch(e) {}
+  const text = dayData.label + ' — Синодальный перевод';
+  // Try Telegram share first, then clipboard
+  try {
+    if (tg && tg.showPopup) {
+      tg.showPopup({title:'Поделиться', message:text, buttons:[{type:'ok',text:'OK'}]});
+    } else {
+      navigator.clipboard.writeText(text);
+    }
+  } catch(e) {
+    try { navigator.clipboard.writeText(text); } catch(e2) {}
+  }
   haptic('light');
 }
 
@@ -1112,14 +1140,24 @@ function renderBookmarks() {
 function openBookmark(id) {
   const bm = app.bookmarks.find(b => b.id === id);
   if (!bm) return;
-  // Open in sequential reading
   const bookIdx = ALL_BOOKS.findIndex(b => b.name === bm.book);
   if (bookIdx < 0) return;
+  // Set position BEFORE initSeq so it reads them correctly
   seqBookIdx = bookIdx;
   seqChIdx = Math.max(0, (bm.ch || 1) - 1);
+  app.seqPos = {bookIdx: seqBookIdx, chIdx: seqChIdx};
   showPage('pg-seq');
-  initSeq();
-  document.getElementById('seq-ch').value = seqChIdx;
+  // Init book select without resetting position
+  const sel = document.getElementById('seq-book');
+  if (!sel.options.length) {
+    sel.innerHTML = ALL_BOOKS.map((b,i) => `<option value="${i}">${b.name}</option>`).join('');
+  }
+  sel.value = seqBookIdx;
+  // Init chapter select for this book
+  const book = ALL_BOOKS[seqBookIdx];
+  const chSel = document.getElementById('seq-ch');
+  chSel.innerHTML = Array.from({length:book.chapters},(_,i) => `<option value="${i}">Глава ${i+1}</option>`).join('');
+  chSel.value = seqChIdx;
   seqRender();
   haptic('light');
 }
@@ -1209,9 +1247,20 @@ function startCustomPlan() {
   }
   const title = conSelected.length===1 ? `${conSelected[0]} за ${days} дней` : `Свой план · ${days} дней`;
   const planId = 'custom_' + Date.now();
-  app.customPlans[planId] = {id:planId, title, icon:'✏️', days:schedule.length, diff:'custom', desc:'Ваш план', schedule};
+  const editId = window._editingPlanId;
+  if (editId && app.customPlans[editId]) {
+    // Update existing custom plan, keep progress
+    const oldProg = app.progress[editId] || {};
+    delete app.customPlans[editId];
+    delete app.progress[editId];
+    app.customPlans[planId] = {id:planId, title, icon:'✏️', days:schedule.length, diff:'custom', desc:'Ваш план', schedule};
+    app.progress[planId] = {...oldProg, planId, daysDone:[]};
+  } else {
+    app.customPlans[planId] = {id:planId, title, icon:'✏️', days:schedule.length, diff:'custom', desc:'Ваш план', schedule};
+    app.progress[planId] = {startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifySlot:'morning',notifyOn:true};
+  }
+  window._editingPlanId = null;
   app.activePlanId = planId;
-  app.progress[planId] = {startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifySlot:'morning',notifyOn:true};
   saveApp();
   haptic('success');
   showPage('pg-read'); renderRead();
@@ -1262,6 +1311,70 @@ function fmtDate(s) {
     const m=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
     return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`;
   } catch(e) { return s; }
+}
+
+function renderSettings() {
+  const s = app.settings || {};
+  const notifyOn = s.notifyOn !== false;
+  const notifyTime = s.notifyTime || '08:00';
+  const tog = document.getElementById('cfg-notify-tog');
+  const lbl = document.getElementById('cfg-notify-lbl');
+  const timeRow = document.getElementById('cfg-time-row');
+  const timeInput = document.getElementById('cfg-notify-time');
+  if (tog) tog.className = 'tog' + (notifyOn ? ' on' : '');
+  if (lbl) lbl.textContent = 'Напоминания ' + (notifyOn ? 'включены' : 'выключены');
+  if (timeRow) timeRow.style.opacity = notifyOn ? '1' : '0.4';
+  if (timeInput) timeInput.value = notifyTime;
+  // Theme buttons
+  ['light','sepia','dark','night'].forEach(t => {
+    document.getElementById('th-'+t)?.classList.toggle('sel', theme === t);
+  });
+  // Font indicator
+  const ind = document.getElementById('font-indicator');
+  if (ind) ind.style.left = (fontIdx / (FONT_SIZES.length-1) * 100 - 4) + '%';
+}
+
+function cfgToggleNotify() {
+  if (!app.settings) app.settings = {};
+  app.settings.notifyOn = !(app.settings.notifyOn !== false);
+  saveApp();
+  // Sync all active plans
+  syncAllNotifySettings();
+  renderSettings();
+  haptic('light');
+}
+
+function cfgSaveNotifyTime(val) {
+  if (!app.settings) app.settings = {};
+  app.settings.notifyTime = val;
+  const h = parseInt(val.split(':')[0]);
+  app.settings.notifySlot = h < 11 ? 'morning' : h < 16 ? 'afternoon' : 'evening';
+  saveApp();
+  syncAllNotifySettings();
+  haptic('light');
+}
+
+function syncAllNotifySettings() {
+  // Apply global settings to all plans and sync to backend
+  const s = app.settings || {};
+  for (const planId of Object.keys(app.progress)) {
+    app.progress[planId].notifySlot = s.notifySlot || 'morning';
+    app.progress[planId].notifyOn = s.notifyOn !== false;
+  }
+  saveApp();
+  if (userId && app.activePlanId) {
+    fetch(BACKEND+'/plan/settings', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({user_id:userId, notify_slot:s.notifySlot||'morning', notify_on:s.notifyOn!==false})
+    }).catch(()=>{});
+  }
+}
+
+function setTheme(t) {
+  theme = t;
+  applyTheme();
+  renderSettings();
+  haptic('light');
 }
 
 function haptic(type) {
@@ -1316,5 +1429,58 @@ async function init() {
 
 init();
 </script>
+
+<!-- Settings page -->
+<div class="page" id="pg-cfg">
+  <div class="hdr"><h1>⚙️ Настройки</h1></div>
+
+  <div class="settings-box" style="margin-bottom:12px">
+    <h3 style="margin-bottom:12px">🔔 Напоминания</h3>
+    <div class="tog-row" style="margin-bottom:10px;border:none;padding:0">
+      <span id="cfg-notify-lbl">Напоминания включены</span>
+      <button class="tog on" id="cfg-notify-tog" onclick="cfgToggleNotify()"></button>
+    </div>
+    <div id="cfg-time-row" style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:20px">🕐</span>
+      <input type="time" id="cfg-notify-time" value="08:00"
+        style="flex:1;padding:12px;border:1px solid var(--brd);border-radius:10px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:16px"
+        onchange="cfgSaveNotifyTime(this.value)">
+      <span style="font-size:13px;color:var(--txt2)">по МСК</span>
+    </div>
+  </div>
+
+  <div class="settings-box" style="margin-bottom:12px">
+    <h3 style="margin-bottom:12px">🎨 Оформление</h3>
+    <div class="sec" style="margin-top:0;margin-bottom:8px;font-size:13px">Тема</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button onclick="setTheme('light')" id="th-light" class="slot sel" style="flex:1;padding:10px 4px"><span class="slot-em">☀️</span>Светлая</button>
+      <button onclick="setTheme('sepia')" id="th-sepia" class="slot" style="flex:1;padding:10px 4px"><span class="slot-em">🌅</span>Сепия</button>
+      <button onclick="setTheme('dark')" id="th-dark" class="slot" style="flex:1;padding:10px 4px"><span class="slot-em">🌙</span>Тёмная</button>
+      <button onclick="setTheme('night')" id="th-night" class="slot" style="flex:1;padding:10px 4px"><span class="slot-em">🌃</span>Ночная</button>
+    </div>
+    <div class="sec" style="margin-top:0;margin-bottom:8px;font-size:13px">Размер шрифта</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="font-btn" onclick="changeFont(-1)" style="width:44px;height:44px">A−</button>
+      <div style="flex:1;height:4px;background:var(--brd);border-radius:2px;position:relative">
+        <div id="font-indicator" style="position:absolute;top:-6px;width:16px;height:16px;background:var(--acc);border-radius:50%;transition:left .2s"></div>
+      </div>
+      <button class="font-btn" onclick="changeFont(1)" style="width:44px;height:44px">A+</button>
+    </div>
+  </div>
+
+  <div class="settings-box" style="margin-bottom:12px">
+    <h3 style="margin-bottom:12px">📜 Вся Библия подряд</h3>
+    <p style="font-size:13px;color:var(--txt2);margin-bottom:10px">Читай Библию последовательно от Бытия до Откровения</p>
+    <button class="btn btn-acc" style="margin-top:0" onclick="switchTab('seq')">Открыть →</button>
+  </div>
+
+  <div class="settings-box" style="margin-bottom:12px">
+    <h3 style="margin-bottom:8px">ℹ️ О приложении</h3>
+    <p style="font-size:13px;color:var(--txt2);line-height:1.6">
+      План чтения Библии · Синодальный перевод<br>
+      Версия 2.0
+    </p>
+  </div>
+</div>
 </body>
 </html>
