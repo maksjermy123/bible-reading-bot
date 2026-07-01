@@ -181,6 +181,12 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 .phrase{font-size:14px;color:var(--acc);text-align:center;padding:8px;animation:fadeIn .5s}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .section-toggle{width:100%;background:none;border:none;text-align:left;padding:8px 0;cursor:pointer;font-size:14px;color:var(--acc);font-family:var(--fui);font-weight:600;display:flex;align-items:center;justify-content:space-between}
+.chan-banner{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--brd);border-radius:12px;padding:10px 14px;margin-top:14px;margin-bottom:6px;cursor:pointer;text-decoration:none;transition:opacity .15s}
+.chan-banner:active{opacity:.7}
+.chan-banner-ico{font-size:20px}
+.chan-banner-text{flex:1;font-size:13px;color:var(--txt2)}
+.chan-banner-text b{color:var(--txt);font-weight:600}
+.chan-banner-arrow{font-size:14px;color:var(--acc)}
 </style>
 </head>
 <body>
@@ -222,6 +228,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
   <button class="btn btn-acc" id="btn-start" onclick="startPlan()" disabled>Начать план</button>
   <button class="btn btn-out" onclick="showPage('pg-seq')">📜 Вся Библия подряд</button>
   <button class="btn btn-out" onclick="showPage('pg-con')">✏️ Составить свой план</button>
+  <div id="chan-banner-sel"></div>
 </div>
 
 <!-- Reading -->
@@ -245,7 +252,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
         <div class="stat"><div class="stat-val" id="s-pct">0%</div><div class="stat-key">выполнено</div></div>
         <div class="stat"><div class="stat-val" id="s-done">0</div><div class="stat-key">дней готово</div></div>
         <div class="stat"><div class="stat-val" id="s-left">0</div><div class="stat-key">осталось</div></div>
-        <div class="stat"><div class="stat-val" id="s-streak">0</div><div class="stat-key">стрик</div></div>
+        <div class="stat"><div class="stat-val" id="s-streak">0</div><div class="stat-key">дней подряд</div></div>
         <div class="stat"><div class="stat-val" id="s-max">0</div><div class="stat-key">рекорд</div></div>
         <div class="stat"><div class="stat-val" id="s-start">—</div><div class="stat-key">начат</div></div>
       </div>
@@ -296,6 +303,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
   <button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button>
   <a class="trans-link" id="r-trans-link" target="_blank">Другой перевод ↗</a>
   <div id="r-phrase" style="min-height:32px"></div>
+  <div id="chan-banner-read"></div>
   <div style="text-align:center;margin-top:16px"><button onclick="showPage('pg-sel')" style="font-size:15px;color:var(--txt2);background:none;border:none;cursor:pointer;font-family:var(--fui);text-decoration:underline;padding:8px 20px">← На главную</button></div>
 </div>
 
@@ -317,6 +325,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
     <button class="btn btn-acc" style="margin-top:0;flex:1" onclick="seqNext()">Далее →</button>
   </div>
   <button class="btn btn-out" onclick="addSeqBookmark()">⭐ Закладка</button>
+  <div id="chan-banner-seq"></div>
   <div style="text-align:center;margin-top:16px"><button onclick="showPage('pg-sel')" style="font-size:15px;color:var(--txt2);background:none;border:none;cursor:pointer;font-family:var(--fui);text-decoration:underline;padding:8px 20px">← На главную</button></div>
 </div>
 
@@ -348,6 +357,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
   <div id="bm-empty" style="text-align:center;padding:40px;color:var(--txt2);font-size:15px;display:none">
     Нет закладок.<br>Нажми ⭐ во время чтения.
   </div>
+  <div id="chan-banner-bm"></div>
   <div style="text-align:center;margin-top:16px"><button onclick="showPage('pg-sel')" style="font-size:15px;color:var(--txt2);background:none;border:none;cursor:pointer;font-family:var(--fui);text-decoration:underline;padding:8px 20px">← На главную</button></div>
 </div>
 
@@ -412,7 +422,7 @@ let conSelected = [];
 
 const OB_STEPS = [
   {em:'📖', title:'Читай Библию каждый день', text:'Выбери план по силам и читай Слово Божье по одному отрывку в день'},
-  {em:'🔥', title:'Следи за своим стриком', text:'Отмечай прочитанное и наблюдай как растёт твоя цепочка дней'},
+  {em:'🔥', title:'Следи за своей серией', text:'Отмечай прочитанное каждый день и наблюдай как растёт число дней подряд'},
   {em:'🔔', title:'Напоминания в удобное время', text:'Мы пришлём тебе одно напоминание в день — утром, днём или вечером'},
 ];
 
@@ -575,6 +585,8 @@ function renderPlanList() {
       <div class="plan-desc">${p.desc}</div>
     </div>
   `).join('');
+  const cb = document.getElementById('chan-banner-sel');
+  if (cb) cb.innerHTML = channelBannerHTML();
 }
 
 function editPlan(id) {
@@ -790,6 +802,8 @@ function renderRead() {
 
   // Read button — "Next" between tabs, "Read" only on last tab
   updateReadBtn(tabs, isCurrentDay, isToday, isDayRead, vDay);
+  const cbr = document.getElementById('chan-banner-read');
+  if (cbr) cbr.innerHTML = channelBannerHTML();
 }
 
 function buildTabs(refs) {
@@ -888,7 +902,7 @@ async function markRead() {
   if (prog.daysDone.length >= plan.days) {
     setTimeout(() => {
       document.getElementById('done-text').textContent =
-        `Ты прочитал «${plan.title}» полностью! Рекорд стрика: ${prog.maxStreak} дней.`;
+        `Ты прочитал «${plan.title}» полностью! Рекорд серии: ${prog.maxStreak} дней.`;
       showPage('pg-done');
     }, 1000);
   }
@@ -1049,18 +1063,19 @@ function initSeq() {
   if (!sel.options.length) {
     sel.innerHTML = ALL_BOOKS.map((b,i) => `<option value="${i}">${b.name}</option>`).join('');
   }
+  // Restore saved position — never reset on open
   seqBookIdx = app.seqPos?.bookIdx || 0;
   seqChIdx = app.seqPos?.chIdx || 0;
   sel.value = seqBookIdx;
-  seqSelectBook();
+  seqSelectBook(true); // keepChapter=true — don't reset to 0
 }
 
-function seqSelectBook() {
+function seqSelectBook(keepChapter) {
   seqBookIdx = parseInt(document.getElementById('seq-book').value);
-  seqChIdx = 0;
+  if (!keepChapter) seqChIdx = 0;
   const book = ALL_BOOKS[seqBookIdx];
   const chSel = document.getElementById('seq-ch');
-  chSel.innerHTML = Array.from({length:book.chapters},((_,i) => `<option value="${i}">Глава ${i+1}</option>`)).join('');
+  chSel.innerHTML = Array.from({length:book.chapters},(_,i) => `<option value="${i}">Глава ${i+1}</option>`).join('');
   chSel.value = seqChIdx;
   seqRender();
 }
@@ -1081,6 +1096,8 @@ function seqRender() {
     <div class="stext" style="font-size:${fs}rem">` +
     verses.map((v,i) => `<span><sup class="vnum">${i+1}</sup>${v} </span>`).join('') +
     '</div>';
+  const cbs = document.getElementById('chan-banner-seq');
+  if (cbs) cbs.innerHTML = channelBannerHTML();
 }
 
 function seqPrev() {
@@ -1101,7 +1118,7 @@ function seqNext() {
   else if (seqBookIdx < ALL_BOOKS.length - 1) { seqBookIdx++; seqChIdx = 0; }
   else return;
   document.getElementById('seq-book').value = seqBookIdx;
-  seqSelectBook();
+  seqSelectBook(true);
   document.getElementById('seq-ch').value = seqChIdx;
   seqRender();
   window.scrollTo(0,0);
@@ -1135,6 +1152,8 @@ function renderBookmarks() {
       <button class="bm-del" onclick="delBookmark(event,'${bm.id}')">✕</button>
     </div>
   `).join('');
+  const cbb = document.getElementById('chan-banner-bm');
+  if (cbb) cbb.innerHTML = channelBannerHTML();
 }
 
 function openBookmark(id) {
@@ -1153,11 +1172,8 @@ function openBookmark(id) {
     sel.innerHTML = ALL_BOOKS.map((b,i) => `<option value="${i}">${b.name}</option>`).join('');
   }
   sel.value = seqBookIdx;
-  // Init chapter select for this book
-  const book = ALL_BOOKS[seqBookIdx];
-  const chSel = document.getElementById('seq-ch');
-  chSel.innerHTML = Array.from({length:book.chapters},(_,i) => `<option value="${i}">Глава ${i+1}</option>`).join('');
-  chSel.value = seqChIdx;
+  seqSelectBook(true); // keepChapter — go to bookmark position
+  document.getElementById('seq-ch').value = seqChIdx;
   seqRender();
   haptic('light');
 }
@@ -1313,6 +1329,14 @@ function fmtDate(s) {
   } catch(e) { return s; }
 }
 
+function channelBannerHTML() {
+  return `<a class="chan-banner" href="https://t.me/Chtenie_Preobrazenie" target="_blank">
+    <span class="chan-banner-ico">📻</span>
+    <span class="chan-banner-text">Канал <b>«От чтения к Преображению»</b></span>
+    <span class="chan-banner-arrow">→</span>
+  </a>`;
+}
+
 function renderSettings() {
   const s = app.settings || {};
   const notifyOn = s.notifyOn !== false;
@@ -1332,6 +1356,8 @@ function renderSettings() {
   // Font indicator
   const ind = document.getElementById('font-indicator');
   if (ind) ind.style.left = (fontIdx / (FONT_SIZES.length-1) * 100 - 4) + '%';
+  const cbc = document.getElementById('chan-banner-cfg');
+  if (cbc) cbc.innerHTML = channelBannerHTML();
 }
 
 function cfgToggleNotify() {
@@ -1481,6 +1507,7 @@ init();
       Версия 2.0
     </p>
   </div>
+  <div id="chan-banner-cfg"></div>
 </div>
 </body>
 </html>
