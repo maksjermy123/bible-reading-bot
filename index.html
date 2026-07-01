@@ -748,14 +748,14 @@ function renderRead() {
   const isCurrentDay = vDay === curDay;
 
   // Topbar
-  document.getElementById('r-streak').textContent = streak;
-  document.getElementById('r-streak-lbl').textContent = streakWord(streak);
+  const _rs=document.getElementById('r-streak'); if(_rs) _rs.textContent = streak;
+  const _rl=document.getElementById('r-streak-lbl'); if(_rl) _rl.textContent = streakWord(streak);
 
   // Compact stats
-  document.getElementById('compact-stats').textContent = `${pct}% · ${done}/${plan.days} дней · ${plan.days - done} осталось`;
+  const _cs=document.getElementById('compact-stats'); if(_cs) _cs.textContent = `${pct}% · ${done}/${plan.days} дней · ${plan.days - done} осталось`;
 
   // Progress bar
-  document.getElementById('r-bar').style.width = pct + '%';
+  const _rb=document.getElementById('r-bar'); if(_rb) _rb.style.width = pct + '%';
 
   // Stats panel
   document.getElementById('s-pct').textContent = pct + '%';
@@ -771,18 +771,18 @@ function renderRead() {
   // Settings panel
   
 
-  document.getElementById('notify-tog2').classList.toggle('on', prog.notifyOn !== false);
-  document.getElementById('notify-lbl').textContent = 'Напоминания ' + (prog.notifyOn !== false ? 'включены' : 'выключены');
+  const nt2=document.getElementById('notify-tog2'); if(nt2) nt2.classList.toggle('on', prog.notifyOn !== false);
+  const _nl=document.getElementById('notify-lbl'); if(_nl) _nl.textContent = 'Напоминания ' + (prog.notifyOn !== false ? 'включены' : 'выключены');
 
   // Day nav
-  document.getElementById('r-day-num').textContent = `День ${vDay} из ${plan.days}`;
-  document.getElementById('r-day-done').textContent = isDayRead && !isCurrentDay ? '✓ Прочитано' : '';
-  document.getElementById('btn-prev').disabled = vDay <= 1;
-  document.getElementById('btn-next').disabled = vDay >= curDay;
-  document.getElementById('to-today-wrap').style.display = !isCurrentDay ? 'block' : 'none';
+  const _dn=document.getElementById('r-day-num'); if(_dn) _dn.textContent = `День ${vDay} из ${plan.days}`;
+  const _rd=document.getElementById('r-day-done'); if(_rd) _rd.textContent = isDayRead && !isCurrentDay ? '✓ Прочитано' : '';
+  const _bp=document.getElementById('btn-prev'); if(_bp) _bp.disabled = vDay <= 1;
+  const _bn=document.getElementById('btn-next'); if(_bn) _bn.disabled = vDay >= curDay;
+  const _tw=document.getElementById('to-today-wrap'); if(_tw) _tw.style.display = !isCurrentDay ? 'block' : 'none';
 
   // Ref label
-  document.getElementById('r-ref').textContent = dayData.label;
+  const _rr=document.getElementById('r-ref'); if(_rr) _rr.textContent = dayData.label;
 
   // Build tabs — expand multi-chapter refs
   const tabs = buildTabs(dayData.refs);
