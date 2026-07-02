@@ -448,9 +448,11 @@ function saveApp() {
 
 // ── Bible loading ─────────────────────────────────────────────────
 async function loadBible() {
+  if (window._bibleData && bible && Object.keys(bible).length > 0) return;
   const r = await fetch('bible_synodal.json');
   const raw = await r.json();
   bible = {};
+  window._bibleData = raw;
   for (const b of raw) bible[b.abbrev] = b.chapters;
   console.log('Bible loaded:', Object.keys(bible).length, 'books');
 }
@@ -835,7 +837,7 @@ function renderScripture(tab, plan) {
   html += `<div class="stext" style="font-size:${fs}rem">`;
   verses.forEach((v,i) => {
     const vn = startV + i;
-    html += `<span><sup class="vnum" onclick="copyVerse(${vn}, this)" title="Копировать">${vn}</sup>${v} </span>`;
+    html += `<span><sup class="vnum" onclick="copyVerse(${vn}, this)" title="Нажми чтобы скопировать стих">${vn}</sup>${v} </span>`;
   });
   html += '</div>';
   el.innerHTML = html;
@@ -1007,9 +1009,11 @@ function changeFont(d) {
 function copyVerse(vn, el) {
   const plan = getPlanById(app.activePlanId);
   const prog = app.progress[app.activePlanId];
+  if (!plan || !prog) return;
   const curDay = currentDayNum(plan, prog);
   const vDay = viewDay !== null ? viewDay : curDay;
   const dayData = plan.schedule[vDay-1];
+  if (!dayData) return;
   const tabs = buildTabs(dayData.refs);
   const tab = tabs[activeTab];
   const verses = getVerses(tab.book, tab.ch, tab.vf, tab.vt);
@@ -1018,9 +1022,28 @@ function copyVerse(vn, el) {
   const idx = vn - startV;
   const text = `${tab.book} ${tab.ch}:${vn} — ${verses[idx]}`;
   try { navigator.clipboard.writeText(text); } catch(e) {}
+  // Show brief "copied" indicator on verse number
+  const orig = el.innerHTML;
   el.innerHTML = '✓';
-  setTimeout(() => el.innerHTML = vn, 1500);
+  el.style.color = 'var(--acc)';
+  setTimeout(() => { el.innerHTML = orig; el.style.color = ''; }, 1200);
+  // Show toast
+  showToast('Стих скопирован');
   haptic('light');
+}
+
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:#fff;padding:8px 18px;border-radius:20px;font-size:13px;z-index:999;pointer-events:none;transition:opacity .3s';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.style.opacity = '0', 1800);
 }
 
 function shareDay() {
@@ -1029,16 +1052,39 @@ function shareDay() {
   const curDay = currentDayNum(plan, prog);
   const vDay = viewDay !== null ? viewDay : curDay;
   const dayData = plan.schedule[vDay-1];
-  const text = dayData.label + ' — Синодальный перевод';
-  // Try Telegram share first, then clipboard
+  const tabs = buildTabs(dayData.refs);
+  const tab = tabs[activeTab];
+  const verses = getVerses(tab.book, tab.ch, tab.vf, tab.vt);
+  const startV = tab.vf || 1;
+  // Build share text with first few verses
+  let shareText = tab.label + ' (Синодальный перевод)
+
+';
+  if (verses && verses.length > 0) {
+    const preview = verses.slice(0, 3);
+    preview.forEach((v, i) => { shareText += (startV + i) + '. ' + v + '
+'; });
+    if (verses.length > 3) shareText += '...
+';
+  }
+  shareText += '
+📖 t.me/mybible_reading_bot/plan';
+  // Try Telegram native share
   try {
-    if (tg && tg.showPopup) {
-      tg.showPopup({title:'Поделиться', message:text, buttons:[{type:'ok',text:'OK'}]});
+    if (tg && tg.switchInlineQuery) {
+      tg.switchInlineQuery(shareText);
+    } else if (navigator.share) {
+      navigator.share({ text: shareText });
     } else {
-      navigator.clipboard.writeText(text);
+      navigator.clipboard.writeText(shareText);
+      tg?.showPopup && tg.showPopup({
+        title: 'Скопировано',
+        message: 'Текст скопирован в буфер обмена',
+        buttons: [{type:'ok', text:'OK'}]
+      });
     }
   } catch(e) {
-    try { navigator.clipboard.writeText(text); } catch(e2) {}
+    try { navigator.clipboard.writeText(shareText); } catch(e2) {}
   }
   haptic('light');
 }
@@ -1060,14 +1106,18 @@ function addBookmark() {
 // ── Sequential reading ────────────────────────────────────────────
 function initSeq() {
   const sel = document.getElementById('seq-book');
-  if (!sel.options.length) {
-    sel.innerHTML = ALL_BOOKS.map((b,i) => `<option value="${i}">${b.name}</option>`).join('');
-  }
-  // Restore saved position — never reset on open
-  seqBookIdx = app.seqPos?.bookIdx || 0;
-  seqChIdx = app.seqPos?.chIdx || 0;
+  // Always populate book list
+  sel.innerHTML = ALL_BOOKS.map((b,i) => `<option value="${i}">${b.name}</option>`).join('');
+  // Restore saved position
+  seqBookIdx = parseInt(app.seqPos?.bookIdx) || 0;
+  seqChIdx = parseInt(app.seqPos?.chIdx) || 0;
   sel.value = seqBookIdx;
-  seqSelectBook(true); // keepChapter=true — don't reset to 0
+  // Populate chapter list for this book
+  const book = ALL_BOOKS[seqBookIdx];
+  const chSel = document.getElementById('seq-ch');
+  chSel.innerHTML = Array.from({length:book.chapters},(_,i) => `<option value="${i}">Глава ${i+1}</option>`).join('');
+  chSel.value = seqChIdx;
+  seqRender();
 }
 
 function seqSelectBook(keepChapter) {
@@ -1081,13 +1131,20 @@ function seqSelectBook(keepChapter) {
 }
 
 function seqRender() {
-  seqChIdx = parseInt(document.getElementById('seq-ch').value);
+  const chVal = parseInt(document.getElementById('seq-ch').value);
+  if (!isNaN(chVal)) seqChIdx = chVal;
   app.seqPos = {bookIdx:seqBookIdx, chIdx:seqChIdx};
   saveApp();
-  const book = ALL_BOOKS[seqBookIdx];
-  const verses = getVerses(book.name, seqChIdx+1);
+  const book = ALL_BOOKS[seqBookIdx] || ALL_BOOKS[0];
   const el = document.getElementById('seq-text');
   const fs = FONT_SIZES[fontIdx];
+  // If bible not loaded yet — wait and retry
+  if (!window._bibleData) {
+    el.innerHTML = '<div class="no-text" style="padding:30px;text-align:center">📖<br><br>Загружаем текст...</div>';
+    loadBible().then(() => seqRender());
+    return;
+  }
+  const verses = getVerses(book.name, seqChIdx+1);
   if (!verses) {
     el.innerHTML = '<div class="no-text">Текст недоступен</div>';
     return;
@@ -1425,6 +1482,22 @@ document.addEventListener('touchend', e => {
     else seqPrev();
   }
 }, {passive:true});
+
+// ── Prevent duplicate instances ───────────────────────────────────
+// If app is already open in another window, Telegram handles this natively.
+// We just ensure state is synced when page becomes visible again.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    // Re-sync app state from localStorage when returning to app
+    const saved = loadApp();
+    if (JSON.stringify(saved) !== JSON.stringify(app)) {
+      app = saved;
+      const curPage = document.querySelector('.page.on')?.id;
+      if (curPage === 'pg-read') renderRead();
+      else if (curPage === 'pg-sel') renderPlanList();
+    }
+  }
+});
 
 // ── Init ──────────────────────────────────────────────────────────
 async function init() {
