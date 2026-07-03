@@ -422,7 +422,7 @@ let conSelected = [];
 
 const OB_STEPS = [
   {em:'📖', title:'Читай Библию каждый день', text:'Выбери план по силам и читай Слово Божье по одному отрывку в день'},
-  {em:'🔥', title:'Следи за своей серией', text:'Отмечай прочитанное каждый день и наблюдай как растёт число дней подряд'},
+  {em:'🔥', title:'Следи за числом дней подряд', text:'Отмечай прочитанное каждый день и наблюдай как растёт число дней подряд'},
   {em:'🔔', title:'Напоминания в удобное время', text:'Мы пришлём тебе одно напоминание в день — утром, днём или вечером'},
 ];
 
@@ -449,7 +449,7 @@ function saveApp() {
 // ── Bible loading ─────────────────────────────────────────────────
 async function loadBible() {
   if (window._bibleData && bible && Object.keys(bible).length > 0) return;
-  const r = await fetch('bible_synodal.json');
+  const r = await fetch('bible_synodal.json?' + Date.now()); // cache bust
   const raw = await r.json();
   bible = {};
   window._bibleData = raw;
@@ -1141,7 +1141,7 @@ function seqRender() {
   // If bible not loaded yet — wait and retry
   if (!window._bibleData) {
     el.innerHTML = '<div class="no-text" style="padding:30px;text-align:center">📖<br><br>Загружаем текст...</div>';
-    loadBible().then(() => seqRender());
+    loadBible().then(() => { if(window._bibleData) seqRender(); });
     return;
   }
   const verses = getVerses(book.name, seqChIdx+1);
@@ -1502,9 +1502,17 @@ document.addEventListener('visibilitychange', () => {
 // ── Init ──────────────────────────────────────────────────────────
 async function init() {
   applyTheme();
-  // Load bible
-  try { await loadBible(); } catch(e) { console.error('Bible load failed:', e); }
-  document.getElementById('pg-load').style.display = 'none';
+  // Load bible with timeout
+  try {
+    const biblePromise = loadBible();
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 15000));
+    await Promise.race([biblePromise, timeout]);
+  } catch(e) {
+    console.error('Bible load failed:', e);
+  }
+  // Always hide loading screen
+  const pgLoad = document.getElementById('pg-load');
+  if (pgLoad) pgLoad.style.display = 'none';
 
   // Sync from backend
   syncFromBackend().catch(()=>{});
