@@ -557,7 +557,21 @@ function initSeq(){
   seqBI=parseInt((app.seqPos&&app.seqPos.bi)||0);
   seqCI=parseInt((app.seqPos&&app.seqPos.ci)||0);
   sel.value=seqBI;
-  seqPopCh(true);
+  // Populate chapter list
+  var book=ALL_BOOKS[seqBI];
+  var chSel=document.getElementById('seq-ch');
+  if(chSel&&book){
+    chSel.innerHTML=Array.from({length:book.chapters},function(_,i){return '<option value="'+i+'">Глава '+(i+1)+'</option>';}).join('');
+    chSel.value=seqCI;
+  }
+  // If bible not loaded yet — load first, then render
+  if(!bible){
+    var el=document.getElementById('seq-sc');
+    if(el)el.innerHTML='<div class="no-text">📖<br><br>Загружаем текст...</div>';
+    loadBible().then(function(){seqRender();}).catch(function(e){console.error('Bible load error:',e);});
+    return;
+  }
+  seqRender();
 }
 function seqBook(){seqBI=parseInt(document.getElementById('seq-book').value);seqCI=0;seqPopCh(false);}
 function seqPopCh(keep){
@@ -744,6 +758,10 @@ async function init(){
   else if(app.activePlanId&&getPlan(app.activePlanId)){viewDay=null;goPage('pg-read');renderRead();}
   else{renderSel();goPage('pg-sel');}
   initCon();
+  // If bible failed to load, retry silently in background
+  if(!bible){
+    loadBible().catch(function(){});
+  }
 }
 init();
 </script>
