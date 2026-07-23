@@ -314,13 +314,13 @@ async function startPlan(){
   if(!selPlanId)return;
   var timeEl=document.getElementById('sel-time');
   var time=timeEl?timeEl.value:'08:00';
-  var mskHour=localTimeToMskHour(time);
+  var msk=localTimeToMsk(time);
   if(!app.settings)app.settings={};
-  app.settings.notifyTime=time;app.settings.notifyHourMsk=mskHour;
+  app.settings.notifyTime=time;app.settings.notifyHourMsk=msk.hour;app.settings.notifyMinuteMsk=msk.minute;
   app.activePlanId=selPlanId;
-  app.progress[selPlanId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyHourMsk:mskHour,notifyOn:app.settings.notifyOn!==false};
+  app.progress[selPlanId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings.notifyOn!==false};
   saveApp();
-  if(userId){try{await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:selPlanId,notify_hour_msk:mskHour,notify_on:app.settings.notifyOn!==false})});}catch(e){}}
+  if(userId){try{await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:selPlanId,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.settings.notifyOn!==false})});}catch(e){}}
   haptic('success');viewDay=null;goPage('pg-read');renderRead();
 }
 function continuePlan(id){app.activePlanId=id;saveApp();viewDay=null;goPage('pg-read');renderRead();}
@@ -332,17 +332,15 @@ function delPlan(id){
 }
 function getPlan(id){return PLANS.find(function(p){return p.id===id;})||app.customPlans[id]||null;}
 
-function localTimeToMskHour(timeStr){
+function localTimeToMsk(timeStr){
   var parts=timeStr.split(':').map(Number);
   var now=new Date();
   var localDate=new Date(now.getFullYear(),now.getMonth(),now.getDate(),parts[0],parts[1],0);
-  var mskHour=(localDate.getUTCHours()+3)%24;
-  if(localDate.getUTCMinutes()>=30) mskHour=(mskHour+1)%24;
-  return mskHour;
+  return {hour:(localDate.getUTCHours()+3)%24,minute:localDate.getUTCMinutes()};
 }
-function mskHourToLocalTime(mskHour){
+function mskToLocalTime(mskHour,mskMinute){
   var now=new Date();
-  var utcMs=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate(),mskHour-3,0,0);
+  var utcMs=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate(),mskHour-3,mskMinute||0,0);
   var d=new Date(utcMs);
   var hh=String(d.getHours()).padStart(2,'0');
   var mm=String(d.getMinutes()).padStart(2,'0');
@@ -723,15 +721,18 @@ function cfgTogNot(){
 function cfgSaveTime(v){
   if(!app.settings)app.settings={};
   app.settings.notifyTime=v;
-  app.settings.notifyHourMsk=localTimeToMskHour(v);
+  var msk=localTimeToMsk(v);
+  app.settings.notifyHourMsk=msk.hour;
+  app.settings.notifyMinuteMsk=msk.minute;
   saveApp();syncNotify();haptic('light');pushState();
 }
 function syncNotify(){
   var s=app.settings||{};
   var mskHour=s.notifyHourMsk!==undefined?s.notifyHourMsk:8;
-  Object.keys(app.progress).forEach(function(id){app.progress[id].notifyHourMsk=mskHour;app.progress[id].notifyOn=s.notifyOn!==false;});
+  var mskMinute=s.notifyMinuteMsk!==undefined?s.notifyMinuteMsk:0;
+  Object.keys(app.progress).forEach(function(id){app.progress[id].notifyHourMsk=mskHour;app.progress[id].notifyMinuteMsk=mskMinute;app.progress[id].notifyOn=s.notifyOn!==false;});
   saveApp();
-  if(userId&&app.activePlanId){fetch(BACKEND+'/plan/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,notify_hour_msk:mskHour,notify_on:s.notifyOn!==false})}).catch(function(){});}
+  if(userId&&app.activePlanId){fetch(BACKEND+'/plan/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,notify_hour_msk:mskHour,notify_minute_msk:mskMinute,notify_on:s.notifyOn!==false})}).catch(function(){});}
 }
 
 // ── Единый аккаунт: полная синхронизация состояния между устройствами ──
