@@ -129,7 +129,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 <div id="pg-load"><div class="spin">📖</div><div style="font-size:15px;color:var(--acc);font-weight:600">Загружаем Библию...</div><div style="font-size:12px;color:var(--txt2)">Пожалуйста, подождите</div></div>
 <div class="pg" id="pg-ob"><div class="ob-wrap"><div class="ob-em" id="ob-em">📖</div><div class="ob-t" id="ob-t">Читай Библию каждый день</div><div class="ob-tx" id="ob-tx">Выбери план по силам и читай Слово Божье каждый день</div><div class="ob-dots"><div class="od on" id="od0"></div><div class="od" id="od1"></div><div class="od" id="od2"></div></div><button class="btn btn-acc" onclick="obNext()">Далее</button></div></div>
 <div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="my-plans"></div><div class="sec" id="suggested-lbl">Готовые планы</div><div id="plan-list"></div><button class="btn btn-out" onclick="goPage('pg-seq');initSeq()">📜 Вся Библия подряд</button><button class="btn btn-out" onclick="goPage('pg-con')">✏️ Составить свой план</button><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a></div>
-<div class="pg" id="pg-read"><div class="topbar"><button class="streak-btn" onclick="toggleStats()"><span style="font-size:20px">🔥</span><span class="streak-n" id="r-streak">0</span><span class="streak-l" id="r-streak-l">дней подряд</span></button><div style="display:flex;gap:5px"><button class="ico-btn" onclick="cycleTheme()" id="theme-btn">☀️</button><button class="ico-btn" onclick="goPage('pg-cfg')">⚙️</button></div></div><div id="stats-panel" style="display:none"><div class="stats-box"><div class="sg"><div class="si"><div class="sv" id="s-pct">0%</div><div class="sk">выполнено</div></div><div class="si"><div class="sv" id="s-done">0</div><div class="sk">дней готово</div></div><div class="si"><div class="sv" id="s-left">0</div><div class="sk">осталось</div></div><div class="si"><div class="sv" id="s-streak">0</div><div class="sk">дней подряд</div></div><div class="si"><div class="sv" id="s-max">0</div><div class="sk">рекорд</div></div><div class="si"><div class="sv" id="s-start">—</div><div class="sk">начат</div></div></div><div class="pb"><div class="pf" id="s-bar" style="width:0%"></div></div><div class="pl" id="s-plan-t"></div><button class="sec-tog" onclick="toggleCal()">📅 Календарь <span id="cal-arr">▼</span></button><div id="cal-wrap" style="display:none"><div class="cal-grid" id="cal-grid"></div></div></div></div><div class="cstat" id="r-cstat"></div><div class="pb" style="margin-bottom:10px"><div class="pf" id="r-bar" style="width:0%"></div></div><div class="day-nav"><button class="nav-btn" id="btn-prev" onclick="goDay(-1)">←</button><div class="day-info"><div class="day-n" id="r-day-n">День 1</div><div class="day-d" id="r-day-d"></div></div><button class="nav-btn" id="btn-next" onclick="goDay(1)">→</button></div><div id="to-today" style="text-align:center;margin-bottom:6px;display:none"><button onclick="goToday()" style="font-size:12px;color:var(--acc);background:var(--acc2);border:none;border-radius:7px;padding:5px 12px;cursor:pointer;font-family:var(--fui)">На сегодня →</button></div><div class="ref-lbl"><span id="r-ref">—</span><button class="ico-btn" onclick="addBm()">⭐</button></div><div class="tabs" id="r-tabs"></div><div class="sc" id="r-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button><span style="color:var(--brd)">|</span><button style="padding:5px 10px;border:1px solid var(--brd);border-radius:7px;background:var(--card);font-size:12px;cursor:pointer;color:var(--txt2);font-family:var(--fui)" onclick="shareDay()">📋 Поделиться</button></div><button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button><a class="tlink" id="r-tlink" target="_blank"><span style="font-size:16px">📚</span> Читать другой перевод</a><div class="phrase" id="r-phrase"></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
+<div class="pg" id="pg-read"><div class="topbar"><button class="streak-btn" onclick="toggleStats()"><span style="font-size:20px">🔥</span><span class="streak-n" id="r-streak">0</span><span class="streak-l" id="r-streak-l">дней подряд</span></button><div style="display:flex;gap:5px"><button class="ico-btn" onclick="cycleTheme()" id="theme-btn">☀️</button><button class="ico-btn" onclick="goPage('pg-cfg')">⚙️</button></div></div><div id="stats-panel" style="display:none"><div class="stats-box"><div class="sg"><div class="si"><div class="sv" id="s-pct">0%</div><div class="sk">выполнено</div></div><div class="si"><div class="sv" id="s-done">0</div><div class="sk">дней готово</div></div><div class="si"><div class="sv" id="s-left">0</div><div class="sk">осталось</div></div><div class="si"><div class="sv" id="s-streak">0</div><div class="sk">дней подряд</div></div><div class="si"><div class="sv" id="s-max">0</div><div class="sk">рекорд</div></div><div class="si"><div class="sv" id="s-start">—</div><div class="sk">начат</div></div></div><div class="pb"><div class="pf" id="s-bar" style="width:0%"></div></div><div class="pl" id="s-plan-t"></div><button class="sec-tog" onclick="toggleCal()">📅 Календарь <span id="cal-arr">▼</span></button><div id="cal-wrap" style="display:none"><div class="cal-grid" id="cal-grid"></div></div></div></div><div class="cstat" id="r-cstat"></div><div class="pb" style="margin-bottom:10px"><div class="pf" id="r-bar" style="width:0%"></div></div><div class="day-nav"><button class="nav-btn" id="btn-prev" onclick="goDay(-1)">←</button><div class="day-info"><div class="day-n" id="r-day-n">День 1</div><div class="day-d" id="r-day-d"></div></div><button class="nav-btn" id="btn-next" onclick="goDay(1)">→</button></div><div id="to-today" style="text-align:center;margin-bottom:6px;display:none"><button onclick="goToday()" style="font-size:12px;color:var(--acc);background:var(--acc2);border:none;border-radius:7px;padding:5px 12px;cursor:pointer;font-family:var(--fui)">К непрочитанному →</button></div><div class="ref-lbl"><span id="r-ref">—</span><button class="ico-btn" onclick="addBm()">⭐</button></div><div class="tabs" id="r-tabs"></div><div class="sc" id="r-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button><span style="color:var(--brd)">|</span><button style="padding:5px 10px;border:1px solid var(--brd);border-radius:7px;background:var(--card);font-size:12px;cursor:pointer;color:var(--txt2);font-family:var(--fui)" onclick="shareDay()">📋 Поделиться</button></div><button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button><a class="tlink" id="r-tlink" target="_blank"><span style="font-size:16px">📚</span> Читать другой перевод</a><div class="phrase" id="r-phrase"></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
 <div class="pg" id="pg-seq"><div class="hdr"><h1>📜 Вся Библия подряд</h1></div><div class="seq-nav"><select class="seq-sel" id="seq-book" onchange="seqBook()"></select><select class="seq-sel" id="seq-ch" onchange="seqRender()"></select></div><div class="sc" id="seq-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-out" style="margin-top:0;flex:1" onclick="seqPrev()">← Назад</button><button class="btn btn-acc" style="margin-top:0;flex:1" onclick="seqNext()">Далее →</button></div><button class="btn btn-out" style="margin-top:8px" onclick="addSeqBm()">⭐ Закладка</button><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
 <div class="pg" id="pg-con"><div class="hdr"><h1>✏️ Свой план</h1></div><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Начать план</button><button class="btn btn-out" onclick="goPage('pg-sel')">Отмена</button></div>
 <div class="pg" id="pg-bm"><div class="hdr"><h1>⭐ Закладки</h1></div><div id="bm-list"></div><div id="bm-empty" style="display:none;text-align:center;padding:36px;color:var(--txt2);font-size:14px">Нет закладок.<br>Нажми ⭐ во время чтения.</div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
@@ -369,6 +369,25 @@ function swWord(n){
   if(r>=2&&r<=4)return 'дня подряд';
   return 'дней подряд';
 }
+function dayWord(n){
+  if(n%100>=11&&n%100<=19)return 'дней';
+  var r=n%10;
+  if(r===1)return 'день';
+  if(r>=2&&r<=4)return 'дня';
+  return 'дней';
+}
+/* Возвращает первый ещё непрочитанный день (а не сегодняшний календарный день).
+   Если пользователь пропустил дни 4-6 и сейчас 7-й календарный день — вернёт 4,
+   чтобы он не терял пропущенные дни, а последовательно наверстал их.
+   Если пробелов нет — вернёт cur (как и раньше). */
+function nextUnreadDay(plan,prog){
+  var cur=curDayNum(plan,prog);
+  var done=prog.daysDone||[];
+  for(var d=1;d<=cur;d++){
+    if(done.indexOf(d)<0)return d;
+  }
+  return cur;
+}
 function buildTabs(refs){
   return refs.map(function(ref){
     return {book:ref.book,ch:ref.ch,vf:ref.vf,vt:ref.vt,full:ref.full,
@@ -381,14 +400,16 @@ function renderRead(){
   var prog=app.progress[app.activePlanId];
   if(!plan||!prog){goPage('pg-sel');return;}
   var cur=curDayNum(plan,prog);
-  var vd=viewDay!==null?viewDay:cur;
+  var landing=nextUnreadDay(plan,prog);
+  var vd=viewDay!==null?viewDay:landing;
   var dd=plan.schedule[vd-1];if(!dd)return;
   var done=(prog.daysDone||[]).length;
   var pct=Math.round(done/plan.days*100);
   var streak=effStreak(prog);
   var isTod=prog.lastRead===today();
   var isDayRead=(prog.daysDone||[]).indexOf(vd)>=0;
-  var isCur=vd===cur;
+  var isLanding=vd===landing;
+  var lag=Math.max(0,cur-landing);
   var el;
   el=document.getElementById('r-streak');if(el)el.textContent=streak;
   el=document.getElementById('r-streak-l');if(el)el.textContent=swWord(streak);
@@ -401,13 +422,13 @@ function renderRead(){
   el=document.getElementById('s-bar');if(el)el.style.width=pct+'%';
   el=document.getElementById('s-plan-t');if(el)el.textContent=plan.title;
   renderCal(plan,prog);
-  el=document.getElementById('r-cstat');if(el)el.textContent=pct+'% · '+done+'/'+plan.days+' дней · '+(plan.days-done)+' осталось';
+  el=document.getElementById('r-cstat');if(el)el.textContent=pct+'% · '+done+'/'+plan.days+' дней · '+(plan.days-done)+' осталось'+(lag>0?' · ⚠️ отстаёшь на '+lag+' '+dayWord(lag):'');
   el=document.getElementById('r-bar');if(el)el.style.width=pct+'%';
   el=document.getElementById('r-day-n');if(el)el.textContent='День '+vd+' из '+plan.days;
-  el=document.getElementById('r-day-d');if(el)el.textContent=isDayRead&&!isCur?'✓ Прочитано':'';
+  el=document.getElementById('r-day-d');if(el)el.textContent=isDayRead?'✓ Прочитано':(lag>0&&isLanding?'Наверстай пропущенное':'');
   el=document.getElementById('btn-prev');if(el)el.disabled=vd<=1;
   el=document.getElementById('btn-next');if(el)el.disabled=vd>=cur;
-  el=document.getElementById('to-today');if(el)el.style.display=!isCur?'block':'none';
+  el=document.getElementById('to-today');if(el)el.style.display=!isLanding?'block':'none';
   el=document.getElementById('r-ref');if(el)el.textContent=dd.label;
   var tabs=buildTabs(dd.refs);
   if(activeTab>=tabs.length)activeTab=0;
@@ -417,7 +438,7 @@ function renderRead(){
   }
   renderSc(tabs[activeTab]);
   el=document.getElementById('r-tlink');if(el&&tabs[activeTab])el.href=bbLink(tabs[activeTab].book,tabs[activeTab].ch);
-  updReadBtn(tabs,isCur,isTod,isDayRead,vd);
+  updReadBtn(tabs,vd>cur,isDayRead,vd);
 }
 
 function renderSc(tab){
@@ -436,21 +457,21 @@ function renderSc(tab){
   el.innerHTML=h;
 }
 
-function updReadBtn(tabs,isCur,isTod,isDayRead,vd){
+function updReadBtn(tabs,isFuture,isDayRead,vd){
   var btn=document.getElementById('r-read-btn');if(!btn)return;
   var isLast=activeTab>=tabs.length-1;
-  if(!isCur){
-    btn.textContent=isDayRead?'✓ День '+vd+' прочитан':'Перейди к сегодняшнему дню';
+  if(isFuture){
+    btn.textContent='Этот день ещё не открыт';
     btn.disabled=true;btn.className='read-btn done';btn.onclick=null;
-  } else if(isTod&&isDayRead){
-    btn.textContent='✓ Прочитано сегодня';
+  } else if(isDayRead){
+    btn.textContent='✓ День '+vd+' прочитан';
     btn.disabled=true;btn.className='read-btn done';btn.onclick=null;
   } else if(!isLast){
     btn.textContent='Следующий отрывок ('+(activeTab+2)+'/'+tabs.length+')';
     btn.disabled=false;btn.className='read-btn';
     btn.onclick=function(){setTab(activeTab+1);window.scrollTo(0,0);};
   } else {
-    btn.textContent='✓ Прочитал';
+    btn.textContent='✓ Прочитал день '+vd;
     btn.disabled=false;btn.className='read-btn';
     btn.onclick=markRead;
   }
@@ -460,34 +481,43 @@ function setTab(i){
   activeTab=i;
   document.querySelectorAll('.tab').forEach(function(t,idx){t.classList.toggle('on',idx===i);});
   var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];if(!plan||!prog)return;
-  var cur=curDayNum(plan,prog);var vd=viewDay!==null?viewDay:cur;
+  var cur=curDayNum(plan,prog);var landing=nextUnreadDay(plan,prog);var vd=viewDay!==null?viewDay:landing;
   var dd=plan.schedule[vd-1];if(!dd)return;
   var tabs=buildTabs(dd.refs);
   renderSc(tabs[i]);
   var tl=document.getElementById('r-tlink');if(tl)tl.href=bbLink(tabs[i].book,tabs[i].ch);
-  updReadBtn(tabs,vd===cur,prog.lastRead===today(),(prog.daysDone||[]).indexOf(vd)>=0,vd);
+  updReadBtn(tabs,vd>cur,(prog.daysDone||[]).indexOf(vd)>=0,vd);
   haptic('light');
 }
 function goDay(d){
   var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];if(!plan||!prog)return;
-  var cur=curDayNum(plan,prog);var vd=(viewDay!==null?viewDay:cur)+d;
+  var cur=curDayNum(plan,prog);var landing=nextUnreadDay(plan,prog);
+  var vd=(viewDay!==null?viewDay:landing)+d;
   if(vd<1||vd>cur)return;
-  viewDay=vd===cur?null:vd;activeTab=0;haptic('light');renderRead();window.scrollTo(0,0);
+  viewDay=vd===landing?null:vd;activeTab=0;haptic('light');renderRead();window.scrollTo(0,0);
 }
 function goToday(){viewDay=null;activeTab=0;haptic('light');renderRead();}
 
 async function markRead(){
   var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];if(!plan||!prog)return;
-  var cur=curDayNum(plan,prog);var t=today(),y=yesterday();
+  var cur=curDayNum(plan,prog);
+  var landing=nextUnreadDay(plan,prog);
+  var vd=viewDay!==null?viewDay:landing;
+  if(vd>cur)return;
+  var t=today(),y=yesterday();
   var ns=prog.streak||0;
   if(prog.lastRead===y)ns++;else if(prog.lastRead!==t)ns=1;
   prog.maxStreak=Math.max(prog.maxStreak||0,ns);
   prog.streak=ns;prog.lastRead=t;
   if(!prog.daysDone)prog.daysDone=[];
-  if(prog.daysDone.indexOf(cur)<0)prog.daysDone.push(cur);
+  if(prog.daysDone.indexOf(vd)<0)prog.daysDone.push(vd);
   saveApp();haptic('success');
   var ph=document.getElementById('r-phrase');
   if(ph){ph.textContent=PHRASES[Math.floor(Math.random()*PHRASES.length)];setTimeout(function(){ph.textContent='';},3000);}
+  /* После отметки — переходим к следующему непрочитанному дню (если пользователь
+     наверстывает пропуски, это позволяет отметить несколько дней подряд за один раз,
+     не теряя ни один из них). */
+  viewDay=null;activeTab=0;
   renderRead();
   if(prog.daysDone.length>=plan.days){
     setTimeout(function(){
@@ -498,7 +528,7 @@ async function markRead(){
   }
   if(userId){
     try{
-      var r=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,day_number:cur})});
+      var r=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,day_number:vd})});
       var data=await r.json();
       if(data.ok){prog.streak=data.streak;prog.maxStreak=data.max_streak;saveApp();renderRead();}
     }catch(e){}
@@ -529,7 +559,7 @@ function renderCal(plan,prog){
 
 function addBm(){
   var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];if(!plan||!prog)return;
-  var cur=curDayNum(plan,prog);var vd=viewDay!==null?viewDay:cur;
+  var vd=viewDay!==null?viewDay:nextUnreadDay(plan,prog);
   var dd=plan.schedule[vd-1];if(!dd)return;
   var tabs=buildTabs(dd.refs);var tab=tabs[activeTab];
   app.bookmarks.unshift({id:'bm'+Date.now(),book:tab.book,ch:tab.ch,label:tab.label,date:today()});
@@ -538,7 +568,7 @@ function addBm(){
 }
 function copyV(vn,el){
   var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];if(!plan||!prog)return;
-  var cur=curDayNum(plan,prog);var vd=viewDay!==null?viewDay:cur;
+  var vd=viewDay!==null?viewDay:nextUnreadDay(plan,prog);
   var dd=plan.schedule[vd-1];if(!dd)return;
   var tabs=buildTabs(dd.refs);var tab=tabs[activeTab];
   var verses=getV(tab.book,tab.ch,tab.vf,tab.vt);if(!verses)return;
@@ -549,7 +579,7 @@ function copyV(vn,el){
 }
 function shareDay(){
   var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];if(!plan||!prog)return;
-  var cur=curDayNum(plan,prog);var vd=viewDay!==null?viewDay:cur;
+  var vd=viewDay!==null?viewDay:nextUnreadDay(plan,prog);
   var dd=plan.schedule[vd-1];if(!dd)return;
   var text=dd.label+' (Синодальный перевод)\n\n📖 t.me/mybible_reading_bot/plan';
   try{if(navigator.share)navigator.share({text:text});else{navigator.clipboard.writeText(text);showToast('Скопировано');}}
