@@ -756,13 +756,28 @@ function cfgSaveTime(v){
   app.settings.notifyMinuteMsk=msk.minute;
   saveApp();syncNotify();haptic('light');pushState();
 }
+/* Debounce сохранения времени напоминания на сервере.
+   На Android в Telegram WebView нативный time-picker может выстрелить
+   событием change НЕСКОЛЬКО раз подряд за одно взаимодействие (на каждый
+   щелчок колеса часов/минут), а не один раз при закрытии. Без задержки
+   это порождало гонку: несколько fetch() уходили параллельно, и более
+   ранний (с промежуточным, ещё не финальным временем) мог завершиться
+   ПОЗЖЕ финального — тогда в базе оставалось неверное время, и напоминание
+   реально приходило не в то время, что показано в интерфейсе. Здесь же,
+   как и в pushState(), реально отправляется только самое последнее
+   значение — все промежуточные вызовы просто перезапускают таймер. */
+var _notifySyncTimer=null;
 function syncNotify(){
   var s=app.settings||{};
   var mskHour=s.notifyHourMsk!==undefined?s.notifyHourMsk:8;
   var mskMinute=s.notifyMinuteMsk!==undefined?s.notifyMinuteMsk:0;
   Object.keys(app.progress).forEach(function(id){app.progress[id].notifyHourMsk=mskHour;app.progress[id].notifyMinuteMsk=mskMinute;app.progress[id].notifyOn=s.notifyOn!==false;});
   saveApp();
-  if(userId&&app.activePlanId){fetch(BACKEND+'/plan/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,notify_hour_msk:mskHour,notify_minute_msk:mskMinute,notify_on:s.notifyOn!==false})}).catch(function(){});}
+  if(!userId||!app.activePlanId) return;
+  clearTimeout(_notifySyncTimer);
+  _notifySyncTimer=setTimeout(function(){
+    fetch(BACKEND+'/plan/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,notify_hour_msk:mskHour,notify_minute_msk:mskMinute,notify_on:s.notifyOn!==false})}).catch(function(){});
+  },700);
 }
 
 // ── Единый аккаунт: полная синхронизация состояния между устройствами ──
