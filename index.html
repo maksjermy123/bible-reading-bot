@@ -204,10 +204,10 @@ function getV(book,ch,vf,vt){
   if(vf!==undefined)return c.slice(vf-1);
   return c;
 }
-function bbLink(book,ch,vf){
+function bbLink(book,ch){
   var n=BOOK_NUM[book];
   if(!n)return 'https://bible.by/';
-  return 'https://bible.by/verse/'+n+'/'+ch+'/'+(vf||1)+'/';
+  return 'https://bible.by/verse/'+n+'/'+ch+'/';
 }
 
 var THEMES=['light','dark','sepia','night'];
