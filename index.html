@@ -867,6 +867,28 @@ async function syncBackend(){
       pushState();
     }
   }catch(e){}
+  await syncCanonicalDaysDone();
+}
+
+/* days_done хранится в ДВУХ независимых местах: canonical plan_progress
+   (им пользуются виджет "План" в мини-аппе Оглавления и push-уведомления)
+   и слепок app_state выше (им пользуется сам этот мини-апп). Если когда-то
+   запрос /plan/read не долетел до сервера (например, обрыв сети сразу
+   после "Прочитал"), эти два списка расходятся — и отставание в разных
+   местах интерфейса показывает разные числа. Здесь объединяем оба списка
+   через /plan/merge_days и используем результат как окончательный —
+   ни один реально прочитанный день не теряется ни на одной из сторон. */
+async function syncCanonicalDaysDone(){
+  var planId=app.activePlanId;
+  if(!userId||!planId||!app.progress[planId])return;
+  try{
+    var r=await fetch(BACKEND+'/plan/merge_days',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,days_done:app.progress[planId].daysDone||[]})});
+    var data=await r.json();
+    if(data&&data.ok){
+      app.progress[planId].daysDone=data.days_done||[];
+      saveApp();
+    }
+  }catch(e){}
 }
 
 function showToast(msg){
