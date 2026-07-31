@@ -138,12 +138,12 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 <body>
 <div id="pg-load"><div class="spin">📖</div><div style="font-size:15px;color:var(--acc);font-weight:600">Загружаем Библию...</div><div style="font-size:12px;color:var(--txt2)">Пожалуйста, подождите</div></div>
 <div class="pg" id="pg-ob"><div class="ob-wrap"><div class="ob-em" id="ob-em">📖</div><div class="ob-t" id="ob-t">Читай Библию каждый день</div><div class="ob-tx" id="ob-tx">Выбери план по силам и читай Слово Божье каждый день</div><div class="ob-dots"><div class="od on" id="od0"></div><div class="od" id="od1"></div><div class="od" id="od2"></div></div><button class="btn btn-acc" onclick="obNext()">Далее</button></div></div>
-<div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="my-plans"></div><div class="sec" id="suggested-lbl">Готовые планы</div><div id="plan-list"></div><div class="card" style="cursor:pointer" onclick="goPage('pg-seq');initSeq()"><div class="card-top"><div class="card-ico">📜</div><div class="card-info"><div class="card-title">Вся Библия подряд</div><div class="card-meta">Свободное чтение, без графика</div></div><div class="badge">Гибкий</div></div></div><div class="card card-custom" style="cursor:pointer" onclick="goPage('pg-con')"><div class="card-top"><div class="card-ico">✏️</div><div class="card-info"><div class="card-title">Составить свой план</div><div class="card-meta">Выбери книги и срок сам</div></div><div class="badge">Свой</div></div></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a></div>
+<div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="my-plans"></div><div class="sec" id="suggested-lbl">Готовые планы</div><div id="plan-list"></div><div class="card" style="cursor:pointer" onclick="goPage('pg-seq');initSeq()"><div class="card-top"><div class="card-ico">📜</div><div class="card-info"><div class="card-title">Вся Библия подряд</div><div class="card-meta">Свободное чтение, без графика</div></div><div class="badge">Гибкий</div></div></div><div class="card card-custom" style="cursor:pointer" onclick="startNewCustomPlan()"><div class="card-top"><div class="card-ico">✏️</div><div class="card-info"><div class="card-title">Составить свой план</div><div class="card-meta">Выбери книги и срок сам</div></div><div class="badge">Свой</div></div></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a></div>
 <div class="pg" id="pg-read"><div class="topbar"><button class="streak-btn" id="streak-badge" onclick="toggleStats()"><span style="font-size:20px" id="streak-ico">🔥</span><span class="streak-n" id="r-streak">0</span><span class="streak-l" id="r-streak-l">дней подряд</span></button><div style="display:flex;gap:5px"><button class="ico-btn" onclick="cycleTheme()" id="theme-btn">☀️</button><button class="ico-btn" onclick="goPage('pg-cfg')">⚙️</button></div></div><div id="stats-panel" style="display:none"><div class="stats-box"><div class="sg"><div class="si"><div class="sv" id="s-pct">0%</div><div class="sk">выполнено</div></div><div class="si"><div class="sv" id="s-done">0</div><div class="sk">дней готово</div></div><div class="si"><div class="sv" id="s-left">0</div><div class="sk">осталось</div></div><div class="si"><div class="sv" id="s-streak">0</div><div class="sk">дней подряд</div></div><div class="si"><div class="sv" id="s-max">0</div><div class="sk">рекорд</div></div><div class="si"><div class="sv" id="s-start">—</div><div class="sk">начат</div></div></div><div class="pb"><div class="pf" id="s-bar" style="width:0%"></div></div><div class="pl" id="s-plan-t"></div><button class="sec-tog" onclick="toggleCal()">📅 Календарь <span id="cal-arr">▼</span></button><div id="cal-wrap" style="display:none"><div class="cal-grid" id="cal-grid"></div></div></div></div><div class="cstat" id="r-cstat"></div><div class="pb" style="margin-bottom:10px"><div class="pf" id="r-bar" style="width:0%"></div></div><div class="day-nav"><button class="nav-btn" id="btn-prev" onclick="goDay(-1)">←</button><div class="day-info"><div class="day-n" id="r-day-n">День 1</div><div class="day-d" id="r-day-d"></div></div><button class="nav-btn" id="btn-next" onclick="goDay(1)">→</button></div><div id="to-today" style="margin-bottom:10px;display:none"><button onclick="goToday()" style="width:100%;font-size:15px;font-weight:800;color:#fff;background:var(--acc);border:none;border-radius:10px;padding:13px;cursor:pointer;font-family:var(--fui);box-shadow:0 3px 12px rgba(0,0,0,.18)">📖 К непрочитанному →</button></div><div class="ref-lbl"><span id="r-ref">—</span><button class="ico-btn" onclick="addBm()">⭐</button></div><div class="tabs" id="r-tabs"></div><div class="sc" id="r-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button><span style="color:var(--brd)">|</span><button style="padding:5px 10px;border:1px solid var(--brd);border-radius:7px;background:var(--card);font-size:12px;cursor:pointer;color:var(--txt2);font-family:var(--fui)" onclick="shareDay()">📋 Поделиться</button></div><button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button><a class="tlink" id="r-tlink" target="_blank"><span style="font-size:16px">📚</span> Читать другой перевод</a><div class="phrase" id="r-phrase"></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a></div>
 <div class="pg" id="pg-seq"><div class="hdr"><h1>📜 Вся Библия подряд</h1></div><div class="seq-nav"><select class="seq-sel" id="seq-book" onchange="seqBook()"></select><select class="seq-sel" id="seq-ch" onchange="seqRender()"></select></div><div class="sc" id="seq-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-out" style="margin-top:0;flex:1" onclick="seqPrev()">← Назад</button><button class="btn btn-acc" style="margin-top:0;flex:1" onclick="seqNext()">Далее →</button></div><button class="btn btn-out" style="margin-top:8px" onclick="addSeqBm()">⭐ Закладка</button><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
-<div class="pg" id="pg-con"><div class="hdr"><h1>✏️ Свой план</h1></div><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Начать план</button><button class="btn btn-out" onclick="goPage('pg-sel')">Отмена</button></div>
+<div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Начать план</button><button class="btn btn-out" onclick="conEditId=null;goPage('pg-sel')">Отмена</button></div>
 <div class="pg" id="pg-bm"><div class="hdr"><h1>⭐ Закладки</h1></div><div id="bm-list"></div><div id="bm-empty" style="display:none;text-align:center;padding:36px;color:var(--txt2);font-size:14px">Нет закладок.<br>Нажми ⭐ во время чтения.</div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a></div>
-<div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid"><button onclick="setTheme('light')" id="th-light" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn"><div>🌅</div>Сепия</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button><button onclick="setTheme('night')" id="th-night" class="th-btn"><div>🌃</div>Ночная</button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div style="flex:1;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div></div>
+<div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-t" style="font-size:12px;color:var(--txt2);margin-bottom:10px"></div><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid"><button onclick="setTheme('light')" id="th-light" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn"><div>🌅</div>Сепия</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button><button onclick="setTheme('night')" id="th-night" class="th-btn"><div>🌃</div>Ночная</button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div style="flex:1;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div></div>
 <div class="pg" id="pg-done"><div class="done-wrap"><div class="done-em">🎉</div><h2 style="font-size:24px;font-weight:800;margin-bottom:8px">План завершён!</h2><p style="font-size:14px;color:var(--txt2);line-height:1.6;margin-bottom:20px" id="done-txt"></p><button class="btn btn-acc" onclick="goPage('pg-sel')">Выбрать новый план</button></div></div>
 <div class="bnav" id="bnav" style="display:none"><button class="nb on" id="nb-read" onclick="switchTab('read')"><span class="nb-em">📖</span>Чтение</button><button class="nb" id="nb-bm" onclick="switchTab('bm')"><span class="nb-em">⭐</span>Закладки</button><button class="nb" id="nb-sel" onclick="switchTab('sel')"><span class="nb-em">🏠</span>Планы</button><button class="nb" id="nb-cfg" onclick="switchTab('cfg')"><span class="nb-em">⚙️</span>Настройки</button></div>
 <div id="toast"></div>
@@ -173,6 +173,7 @@ var showStats=false;
 var showCal=false;
 var seqBI=0,seqCI=0;
 var conSel=[];
+var conEditId=null; // null — создаём новый свой план; иначе — редактируем существующий (тот же id)
 var obStep=0;
 
 var OB=[
@@ -270,6 +271,7 @@ function renderSel(){
       var done=(prog.daysDone||[]).length;
       var pct=Math.round(done/pl.days*100);
       var isAct=id===app.activePlanId;
+      var isCustom=id.charAt(0)==='c';
       html+='<div class="card'+(isAct?' sel':'')+'">'+
         '<div class="card-top" onclick="continuePlan(\''+id+'\')" style="cursor:pointer">'+
         '<div class="card-ico">'+pl.icon+'</div>'+
@@ -278,6 +280,7 @@ function renderSel(){
         '<div class="badge" style="background:var(--acc);color:#fff">→</div></div>'+
         '<div style="display:flex;gap:6px;margin-top:8px">'+
         '<button onclick="delPlan(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">🗑 Удалить</button>'+
+        (isCustom?'<button onclick="editCustomPlan(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">✏️ Изменить</button>':'')+
         '<button onclick="continuePlan(\''+id+'\')" style="flex:2;padding:7px;border:none;border-radius:7px;background:var(--acc);color:#fff;font-size:12px;cursor:pointer;font-family:var(--fui);font-weight:600">Продолжить →</button>'+
         '</div></div>';
     });
@@ -328,17 +331,25 @@ async function startPlan(){
   if(!app.settings)app.settings={};
   app.settings.notifyTime=time;app.settings.notifyHourMsk=msk.hour;app.settings.notifyMinuteMsk=msk.minute;
   app.activePlanId=selPlanId;
-  app.progress[selPlanId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings.notifyOn!==false};
+  app.progress[selPlanId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyTime:time,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings.notifyOn!==false};
   saveApp();
   if(userId){try{await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:selPlanId,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.settings.notifyOn!==false})});}catch(e){}}
   haptic('success');viewDay=null;goPage('pg-read');renderRead();
 }
 function continuePlan(id){app.activePlanId=id;saveApp();viewDay=null;goPage('pg-read');renderRead();}
-function delPlan(id){
+async function delPlan(id){
   if(!confirm('Удалить план? Прогресс будет потерян.'))return;
   delete app.progress[id];delete app.customPlans[id];
   if(app.activePlanId===id)app.activePlanId=null;
   saveApp();haptic('light');renderSel();
+  /* Каждый план теперь свой ряд на сервере (user_id+plan_id) — просто
+     чистим ряд именно этого плана, остальные планы пользователя не
+     затрагиваются. Без этого виджет "План" в Оглавлении и уведомления
+     продолжали бы показывать прогресс уже удалённого плана. */
+  if(!userId)return;
+  try{
+    await fetch(BACKEND+'/plan/unregister',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:id})});
+  }catch(e){}
 }
 function getPlan(id){return PLANS.find(function(p){return p.id===id;})||app.customPlans[id]||null;}
 
@@ -584,7 +595,7 @@ async function markRead(){
   }
   if(userId){
     try{
-      var r=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,day_number:vd,local_date:t})});
+      var r=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,day_number:vd,local_date:t})});
       var data=await r.json();
       if(data.ok){prog.streak=data.streak;prog.maxStreak=data.max_streak;saveApp();renderRead();}
     }catch(e){}
@@ -745,7 +756,28 @@ function initCon(){
   var ot=document.getElementById('ot-books');var nt=document.getElementById('nt-books');
   if(ot)ot.innerHTML=OT_BOOKS.map(function(b){return '<button class="bc" data-n="'+b.name+'" onclick="toggleBook(this)">'+b.name+'</button>';}).join('');
   if(nt)nt.innerHTML=NT_BOOKS.map(function(b){return '<button class="bc" data-n="'+b.name+'" onclick="toggleBook(this)">'+b.name+'</button>';}).join('');
-  conSel=[];updatePrev();
+  var title=document.getElementById('con-title');
+  var editing=conEditId&&app.customPlans[conEditId];
+  if(title)title.textContent=editing?'✏️ Изменить план':'✏️ Свой план';
+  if(editing){
+    conSel=(editing.books||[]).slice();
+    var daysInp=document.getElementById('con-days');if(daysInp)daysInp.value=editing.totalDays||editing.days||30;
+    document.querySelectorAll('.bc').forEach(function(b){b.classList.toggle('sel',conSel.indexOf(b.dataset.n)>=0);});
+  } else {
+    conSel=[];
+    var daysInp2=document.getElementById('con-days');if(daysInp2)daysInp2.value=30;
+  }
+  updatePrev();
+}
+function startNewCustomPlan(){
+  conEditId=null;
+  goPage('pg-con');initCon();
+}
+function editCustomPlan(id){
+  if(!app.customPlans[id])return;
+  conEditId=id;
+  goPage('pg-con');initCon();
+  haptic('light');
 }
 function toggleBook(btn){
   var n=btn.dataset.n;var i=conSel.indexOf(n);
@@ -759,11 +791,9 @@ function updatePrev(){
   var totalCh=0;
   conSel.forEach(function(n){var b=ALL_BOOKS.find(function(b){return b.name===n;});if(b)totalCh+=b.chapters;});
   if(prev)prev.textContent=conSel.length+' книг · '+totalCh+' глав · ~'+(totalCh/days).toFixed(1)+' глав/день · '+days+' дней';
-  if(btn)btn.disabled=false;
+  if(btn){btn.disabled=false;btn.textContent=conEditId?'Сохранить изменения':'Начать план';}
 }
-function startCustom(){
-  var days=parseInt(document.getElementById('con-days').value)||30;
-  if(!conSel.length)return;
+function buildCustomSchedule(days){
   var allV=[];
   conSel.forEach(function(n){var counts=VC[n];if(!counts)return;counts.forEach(function(cnt,ci){for(var vi=1;vi<=cnt;vi++)allV.push({book:n,ch:ci+1,v:vi});});});
   var total=allV.length;var schedule=[];var prev=0;
@@ -780,36 +810,75 @@ function startCustom(){
     var label=refs.map(function(r){return r.full?(r.book+' '+r.ch):(r.book+' '+r.ch+':'+r.vf+'-'+r.vt);}).join('; ');
     schedule.push({day:day,refs:refs,label:label});prev=end;
   }
+  return schedule;
+}
+async function startCustom(){
+  var days=parseInt(document.getElementById('con-days').value)||30;
+  if(!conSel.length)return;
+  var schedule=buildCustomSchedule(days);
   var title=conSel.length===1?conSel[0]+' за '+days+' дней':'Свой план · '+days+' дней';
+  if(conEditId&&app.customPlans[conEditId]){
+    /* Редактирование существующего плана — тот же id, пересобранное
+       расписание. Дни, отмеченные прочитанными, но выходящие за пределы
+       новой длительности, обрезаются — план и прогресс адаптируются под
+       новые параметры, как и просилось. */
+    var id=conEditId;
+    app.customPlans[id]={id:id,title:title,icon:'✏️',days:schedule.length,diff:'custom',desc:'Ваш план',schedule:schedule,books:conSel.slice(),totalDays:days};
+    var prog=app.progress[id];
+    if(prog){
+      prog.daysDone=(prog.daysDone||[]).filter(function(d){return d<=schedule.length;});
+      saveApp();
+      if(userId){
+        try{
+          await fetch(BACKEND+'/plan/set_days',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:id,days_done:prog.daysDone})});
+        }catch(e){}
+      }
+    } else saveApp();
+    conEditId=null;
+    app.activePlanId=id;
+    haptic('success');viewDay=null;goPage('pg-read');renderRead();
+    return;
+  }
   var planId='c'+Date.now();
-  app.customPlans[planId]={id:planId,title:title,icon:'✏️',days:schedule.length,diff:'custom',desc:'Ваш план',schedule:schedule};
+  app.customPlans[planId]={id:planId,title:title,icon:'✏️',days:schedule.length,diff:'custom',desc:'Ваш план',schedule:schedule,books:conSel.slice(),totalDays:days};
   app.activePlanId=planId;
-  app.progress[planId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifySlot:(app.settings&&app.settings.notifySlot)||'morning',notifyOn:app.settings&&app.settings.notifyOn!==false};
+  var defTime=(app.settings&&app.settings.notifyTime)||'08:00';
+  var msk=localTimeToMsk(defTime);
+  app.progress[planId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyTime:defTime,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings?app.settings.notifyOn!==false:true};
   saveApp();haptic('success');viewDay=null;goPage('pg-read');renderRead();
+  if(userId){
+    try{await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.progress[planId].notifyOn})});}catch(e){}
+  }
 }
 
 function renderCfg(){
-  var s=app.settings||{};
-  var tog=document.getElementById('cfg-not-tog');var lbl=document.getElementById('cfg-not-lbl');var ti=document.getElementById('cfg-time');
-  if(tog)tog.className='tog'+(s.notifyOn!==false?' on':'');
-  if(lbl)lbl.textContent='Напоминания '+(s.notifyOn!==false?'включены':'выключены');
-  if(ti)ti.value=s.notifyTime||'08:00';
+  var planId=app.activePlanId;
+  var prog=planId?app.progress[planId]:null;
+  var plan=planId?getPlan(planId):null;
+  var tog=document.getElementById('cfg-not-tog');var lbl=document.getElementById('cfg-not-lbl');var ti=document.getElementById('cfg-time');var pt=document.getElementById('cfg-plan-t');
+  if(pt)pt.textContent=plan?('Напоминания для плана: '+plan.title):'Сначала выбери план на вкладке «Планы»';
+  if(tog){tog.disabled=!prog;tog.className='tog'+(prog&&prog.notifyOn!==false?' on':'');}
+  if(ti)ti.disabled=!prog;
+  if(lbl)lbl.textContent=prog?('Напоминания '+(prog.notifyOn!==false?'включены':'выключены')):'Нет активного плана';
+  if(ti)ti.value=(prog&&prog.notifyTime)||'08:00';
   ['light','sepia','dark','night'].forEach(function(t){var b=document.getElementById('th-'+t);if(b)b.classList.toggle('sel',theme===t);});
   var fi=document.getElementById('font-ind');if(fi)fi.style.left=(fontIdx/(FS.length-1)*100-4)+'%';
   var tz=document.getElementById('cfg-tz-note');
   if(tz){var off=-new Date().getTimezoneOffset()/60;tz.textContent='Время указано по твоему часовому поясу (UTC'+(off>=0?'+':'')+off+')';}
 }
 function cfgTogNot(){
-  if(!app.settings)app.settings={};
-  app.settings.notifyOn=!(app.settings.notifyOn!==false);
+  var planId=app.activePlanId;if(!planId||!app.progress[planId])return;
+  var prog=app.progress[planId];
+  prog.notifyOn=!(prog.notifyOn!==false);
   saveApp();syncNotify();renderCfg();haptic('light');
 }
 function cfgSaveTime(v){
-  if(!app.settings)app.settings={};
-  app.settings.notifyTime=v;
+  var planId=app.activePlanId;if(!planId||!app.progress[planId])return;
+  var prog=app.progress[planId];
+  prog.notifyTime=v;
   var msk=localTimeToMsk(v);
-  app.settings.notifyHourMsk=msk.hour;
-  app.settings.notifyMinuteMsk=msk.minute;
+  prog.notifyHourMsk=msk.hour;
+  prog.notifyMinuteMsk=msk.minute;
   saveApp();syncNotify();haptic('light');pushState();
 }
 /* Debounce сохранения времени напоминания на сервере.
@@ -821,18 +890,23 @@ function cfgSaveTime(v){
    ПОЗЖЕ финального — тогда в базе оставалось неверное время, и напоминание
    реально приходило не в то время, что показано в интерфейсе. Здесь же,
    как и в pushState(), реально отправляется только самое последнее
-   значение — все промежуточные вызовы просто перезапускают таймер. */
+   значение — все промежуточные вызовы просто перезапускают таймер.
+
+   Важно: настройки напоминания теперь per-plan (у каждого плана — своё
+   время), а не общие на все планы разом — так каждый план с разным темпом
+   чтения может напоминать о себе в удобное именно для него время. */
 var _notifySyncTimer=null;
 function syncNotify(){
-  var s=app.settings||{};
-  var mskHour=s.notifyHourMsk!==undefined?s.notifyHourMsk:8;
-  var mskMinute=s.notifyMinuteMsk!==undefined?s.notifyMinuteMsk:0;
-  Object.keys(app.progress).forEach(function(id){app.progress[id].notifyHourMsk=mskHour;app.progress[id].notifyMinuteMsk=mskMinute;app.progress[id].notifyOn=s.notifyOn!==false;});
+  var planId=app.activePlanId;if(!planId||!app.progress[planId])return;
+  var prog=app.progress[planId];
+  var mskHour=prog.notifyHourMsk!==undefined?prog.notifyHourMsk:8;
+  var mskMinute=prog.notifyMinuteMsk!==undefined?prog.notifyMinuteMsk:0;
+  var notifyOn=prog.notifyOn!==false;
   saveApp();
-  if(!userId||!app.activePlanId) return;
+  if(!userId) return;
   clearTimeout(_notifySyncTimer);
   _notifySyncTimer=setTimeout(function(){
-    fetch(BACKEND+'/plan/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,notify_hour_msk:mskHour,notify_minute_msk:mskMinute,notify_on:s.notifyOn!==false})}).catch(function(){});
+    fetch(BACKEND+'/plan/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,notify_hour_msk:mskHour,notify_minute_msk:mskMinute,notify_on:notifyOn})}).catch(function(){});
   },700);
 }
 
@@ -879,16 +953,19 @@ async function syncBackend(){
    через /plan/merge_days и используем результат как окончательный —
    ни один реально прочитанный день не теряется ни на одной из сторон. */
 async function syncCanonicalDaysDone(){
-  var planId=app.activePlanId;
-  if(!userId||!planId||!app.progress[planId])return;
-  try{
-    var r=await fetch(BACKEND+'/plan/merge_days',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,days_done:app.progress[planId].daysDone||[]})});
-    var data=await r.json();
-    if(data&&data.ok){
-      app.progress[planId].daysDone=data.days_done||[];
-      saveApp();
-    }
-  }catch(e){}
+  if(!userId)return;
+  var planIds=Object.keys(app.progress||{});
+  for(var i=0;i<planIds.length;i++){
+    var planId=planIds[i];
+    try{
+      var r=await fetch(BACKEND+'/plan/merge_days',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,days_done:app.progress[planId].daysDone||[]})});
+      var data=await r.json();
+      if(data&&data.ok){
+        app.progress[planId].daysDone=data.days_done||[];
+      }
+    }catch(e){}
+  }
+  saveApp();
 }
 
 function showToast(msg){
