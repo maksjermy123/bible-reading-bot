@@ -143,7 +143,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 <div class="pg" id="pg-seq"><div class="hdr"><h1>📜 Вся Библия подряд</h1></div><div class="seq-nav"><select class="seq-sel" id="seq-book" onchange="seqBook()"></select><select class="seq-sel" id="seq-ch" onchange="seqRender()"></select></div><div class="sc" id="seq-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-out" style="margin-top:0;flex:1" onclick="seqPrev()">← Назад</button><button class="btn btn-acc" style="margin-top:0;flex:1" onclick="seqNext()">Далее →</button></div><button class="btn btn-out" style="margin-top:8px" onclick="addSeqBm()">⭐ Закладка</button><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
 <div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Начать план</button><button class="btn btn-out" onclick="conEditId=null;goPage('pg-sel')">Отмена</button></div>
 <div class="pg" id="pg-bm"><div class="hdr"><h1>⭐ Закладки</h1></div><div id="bm-list"></div><div id="bm-empty" style="display:none;text-align:center;padding:36px;color:var(--txt2);font-size:14px">Нет закладок.<br>Нажми ⭐ во время чтения.</div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a></div>
-<div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-t" style="font-size:12px;color:var(--txt2);margin-bottom:10px"></div><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid"><button onclick="setTheme('light')" id="th-light" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn"><div>🌅</div>Сепия</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button><button onclick="setTheme('night')" id="th-night" class="th-btn"><div>🌃</div>Ночная</button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div style="flex:1;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div></div>
+<div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-empty" style="font-size:12px;color:var(--txt2);margin-bottom:10px;display:none">Сначала выбери план на вкладке «Планы»</div><select id="cfg-plan-sel" onchange="cfgSelectPlan(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px;margin-bottom:12px"></select><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid"><button onclick="setTheme('light')" id="th-light" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn"><div>🌅</div>Сепия</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button><button onclick="setTheme('night')" id="th-night" class="th-btn"><div>🌃</div>Ночная</button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div style="flex:1;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div></div>
 <div class="pg" id="pg-done"><div class="done-wrap"><div class="done-em">🎉</div><h2 style="font-size:24px;font-weight:800;margin-bottom:8px">План завершён!</h2><p style="font-size:14px;color:var(--txt2);line-height:1.6;margin-bottom:20px" id="done-txt"></p><button class="btn btn-acc" onclick="goPage('pg-sel')">Выбрать новый план</button></div></div>
 <div class="bnav" id="bnav" style="display:none"><button class="nb on" id="nb-read" onclick="switchTab('read')"><span class="nb-em">📖</span>Чтение</button><button class="nb" id="nb-bm" onclick="switchTab('bm')"><span class="nb-em">⭐</span>Закладки</button><button class="nb" id="nb-sel" onclick="switchTab('sel')"><span class="nb-em">🏠</span>Планы</button><button class="nb" id="nb-cfg" onclick="switchTab('cfg')"><span class="nb-em">⚙️</span>Настройки</button></div>
 <div id="toast"></div>
@@ -851,30 +851,48 @@ async function startCustom(){
   }
 }
 
+var cfgPlanId=null; // какой план сейчас настраивается на вкладке "Настройки" — независимо от того, какой план читается
 function renderCfg(){
-  var planId=app.activePlanId;
-  var prog=planId?app.progress[planId]:null;
-  var plan=planId?getPlan(planId):null;
-  var tog=document.getElementById('cfg-not-tog');var lbl=document.getElementById('cfg-not-lbl');var ti=document.getElementById('cfg-time');var pt=document.getElementById('cfg-plan-t');
-  if(pt)pt.textContent=plan?('Напоминания для плана: '+plan.title):'Сначала выбери план на вкладке «Планы»';
+  var ids=Object.keys(app.progress||{}).filter(function(id){return getPlan(id);});
+  // Сохраняем предыдущий выбор, если план всё ещё существует; иначе — активный план чтения; иначе первый попавшийся.
+  if(!cfgPlanId||ids.indexOf(cfgPlanId)<0){
+    cfgPlanId=(app.activePlanId&&ids.indexOf(app.activePlanId)>=0)?app.activePlanId:(ids[0]||null);
+  }
+  var sel=document.getElementById('cfg-plan-sel');
+  var empty=document.getElementById('cfg-plan-empty');
+  if(sel){
+    sel.innerHTML=ids.map(function(id){
+      var t=getPlan(id).title;
+      return '<option value="'+id+'"'+(id===cfgPlanId?' selected':'')+'>'+t+(id===app.activePlanId?' (читаю сейчас)':'')+'</option>';
+    }).join('');
+    sel.style.display=ids.length?'block':'none';
+  }
+  if(empty)empty.style.display=ids.length?'none':'block';
+  var prog=cfgPlanId?app.progress[cfgPlanId]:null;
+  var tog=document.getElementById('cfg-not-tog');var lbl=document.getElementById('cfg-not-lbl');var ti=document.getElementById('cfg-time');
   if(tog){tog.disabled=!prog;tog.className='tog'+(prog&&prog.notifyOn!==false?' on':'');}
   if(ti)ti.disabled=!prog;
-  if(lbl)lbl.textContent=prog?('Напоминания '+(prog.notifyOn!==false?'включены':'выключены')):'Нет активного плана';
+  if(lbl)lbl.textContent=prog?('Напоминания '+(prog.notifyOn!==false?'включены':'выключены')):'Нет плана для настройки';
   if(ti)ti.value=(prog&&prog.notifyTime)||'08:00';
   ['light','sepia','dark','night'].forEach(function(t){var b=document.getElementById('th-'+t);if(b)b.classList.toggle('sel',theme===t);});
   var fi=document.getElementById('font-ind');if(fi)fi.style.left=(fontIdx/(FS.length-1)*100-4)+'%';
   var tz=document.getElementById('cfg-tz-note');
   if(tz){var off=-new Date().getTimezoneOffset()/60;tz.textContent='Время указано по твоему часовому поясу (UTC'+(off>=0?'+':'')+off+')';}
 }
+function cfgSelectPlan(id){
+  cfgPlanId=id;
+  renderCfg();
+  haptic('light');
+}
 function cfgTogNot(){
-  var planId=app.activePlanId;if(!planId||!app.progress[planId])return;
-  var prog=app.progress[planId];
+  if(!cfgPlanId||!app.progress[cfgPlanId])return;
+  var prog=app.progress[cfgPlanId];
   prog.notifyOn=!(prog.notifyOn!==false);
   saveApp();syncNotify();renderCfg();haptic('light');
 }
 function cfgSaveTime(v){
-  var planId=app.activePlanId;if(!planId||!app.progress[planId])return;
-  var prog=app.progress[planId];
+  if(!cfgPlanId||!app.progress[cfgPlanId])return;
+  var prog=app.progress[cfgPlanId];
   prog.notifyTime=v;
   var msk=localTimeToMsk(v);
   prog.notifyHourMsk=msk.hour;
@@ -894,10 +912,13 @@ function cfgSaveTime(v){
 
    Важно: настройки напоминания теперь per-plan (у каждого плана — своё
    время), а не общие на все планы разом — так каждый план с разным темпом
-   чтения может напоминать о себе в удобное именно для него время. */
+   чтения может напоминать о себе в удобное именно для него время.
+   Настраиваемый план (cfgPlanId) выбирается через выпадающий список на
+   странице настроек и не обязан совпадать с тем планом, который сейчас
+   читается (app.activePlanId). */
 var _notifySyncTimer=null;
 function syncNotify(){
-  var planId=app.activePlanId;if(!planId||!app.progress[planId])return;
+  var planId=cfgPlanId;if(!planId||!app.progress[planId])return;
   var prog=app.progress[planId];
   var mskHour=prog.notifyHourMsk!==undefined?prog.notifyHourMsk:8;
   var mskMinute=prog.notifyMinuteMsk!==undefined?prog.notifyMinuteMsk:0;
