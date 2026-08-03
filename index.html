@@ -345,11 +345,21 @@ async function delPlan(id){
   /* Каждый план теперь свой ряд на сервере (user_id+plan_id) — просто
      чистим ряд именно этого плана, остальные планы пользователя не
      затрагиваются. Без этого виджет "План" в Оглавлении и уведомления
-     продолжали бы показывать прогресс уже удалённого плана. */
+     продолжали бы показывать прогресс/слать напоминания по уже удалённому
+     плану. Проверяем ответ и пробуем ещё раз при сбое сети — раньше
+     неудачный запрос молча проглатывался, и удалённый план мог продолжать
+     присылать уведомления без какого-либо видимого признака ошибки. */
   if(!userId)return;
+  var ok=await unregisterOnServer(id);
+  if(!ok)ok=await unregisterOnServer(id); // одна повторная попытка при сбое сети
+  if(!ok)showToast('⚠️ Не удалось удалить план на сервере — попробуй ещё раз');
+}
+async function unregisterOnServer(planId){
   try{
-    await fetch(BACKEND+'/plan/unregister',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:id})});
-  }catch(e){}
+    var r=await fetch(BACKEND+'/plan/unregister',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId})});
+    var data=await r.json();
+    return !!(data&&data.ok);
+  }catch(e){return false;}
 }
 function getPlan(id){return PLANS.find(function(p){return p.id===id;})||app.customPlans[id]||null;}
 
@@ -916,7 +926,7 @@ function cfgSaveTime(v){
    Настраиваемый план (cfgPlanId) выбирается через выпадающий список на
    странице настроек и не обязан совпадать с тем планом, который сейчас
    читается (app.activePlanId). */
-var _notifySyncTimer=null;
+var _notifySyncTimers={}; // planId -> timeout handle (per-план, а не общий на всех)
 function syncNotify(){
   var planId=cfgPlanId;if(!planId||!app.progress[planId])return;
   var prog=app.progress[planId];
@@ -925,8 +935,8 @@ function syncNotify(){
   var notifyOn=prog.notifyOn!==false;
   saveApp();
   if(!userId) return;
-  clearTimeout(_notifySyncTimer);
-  _notifySyncTimer=setTimeout(function(){
+  clearTimeout(_notifySyncTimers[planId]);
+  _notifySyncTimers[planId]=setTimeout(function(){
     fetch(BACKEND+'/plan/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,notify_hour_msk:mskHour,notify_minute_msk:mskMinute,notify_on:notifyOn})}).catch(function(){});
   },700);
 }
