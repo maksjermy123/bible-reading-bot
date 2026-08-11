@@ -163,6 +163,19 @@ var tg=window.Telegram&&window.Telegram.WebApp;
 if(tg){tg.ready();tg.expand();}
 var userId=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user?tg.initDataUnsafe.user.id:null;
 
+/* Принудительный локальный сброс — открой t.me/<бот>/plan?startapp=wipe.
+   Нужен в паре с админ-панелью /users (🧨 Сбросить всё): даже если стереть
+   прогресс и app_state на сервере, ЭТО устройство всё равно хранит копию
+   в localStorage и при обычном открытии просто зальёт её обратно на
+   сервер как "текущее" состояние — то есть старые планы вернутся, будто
+   их и не удаляли. startapp=wipe стирает localStorage ДО загрузки app,
+   давая настоящий чистый лист именно на этом устройстве. */
+try{
+  if(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param==='wipe'){
+    localStorage.removeItem('bapp3');
+  }
+}catch(e){}
+
 var bible=null;
 var app=loadApp();
 var viewDay=null;
