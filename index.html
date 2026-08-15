@@ -138,10 +138,10 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 <body>
 <div id="pg-load"><div class="spin">📖</div><div style="font-size:15px;color:var(--acc);font-weight:600">Загружаем Библию...</div><div style="font-size:12px;color:var(--txt2)">Пожалуйста, подождите</div></div>
 <div class="pg" id="pg-ob"><div class="ob-wrap"><div class="ob-em" id="ob-em">📖</div><div class="ob-t" id="ob-t">Читай Библию каждый день</div><div class="ob-tx" id="ob-tx">Выбери план по силам и читай Слово Божье каждый день</div><div class="ob-dots"><div class="od on" id="od0"></div><div class="od" id="od1"></div><div class="od" id="od2"></div></div><button class="btn btn-acc" onclick="obNext()">Далее</button></div></div>
-<div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="my-plans"></div><div class="sec" id="suggested-lbl">Готовые планы</div><div id="plan-list"></div><div class="card card-custom" style="cursor:pointer" onclick="startNewCustomPlan()"><div class="card-top"><div class="card-ico">✏️</div><div class="card-info"><div class="card-title">Составить свой план</div><div class="card-meta">Выбери книги и срок сам</div></div><div class="badge">Свой</div></div></div><div class="card" style="cursor:pointer" onclick="goPage('pg-seq');initSeq()"><div class="card-top"><div class="card-ico">📜</div><div class="card-info"><div class="card-title">Свободное чтение</div><div class="card-meta">Свободное чтение, без графика</div></div><div class="badge">Гибкий</div></div></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a></div>
+<div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="my-plans"></div><div class="sec" id="suggested-lbl">Готовые планы</div><div id="plan-list"></div><div class="card" style="cursor:pointer" onclick="startChronoPlan()"><div class="card-top"><div class="card-ico">🕰️</div><div class="card-info"><div class="card-title">Хронологический Новый Завет</div><div class="card-meta">Выбери длительность сам</div></div><div class="badge">Гармония</div></div><div class="card-desc">Гармония четырёх Евангелий, Деяния, Послания и Откровение — в порядке реальных событий, а не порядке книг в каноне.</div></div><div class="card card-custom" style="cursor:pointer" onclick="startNewCustomPlan()"><div class="card-top"><div class="card-ico">✏️</div><div class="card-info"><div class="card-title">Составить свой план</div><div class="card-meta">Выбери книги и срок сам</div></div><div class="badge">Свой</div></div></div><div class="card" style="cursor:pointer" onclick="goPage('pg-seq');initSeq()"><div class="card-top"><div class="card-ico">📜</div><div class="card-info"><div class="card-title">Свободное чтение</div><div class="card-meta">Свободное чтение, без графика</div></div><div class="badge">Гибкий</div></div></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a></div>
 <div class="pg" id="pg-read"><div class="topbar"><button class="streak-btn" id="streak-badge" onclick="toggleStats()"><span style="font-size:20px" id="streak-ico">🔥</span><span class="streak-n" id="r-streak">0</span><span class="streak-l" id="r-streak-l">дней подряд</span></button><div style="display:flex;gap:5px"><button class="ico-btn" onclick="cycleTheme()" id="theme-btn">☀️</button><button class="ico-btn" onclick="goPage('pg-cfg')">⚙️</button></div></div><div id="stats-panel" style="display:none"><div class="stats-box"><div class="sg"><div class="si"><div class="sv" id="s-pct">0%</div><div class="sk">выполнено</div></div><div class="si"><div class="sv" id="s-done">0</div><div class="sk">дней готово</div></div><div class="si"><div class="sv" id="s-left">0</div><div class="sk">осталось</div></div><div class="si"><div class="sv" id="s-streak">0</div><div class="sk">дней подряд</div></div><div class="si"><div class="sv" id="s-max">0</div><div class="sk">рекорд</div></div><div class="si"><div class="sv" id="s-start">—</div><div class="sk">начат</div></div></div><div class="pb"><div class="pf" id="s-bar" style="width:0%"></div></div><div class="pl" id="s-plan-t"></div><button class="sec-tog" onclick="toggleCal()">📅 Календарь <span id="cal-arr">▼</span></button><div id="cal-wrap" style="display:none"><div class="cal-grid" id="cal-grid"></div></div></div></div><div class="cstat" id="r-cstat"></div><div class="pb" style="margin-bottom:10px"><div class="pf" id="r-bar" style="width:0%"></div></div><div class="day-nav"><button class="nav-btn" id="btn-prev" onclick="goDay(-1)">←</button><div class="day-info"><div class="day-n" id="r-day-n">День 1</div><div class="day-d" id="r-day-d"></div></div><button class="nav-btn" id="btn-next" onclick="goDay(1)">→</button></div><div id="to-today" style="margin-bottom:10px;display:none"><button onclick="goToday()" style="width:100%;font-size:15px;font-weight:800;color:#fff;background:var(--acc);border:none;border-radius:10px;padding:13px;cursor:pointer;font-family:var(--fui);box-shadow:0 3px 12px rgba(0,0,0,.18)">📖 К непрочитанному →</button></div><div class="ref-lbl"><span id="r-ref">—</span><button class="ico-btn" onclick="addBm()">⭐</button></div><div class="tabs" id="r-tabs"></div><div class="sc" id="r-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button><span style="color:var(--brd)">|</span><button style="padding:5px 10px;border:1px solid var(--brd);border-radius:7px;background:var(--card);font-size:12px;cursor:pointer;color:var(--txt2);font-family:var(--fui)" onclick="shareDay()">📋 Поделиться</button></div><button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button><a class="tlink" id="r-tlink" target="_blank"><span style="font-size:16px">📚</span> Читать другой перевод</a><div class="phrase" id="r-phrase"></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a></div>
 <div class="pg" id="pg-seq"><div class="hdr"><h1>📜 Свободное чтение</h1></div><div class="seq-nav"><select class="seq-sel" id="seq-book" onchange="seqBook()"></select><select class="seq-sel" id="seq-ch" onchange="seqRender()"></select></div><div class="sc" id="seq-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-out" style="margin-top:0;flex:1" onclick="seqPrev()">← Назад</button><button class="btn btn-acc" style="margin-top:0;flex:1" onclick="seqNext()">Далее →</button></div><button class="btn btn-out" style="margin-top:8px" onclick="addSeqBm()">⭐ Закладка</button><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
-<div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Начать план</button><button class="btn btn-out" onclick="conEditId=null;goPage('pg-sel')">Отмена</button></div>
+<div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div id="con-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Начать план</button><button class="btn btn-out" onclick="conEditId=null;goPage('pg-sel')">Отмена</button></div>
 <div class="pg" id="pg-bm"><div class="hdr"><h1>⭐ Закладки</h1></div><div id="bm-list"></div><div id="bm-empty" style="display:none;text-align:center;padding:36px;color:var(--txt2);font-size:14px">Нет закладок.<br>Нажми ⭐ во время чтения.</div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a></div>
 <div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-empty" style="font-size:12px;color:var(--txt2);margin-bottom:10px;display:none">Сначала выбери план на вкладке «Планы»</div><select id="cfg-plan-sel" onchange="cfgSelectPlan(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px;margin-bottom:12px"></select><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid"><button onclick="setTheme('light')" id="th-light" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn"><div>🌅</div>Сепия</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button><button onclick="setTheme('night')" id="th-night" class="th-btn"><div>🌃</div>Ночная</button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div style="flex:1;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div></div>
 <div class="pg" id="pg-done"><div class="done-wrap"><div class="done-em">🎉</div><h2 style="font-size:24px;font-weight:800;margin-bottom:8px">План завершён!</h2><p style="font-size:14px;color:var(--txt2);line-height:1.6;margin-bottom:20px" id="done-txt"></p><button class="btn btn-acc" onclick="goPage('pg-sel')">Выбрать новый план</button></div></div>
@@ -223,6 +223,42 @@ function bbLink(book,ch){
   if(!n)return 'https://bible.by/';
   return 'https://bible.by/verse/'+n+'/'+ch+'/';
 }
+
+/* Хронологический Новый Завет — источник: гармония четырёх Евангелий +
+   Деяния + Послания в порядке написания/путешествий Павла + Откровение.
+   Хранится КОМПАКТНО как список "юнитов" (книга-индекс, глава, стих_от,
+   стих_до) в правильном хронологическом порядке — а не готовое расписание
+   на фиксированное число дней. Это даёт возможность растянуть тот же самый
+   порядок чтения на ЛЮБОЕ количество дней, которое выберет пользователь:
+   buildChronoSchedule() разворачивает юниты в плоский список стихов (как
+   uже делает buildCustomSchedule() для книг целиком) и нарезает его на N
+   дней тем же самым проверенным алгоритмом равномерного распределения. */
+var NT_CHRONO_BOOKS=["Матфей", "Марк", "Лука", "Иоанн", "Деяния", "Римлянам", "1 Коринфянам", "2 Коринфянам", "Галатам", "Ефесянам", "Филиппийцам", "Колоссянам", "1 Фессалоникийцам", "2 Фессалоникийцам", "1 Тимофею", "2 Тимофею", "Титу", "Филимону", "Евреям", "Иаков", "1 Петра", "2 Петра", "1 Иоанна", "2 Иоанна", "3 Иоанна", "Иуда", "Откровение"];
+var NT_CHRONO_U=[3,1,1,51,2,1,1,80,0,1,1,25,2,2,1,52,0,2,1,23,0,3,1,17,1,1,1,45,2,3,1,38,0,4,1,25,2,4,1,44,3,2,1,25,3,3,1,36,3,4,1,54,0,5,1,48,0,6,1,34,0,7,1,29,2,5,1,39,0,8,1,34,0,9,1,38,1,2,1,28,3,5,1,47,0,12,1,50,1,3,1,35,2,6,1,49,0,13,1,58,1,4,1,41,2,7,1,50,1,5,1,43,2,8,1,56,0,10,1,42,0,11,1,30,1,6,1,56,0,14,1,36,3,6,1,71,0,15,1,39,1,7,1,37,0,16,1,28,1,8,1,38,0,17,1,27,1,9,1,50,0,18,1,35,3,7,1,53,3,8,1,59,3,9,1,41,3,10,1,42,2,9,1,62,2,10,1,42,2,11,1,54,2,12,1,59,2,13,1,35,2,14,1,35,2,15,1,32,2,16,1,31,2,17,1,37,3,11,1,57,0,19,1,30,1,10,1,52,2,18,1,43,0,20,1,34,3,12,1,11,2,19,1,28,0,21,1,11,1,11,1,11,2,19,29,44,3,12,12,19,0,21,18,19,1,11,12,14,0,21,12,17,1,11,15,19,2,19,45,48,0,21,20,22,1,11,20,26,0,21,23,32,1,11,27,33,2,20,1,8,0,21,33,46,0,22,1,14,1,12,1,12,2,20,9,19,0,22,15,46,1,12,13,37,2,20,20,44,0,23,1,39,1,12,38,40,2,20,45,47,1,12,41,44,2,21,1,4,3,12,20,50,0,24,1,51,0,25,1,46,1,13,1,37,2,21,5,36,2,21,37,38,0,26,1,16,1,14,1,11,2,22,1,6,0,26,17,19,1,14,12,16,2,22,7,13,2,22,14,16,3,13,1,20,0,26,20,25,1,14,17,21,2,22,21,23,3,13,21,30,0,26,26,29,1,14,22,25,2,22,17,20,2,22,24,30,0,26,31,35,1,14,27,31,2,22,31,38,3,13,31,38,3,14,1,31,3,15,1,27,3,16,1,33,3,17,1,26,0,26,30,30,0,26,36,46,1,14,26,26,1,14,32,42,2,22,39,46,0,26,47,56,1,14,43,52,2,22,47,53,3,18,1,12,3,18,13,14,3,18,19,24,0,26,57,68,1,14,53,65,2,22,63,65,0,26,69,75,1,14,66,72,2,22,54,62,3,18,15,18,3,18,25,27,0,27,1,1,1,15,1,1,2,22,66,71,0,27,3,10,0,27,2,2,0,27,11,14,1,15,2,5,2,23,1,5,3,18,28,38,2,23,6,12,0,27,15,23,1,15,6,14,2,23,13,23,3,18,39,40,0,27,26,30,1,15,15,19,3,19,1,7,0,27,24,25,2,23,24,25,3,19,8,16,0,27,31,34,1,15,20,23,2,23,26,32,3,19,17,17,0,27,35,38,1,15,24,28,2,23,33,34,3,19,18,24,0,27,39,44,1,15,29,32,2,23,35,43,3,19,25,27,0,27,45,45,1,15,33,33,2,23,44,45,0,27,46,50,1,15,34,37,2,23,46,46,3,19,28,30,0,27,51,54,1,15,38,39,2,23,47,47,0,27,55,56,1,15,40,41,2,23,48,49,3,19,31,37,0,27,57,61,1,15,42,47,2,23,50,56,3,19,38,42,0,27,62,66,0,28,1,4,0,28,5,8,1,16,1,8,2,24,1,11,3,20,1,2,3,20,3,10,2,24,12,12,3,20,11,18,1,16,9,11,0,28,9,10,0,28,11,15,2,24,13,35,1,16,12,13,2,24,36,43,3,20,19,23,3,20,24,29,3,20,30,31,3,21,1,23,3,21,24,25,0,28,16,20,1,16,14,20,2,24,44,53,4,1,1,26,4,2,1,47,4,3,1,26,4,4,1,37,4,5,1,42,4,6,1,15,4,7,1,60,4,8,1,40,4,9,1,43,4,10,1,48,4,11,1,30,4,12,1,25,4,13,1,52,4,14,1,28,8,1,1,24,8,2,1,21,8,3,1,29,8,4,1,31,8,5,1,26,8,6,1,18,4,15,1,41,19,1,1,27,19,2,1,26,19,3,1,18,19,4,1,17,19,5,1,20,4,16,1,40,4,17,1,34,4,18,1,28,12,1,1,10,12,2,1,20,12,3,1,13,12,4,1,18,12,5,1,28,13,1,1,12,13,2,1,17,13,3,1,18,4,19,1,40,6,1,1,31,6,2,1,16,6,3,1,23,6,4,1,21,6,5,1,13,6,6,1,20,6,7,1,40,6,8,1,13,6,9,1,27,6,10,1,33,6,11,1,34,6,12,1,31,6,13,1,13,6,14,1,40,6,15,1,58,6,16,1,24,4,20,1,38,7,1,1,24,7,2,1,17,7,3,1,18,7,4,1,18,7,5,1,21,7,6,1,18,7,7,1,16,7,8,1,24,7,9,1,15,7,10,1,18,7,11,1,32,7,12,1,21,7,13,1,13,5,1,1,32,5,2,1,29,5,3,1,31,5,4,1,25,5,5,1,21,5,6,1,23,5,7,1,25,5,8,1,39,5,9,1,33,5,10,1,21,5,11,1,36,5,12,1,21,5,13,1,14,5,14,1,26,5,15,1,33,5,16,1,24,4,21,1,40,4,22,1,30,4,23,1,35,4,24,1,27,4,25,1,27,4,26,1,32,4,27,1,44,4,28,1,31,9,1,1,23,9,2,1,22,9,3,1,21,9,4,1,32,9,5,1,33,9,6,1,24,10,1,1,30,10,2,1,30,10,3,1,21,10,4,1,23,11,1,1,29,11,2,1,23,11,3,1,25,11,4,1,18,17,1,1,25,20,1,1,25,20,2,1,25,20,3,1,22,20,4,1,19,20,5,1,14,21,1,1,21,21,2,1,22,21,3,1,18,14,1,1,20,14,2,1,15,14,3,1,16,14,4,1,16,14,5,1,25,14,6,1,21,16,1,1,16,16,2,1,15,16,3,1,15,18,1,1,14,18,2,1,18,18,3,1,19,18,4,1,16,18,5,1,14,18,6,1,20,18,7,1,28,18,8,1,13,18,9,1,28,18,10,1,39,18,11,1,40,18,12,1,29,18,13,1,25,15,1,1,18,15,2,1,26,15,3,1,17,15,4,1,22,25,1,1,25,22,1,1,10,22,2,1,29,22,3,1,24,22,4,1,21,22,5,1,21,23,1,1,13,24,1,1,15,26,1,1,20,26,2,1,29,26,3,1,22,26,4,1,11,26,5,1,14,26,6,1,17,26,7,1,17,26,8,1,13,26,9,1,21,26,10,1,11,26,11,1,19,26,12,1,17,26,13,1,18,26,14,1,20,26,15,1,8,26,16,1,21,26,17,1,18,26,18,1,24,26,19,1,21,26,20,1,15,26,21,1,27,26,22,1,21];
+function buildChronoSchedule(days){
+  var allV=[];
+  for(var i=0;i<NT_CHRONO_U.length;i+=4){
+    var bn=NT_CHRONO_BOOKS[NT_CHRONO_U[i]],ch=NT_CHRONO_U[i+1],vf=NT_CHRONO_U[i+2],vt=NT_CHRONO_U[i+3];
+    for(var v=vf;v<=vt;v++)allV.push({book:bn,ch:ch,v:v});
+  }
+  var total=allV.length;var schedule=[];var prev=0;
+  for(var day=1;day<=days;day++){
+    var end=Math.round(day*total/days);var dv=allV.slice(prev,end);if(!dv.length){prev=end;continue;}
+    var refs=[];var rs=dv[0];var re=dv[0];
+    for(var j=1;j<dv.length;j++){
+      var vv=dv[j];
+      if(vv.book===re.book&&vv.ch===re.ch&&vv.v===re.v+1)re=vv;
+      else{var full=rs.v===1&&re.v===(VC[rs.book]?VC[rs.book][rs.ch-1]:0);refs.push({book:rs.book,ch:rs.ch,vf:rs.v,vt:re.v,full:full});rs=vv;re=vv;}
+    }
+    var full2=rs.v===1&&re.v===(VC[rs.book]?VC[rs.book][rs.ch-1]:0);
+    refs.push({book:rs.book,ch:rs.ch,vf:rs.v,vt:re.v,full:full2});
+    var label=refs.map(function(r){return r.full?(r.book+' '+r.ch):(r.book+' '+r.ch+':'+r.vf+'-'+r.vt);}).join('; ');
+    schedule.push({day:day,refs:refs,label:label});prev=end;
+  }
+  return schedule;
+}
+var conChrono=false;
+function startChronoPlan(){conChrono=true;conEditId=null;goPage('pg-con');initCon();}
 
 var THEMES=['light','dark','sepia','night'];
 var THEME_ICO={light:'☀️',dark:'🌙',sepia:'🌅',night:'🌃'};
@@ -623,19 +659,26 @@ async function markRead(){
       if(data.ok){
         prog.streak=data.streak;prog.maxStreak=data.max_streak;saveApp();renderRead();
       } else if(data.error==='not registered'){
-        /* Стрик/день выше уже были записаны в localStorage ОПТИМИСТИЧНО,
-           до этого ответа. Раз сервер говорит "план не зарегистрирован"
-           (удалён вручную, через /users, или ещё не восстановлен после
-           сброса аккаунта) — этот локальный прогресс нелегитимен и не
-           должен тихо копиться дальше в отрыве от сервера. Откатываем
-           план целиком и просим выбрать его заново, а не просто откатываем
-           стрик — иначе план остался бы "наполовину живым призраком". */
-        var deadPlanId=app.activePlanId;
-        delete app.progress[deadPlanId];
-        app.activePlanId=null;
-        saveApp();
-        showToast('Этот план сброшен на сервере — выбери план заново');
-        renderSel();goPage('pg-sel');
+        /* В подавляющем большинстве случаев это НЕ "план правда удалили",
+           а временный сбой — например, бэкенд на Render ещё "просыпался",
+           пока шла регистрация плана, и /plan/register не успел
+           отработать. Удалять план целиком за это — слишком радикально:
+           так ломается второй (третий, ...) параллельно читаемый план при
+           любой сетевой заминке, а не только при реальном удалении.
+           Вместо разрушительного отката один раз пробуем
+           самовосстановиться: перерегистрировать план с текущими локальными
+           настройками уведомлений и повторить попытку записать день —
+           локальный прогресс при этом не трогаем ни в каком случае.
+           От настоящего сценария "аккаунт сбросили через /users" защищает
+           не это, а checkAccountReset() при следующей загрузке приложения —
+           там localStorage чистится ЦЕЛИКОМ и сознательно, а не по одному
+           плану на основании единственного неудачного запроса. */
+        try{
+          await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,notify_hour_msk:prog.notifyHourMsk,notify_minute_msk:prog.notifyMinuteMsk,notify_on:prog.notifyOn!==false})});
+          var r2=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,day_number:vd,local_date:t})});
+          var data2=await r2.json();
+          if(data2.ok){prog.streak=data2.streak;prog.maxStreak=data2.max_streak;saveApp();renderRead();}
+        }catch(e2){}
       }
     }catch(e){}
   }
@@ -792,29 +835,34 @@ function delBm(e,id){
 }
 
 function initCon(){
-  var ot=document.getElementById('ot-books');var nt=document.getElementById('nt-books');
-  if(ot)ot.innerHTML=OT_BOOKS.map(function(b){return '<button class="bc" data-n="'+b.name+'" onclick="toggleBook(this)">'+b.name+'</button>';}).join('');
-  if(nt)nt.innerHTML=NT_BOOKS.map(function(b){return '<button class="bc" data-n="'+b.name+'" onclick="toggleBook(this)">'+b.name+'</button>';}).join('');
-  var title=document.getElementById('con-title');
   var editing=conEditId&&app.customPlans[conEditId];
-  if(title)title.textContent=editing?'✏️ Изменить план':'✏️ Свой план';
+  if(editing&&editing.chrono)conChrono=true;
+  var books=document.getElementById('con-books-wrap');
+  if(books)books.style.display=conChrono?'none':'';
+  if(!conChrono){
+    var ot=document.getElementById('ot-books');var nt=document.getElementById('nt-books');
+    if(ot)ot.innerHTML=OT_BOOKS.map(function(b){return '<button class="bc" data-n="'+b.name+'" onclick="toggleBook(this)">'+b.name+'</button>';}).join('');
+    if(nt)nt.innerHTML=NT_BOOKS.map(function(b){return '<button class="bc" data-n="'+b.name+'" onclick="toggleBook(this)">'+b.name+'</button>';}).join('');
+  }
+  var title=document.getElementById('con-title');
+  if(title)title.textContent=conChrono?'🕰️ Хронологический Новый Завет':(editing?'✏️ Изменить план':'✏️ Свой план');
   if(editing){
     conSel=(editing.books||[]).slice();
-    var daysInp=document.getElementById('con-days');if(daysInp)daysInp.value=editing.totalDays||editing.days||30;
+    var daysInp=document.getElementById('con-days');if(daysInp)daysInp.value=editing.totalDays||editing.days||(conChrono?180:30);
     document.querySelectorAll('.bc').forEach(function(b){b.classList.toggle('sel',conSel.indexOf(b.dataset.n)>=0);});
   } else {
     conSel=[];
-    var daysInp2=document.getElementById('con-days');if(daysInp2)daysInp2.value=30;
+    var daysInp2=document.getElementById('con-days');if(daysInp2)daysInp2.value=conChrono?180:30;
   }
   updatePrev();
 }
 function startNewCustomPlan(){
-  conEditId=null;
+  conEditId=null;conChrono=false;
   goPage('pg-con');initCon();
 }
 function editCustomPlan(id){
   if(!app.customPlans[id])return;
-  conEditId=id;
+  conEditId=id;conChrono=!!app.customPlans[id].chrono;
   goPage('pg-con');initCon();
   haptic('light');
 }
@@ -826,6 +874,12 @@ function toggleBook(btn){
 function updatePrev(){
   var days=parseInt(document.getElementById('con-days').value)||0;
   var prev=document.getElementById('con-prev');var btn=document.getElementById('btn-con');
+  if(conChrono){
+    if(days<1){if(prev)prev.textContent='Укажи длительность';if(btn)btn.disabled=true;return;}
+    if(prev)prev.textContent='Весь Новый Завет в хронологическом порядке · 260 глав · 7955 стихов · ~'+(7955/days).toFixed(0)+' стихов/день · '+days+' дней';
+    if(btn){btn.disabled=false;btn.textContent=conEditId?'Сохранить изменения':'Начать план';}
+    return;
+  }
   if(!conSel.length||days<1){if(prev)prev.textContent='Выбери книги и укажи длительность';if(btn)btn.disabled=true;return;}
   var totalCh=0;
   conSel.forEach(function(n){var b=ALL_BOOKS.find(function(b){return b.name===n;});if(b)totalCh+=b.chapters;});
@@ -852,17 +906,17 @@ function buildCustomSchedule(days){
   return schedule;
 }
 async function startCustom(){
-  var days=parseInt(document.getElementById('con-days').value)||30;
-  if(!conSel.length)return;
-  var schedule=buildCustomSchedule(days);
-  var title=conSel.length===1?conSel[0]+' за '+days+' дней':'Свой план · '+days+' дней';
+  var days=parseInt(document.getElementById('con-days').value)||(conChrono?180:30);
+  if(!conChrono&&!conSel.length)return;
+  var schedule=conChrono?buildChronoSchedule(days):buildCustomSchedule(days);
+  var title=conChrono?('🕰️ Хронологический Новый Завет · '+days+' дней'):(conSel.length===1?conSel[0]+' за '+days+' дней':'Свой план · '+days+' дней');
   if(conEditId&&app.customPlans[conEditId]){
     /* Редактирование существующего плана — тот же id, пересобранное
        расписание. Дни, отмеченные прочитанными, но выходящие за пределы
        новой длительности, обрезаются — план и прогресс адаптируются под
        новые параметры, как и просилось. */
     var id=conEditId;
-    app.customPlans[id]={id:id,title:title,icon:'✏️',days:schedule.length,diff:'custom',desc:'Ваш план',schedule:schedule,books:conSel.slice(),totalDays:days};
+    app.customPlans[id]={id:id,title:title,icon:conChrono?'🕰️':'✏️',days:schedule.length,diff:'custom',desc:conChrono?'Гармония Евангелий, Деяния, Послания и Откровение по порядку событий':'Ваш план',schedule:schedule,books:conChrono?[]:conSel.slice(),totalDays:days,chrono:conChrono};
     var prog=app.progress[id];
     if(prog){
       prog.daysDone=(prog.daysDone||[]).filter(function(d){return d<=schedule.length;});
@@ -879,7 +933,7 @@ async function startCustom(){
     return;
   }
   var planId='c'+Date.now();
-  app.customPlans[planId]={id:planId,title:title,icon:'✏️',days:schedule.length,diff:'custom',desc:'Ваш план',schedule:schedule,books:conSel.slice(),totalDays:days};
+  app.customPlans[planId]={id:planId,title:title,icon:conChrono?'🕰️':'✏️',days:schedule.length,diff:'custom',desc:conChrono?'Гармония Евангелий, Деяния, Послания и Откровение по порядку событий':'Ваш план',schedule:schedule,books:conChrono?[]:conSel.slice(),totalDays:days,chrono:conChrono};
   app.activePlanId=planId;
   var defTime=(app.settings&&app.settings.notifyTime)||'08:00';
   var msk=localTimeToMsk(defTime);
