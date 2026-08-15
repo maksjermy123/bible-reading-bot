@@ -620,7 +620,23 @@ async function markRead(){
     try{
       var r=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,day_number:vd,local_date:t})});
       var data=await r.json();
-      if(data.ok){prog.streak=data.streak;prog.maxStreak=data.max_streak;saveApp();renderRead();}
+      if(data.ok){
+        prog.streak=data.streak;prog.maxStreak=data.max_streak;saveApp();renderRead();
+      } else if(data.error==='not registered'){
+        /* Стрик/день выше уже были записаны в localStorage ОПТИМИСТИЧНО,
+           до этого ответа. Раз сервер говорит "план не зарегистрирован"
+           (удалён вручную, через /users, или ещё не восстановлен после
+           сброса аккаунта) — этот локальный прогресс нелегитимен и не
+           должен тихо копиться дальше в отрыве от сервера. Откатываем
+           план целиком и просим выбрать его заново, а не просто откатываем
+           стрик — иначе план остался бы "наполовину живым призраком". */
+        var deadPlanId=app.activePlanId;
+        delete app.progress[deadPlanId];
+        app.activePlanId=null;
+        saveApp();
+        showToast('Этот план сброшен на сервере — выбери план заново');
+        renderSel();goPage('pg-sel');
+      }
     }catch(e){}
   }
 }
@@ -969,8 +985,38 @@ function pushState(){
   },1200);
 }
 
+/* Отличает "это новое устройство/новый пользователь" от "этого
+   пользователя стёрли через /users" — оба случая раньше выглядели для
+   syncBackend() одинаково ("на сервере пусто"), из-за чего старый
+   localStorage безусловно заливался обратно как "текущее" состояние.
+   bible_accounts.reset_token — метка, которая переживает удаление
+   plan_progress/app_state и меняется только когда админ реально стирает
+   пользователя. Если локально уже был сохранён token и он не совпал с
+   серверным — значит сброс произошёл именно с прошлой синхронизации
+   ЭТОГО устройства, и localStorage нужно стереть ДО того, как pushState()
+   успеет воскресить его на сервере. Если локального token ещё нет
+   (устройство впервые видит эту проверку) — ничего не трогаем, просто
+   запоминаем token: иначе первый же деплой этой правки стёр бы прогресс
+   всем существующим пользователям поголовно. */
+async function checkAccountReset(){
+  if(!userId) return;
+  try{
+    var r=await fetch(BACKEND+'/account/status?user_id='+userId);
+    var s=await r.json();
+    var serverToken=s&&s.reset_token;
+    if(!serverToken) return;
+    var localToken=localStorage.getItem('bres');
+    if(localToken && localToken!==serverToken){
+      localStorage.removeItem('bapp3');
+      app=loadApp();
+    }
+    localStorage.setItem('bres',serverToken);
+  }catch(e){}
+}
+
 async function syncBackend(){
   if(!userId)return;
+  await checkAccountReset();
   try{
     var r=await fetch(BACKEND+'/state?user_id='+userId);
     var s=await r.json();
