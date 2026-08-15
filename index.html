@@ -382,7 +382,7 @@ async function startPlan(){
   app.activePlanId=selPlanId;
   app.progress[selPlanId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyTime:time,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings.notifyOn!==false};
   saveApp();
-  if(userId){try{await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:selPlanId,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.settings.notifyOn!==false})});}catch(e){}}
+  if(userId){try{await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:selPlanId,title:(getPlan(selPlanId)||{}).title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.settings.notifyOn!==false})});}catch(e){}}
   haptic('success');viewDay=null;goPage('pg-read');renderRead();
 }
 function continuePlan(id){app.activePlanId=id;saveApp();viewDay=null;goPage('pg-read');renderRead();}
@@ -674,7 +674,7 @@ async function markRead(){
            там localStorage чистится ЦЕЛИКОМ и сознательно, а не по одному
            плану на основании единственного неудачного запроса. */
         try{
-          await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,notify_hour_msk:prog.notifyHourMsk,notify_minute_msk:prog.notifyMinuteMsk,notify_on:prog.notifyOn!==false})});
+          await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,title:(getPlan(app.activePlanId)||{}).title,notify_hour_msk:prog.notifyHourMsk,notify_minute_msk:prog.notifyMinuteMsk,notify_on:prog.notifyOn!==false})});
           var r2=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,day_number:vd,local_date:t})});
           var data2=await r2.json();
           if(data2.ok){prog.streak=data2.streak;prog.maxStreak=data2.max_streak;saveApp();renderRead();}
@@ -940,7 +940,7 @@ async function startCustom(){
   app.progress[planId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyTime:defTime,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings?app.settings.notifyOn!==false:true};
   saveApp();haptic('success');viewDay=null;goPage('pg-read');renderRead();
   if(userId){
-    try{await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.progress[planId].notifyOn})});}catch(e){}
+    try{await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,title:title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.progress[planId].notifyOn})});}catch(e){}
   }
 }
 
