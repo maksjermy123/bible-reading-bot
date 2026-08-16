@@ -195,9 +195,19 @@ var userId=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user?tg.initDataUnsafe.user.
    сервер как "текущее" состояние — то есть старые планы вернутся, будто
    их и не удаляли. startapp=wipe стирает localStorage ДО загрузки app,
    давая настоящий чистый лист именно на этом устройстве. */
+/* Тот же startapp-механизм, что и wipe выше, только для диплинков с другим
+   значением: виджет "План" в мини-аппе Radio (открыт через ДРУГОГО бота,
+   @preoradio_bot) ведёт сюда через t.me/mybible_reading_bot/plan?startapp=
+   open_<planId> — это межботовый переход, поэтому planId приходит через
+   tg.initDataUnsafe.start_param, а не через query-параметр URL (тот
+   способ работает только для web_app-кнопок с прямым URL, как в
+   уведомлениях бота — см. плоскую ?plan= проверку в init() ниже). */
+var startParamOpenPlanId=null;
 try{
   if(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param==='wipe'){
     localStorage.removeItem('bapp3');
+  } else if(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param&&tg.initDataUnsafe.start_param.indexOf('open_')===0){
+    startParamOpenPlanId=tg.initDataUnsafe.start_param.slice(5);
   }
 }catch(e){}
 
@@ -1176,7 +1186,7 @@ async function init(){
      устройстве) — иначе переключение могло не сработать на первом
      открытии нового устройства. */
   try{
-    var urlPlanId=new URLSearchParams(location.search).get('plan');
+    var urlPlanId=new URLSearchParams(location.search).get('plan')||startParamOpenPlanId;
     if(urlPlanId && app.progress && app.progress[urlPlanId] && getPlan(urlPlanId)){
       app.activePlanId=urlPlanId;
     }
