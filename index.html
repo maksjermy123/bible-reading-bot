@@ -78,7 +78,8 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 .tab.on{border-color:var(--acc);background:var(--acc2);color:var(--acc);font-weight:600}
 .sc{background:var(--card);border:1px solid var(--brd);border-radius:var(--rad);padding:16px;margin-bottom:8px}
 .sch{font-size:12px;font-weight:700;color:var(--acc);margin-bottom:8px}
-.st{font-family:var(--ftxt);font-size:1rem;line-height:1.85;color:var(--txt)}
+.st{font-family:var(--ftxt);font-size:1rem;line-height:1.85;color:var(--txt);-webkit-user-select:text;user-select:text}
+#sel-copy-btn{position:fixed;z-index:9998;display:none;background:var(--txt);color:var(--bg);border:none;border-radius:20px;padding:9px 16px;font-size:13px;font-weight:700;font-family:var(--fui);box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer;align-items:center;gap:6px;transform:translateX(-50%)}
 .vn{font-size:10px;font-weight:700;color:var(--acc);vertical-align:super;margin-right:1px;cursor:pointer}
 .no-text{text-align:center;padding:20px;color:var(--txt2);font-size:13px;line-height:1.6}
 .font-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
@@ -144,10 +145,12 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 <div class="pg" id="pg-seq"><div class="hdr"><h1>📜 Свободное чтение</h1></div><div class="seq-nav"><select class="seq-sel" id="seq-book" onchange="seqBook()"></select><select class="seq-sel" id="seq-ch" onchange="seqRender()"></select></div><div class="sc" id="seq-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-out" style="margin-top:0;flex:1" onclick="seqPrev()">← Назад</button><button class="btn btn-acc" style="margin-top:0;flex:1" onclick="seqNext()">Далее →</button></div><button class="btn btn-out" style="margin-top:8px" onclick="addSeqBm()">⭐ Закладка</button><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
 <div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div id="con-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Начать план</button><button class="btn btn-out" onclick="conEditId=null;goPage('pg-sel')">Отмена</button></div>
 <div class="pg" id="pg-bm"><div class="hdr"><h1>⭐ Закладки</h1></div><div id="bm-list"></div><div id="bm-empty" style="display:none;text-align:center;padding:36px;color:var(--txt2);font-size:14px">Нет закладок.<br>Нажми ⭐ во время чтения.</div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a></div>
-<div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-empty" style="font-size:12px;color:var(--txt2);margin-bottom:10px;display:none">Сначала выбери план на вкладке «Планы»</div><select id="cfg-plan-sel" onchange="cfgSelectPlan(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px;margin-bottom:12px"></select><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid"><button onclick="setTheme('light')" id="th-light" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn"><div>🌅</div>Сепия</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button><button onclick="setTheme('night')" id="th-night" class="th-btn"><div>🌃</div>Ночная</button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div style="flex:1;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div></div>
+<div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-empty" style="font-size:12px;color:var(--txt2);margin-bottom:10px;display:none">Сначала выбери план на вкладке «Планы»</div><select id="cfg-plan-sel" onchange="cfgSelectPlan(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px;margin-bottom:12px"></select><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid"><button onclick="setTheme('light')" id="th-light" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn"><div>🌅</div>Сепия</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button><button onclick="setTheme('night')" id="th-night" class="th-btn"><div>🌃</div>Ночная</button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div id="font-track" style="flex:1;height:28px;display:flex;align-items:center;position:relative;touch-action:none;cursor:pointer"><div style="width:100%;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div></div>
+
 <div class="pg" id="pg-done"><div class="done-wrap"><div class="done-em">🎉</div><h2 style="font-size:24px;font-weight:800;margin-bottom:8px">План завершён!</h2><p style="font-size:14px;color:var(--txt2);line-height:1.6;margin-bottom:20px" id="done-txt"></p><button class="btn btn-acc" onclick="goPage('pg-sel')">Выбрать новый план</button></div></div>
 <div class="bnav" id="bnav" style="display:none"><button class="nb on" id="nb-read" onclick="switchTab('read')"><span class="nb-em">📖</span>Чтение</button><button class="nb" id="nb-bm" onclick="switchTab('bm')"><span class="nb-em">⭐</span>Закладки</button><button class="nb" id="nb-sel" onclick="switchTab('sel')"><span class="nb-em">🏠</span>Планы</button><button class="nb" id="nb-cfg" onclick="switchTab('cfg')"><span class="nb-em">⚙️</span>Настройки</button></div>
 <div id="toast"></div>
+<button id="sel-copy-btn">📋 Копировать</button>
 <script>
 var BACKEND='https://myradio-rrsk.onrender.com';
 var BOOK_NUM={"Бытие": 1, "Исход": 2, "Левит": 3, "Числа": 4, "Второзаконие": 5, "Иисус Навин": 6, "Судьи": 7, "Руфь": 8, "1 Царств": 9, "2 Царств": 10, "3 Царств": 11, "4 Царств": 12, "1 Паралипоменон": 13, "2 Паралипоменон": 14, "Ездра": 15, "Неемия": 16, "Есфирь": 17, "Иов": 18, "Псалтирь": 19, "Притчи": 20, "Екклесиаст": 21, "Песнь Песней": 22, "Исаия": 23, "Иеремия": 24, "Плач Иеремии": 25, "Иезекииль": 26, "Даниил": 27, "Осия": 28, "Иоиль": 29, "Амос": 30, "Авдий": 31, "Иона": 32, "Михей": 33, "Наум": 34, "Аввакум": 35, "Софония": 36, "Аггей": 37, "Захария": 38, "Малахия": 39, "Матфей": 40, "Марк": 41, "Лука": 42, "Иоанн": 43, "Деяния": 44, "Иаков": 45, "1 Петра": 46, "2 Петра": 47, "1 Иоанна": 48, "2 Иоанна": 49, "3 Иоанна": 50, "Иуда": 51, "Римлянам": 52, "1 Коринфянам": 53, "2 Коринфянам": 54, "Галатам": 55, "Ефесянам": 56, "Филиппийцам": 57, "Колоссянам": 58, "1 Фессалоникийцам": 59, "2 Фессалоникийцам": 60, "1 Тимофею": 61, "2 Тимофею": 62, "Титу": 63, "Филимону": 64, "Евреям": 65, "Откровение": 66};
@@ -772,12 +775,99 @@ function shareDay(){
   haptic('light');
 }
 
-function chFont(d){
-  fontIdx=Math.max(0,Math.min(FS.length-1,fontIdx+d));
+function applyFontIdx(idx){
+  fontIdx=Math.max(0,Math.min(FS.length-1,idx));
   localStorage.setItem('fi',fontIdx);
   document.querySelectorAll('.st').forEach(function(el){el.style.fontSize=FS[fontIdx]+'rem';});
   var fi=document.getElementById('font-ind');if(fi)fi.style.left=(fontIdx/(FS.length-1)*100-4)+'%';
+}
+function chFont(d){
+  applyFontIdx(fontIdx+d);
   haptic('light');
+}
+/* Раньше единственным способом скопировать текст было тапнуть по мелкой
+   цифре стиха — копировался ровно один стих, и мало кто вообще замечал,
+   что цифра кликабельна. Здесь — привычный всем паттерн выделения текста
+   пальцем (как в любом читалке/заметках): выделяешь сколько нужно слов
+   или стихов подряд, над выделением всплывает кнопка "Копировать".
+   Работает поверх нативного выделения браузера (просто слушаем
+   selectionchange), а не подменяет его — так что long-press → выделить
+   → тянуть за маркеры продолжает работать, как ожидает пользователь. */
+function initSelectionCopy(){
+  var btn=document.getElementById('sel-copy-btn');
+  if(!btn)return;
+  function hide(){btn.style.display='none';}
+  function updateFromSelection(){
+    var sel=window.getSelection();
+    if(!sel||sel.isCollapsed||sel.rangeCount===0){hide();return;}
+    var text=sel.toString().trim();
+    if(!text){hide();return;}
+    var range=sel.getRangeAt(0);
+    var container=range.commonAncestorContainer;
+    var el=container.nodeType===1?container:container.parentElement;
+    if(!el||!el.closest('.st')){hide();return;}
+    var rect=range.getBoundingClientRect();
+    if(!rect||(!rect.width&&!rect.height)){hide();return;}
+    btn.style.display='flex';
+    btn.style.left=Math.min(Math.max(70,rect.left+rect.width/2),window.innerWidth-70)+'px';
+    var top=rect.top-46;
+    btn.style.top=(top<8?rect.bottom+10:top)+'px';
+  }
+  document.addEventListener('selectionchange',function(){
+    clearTimeout(btn._t);
+    btn._t=setTimeout(updateFromSelection,60);
+  });
+  window.addEventListener('scroll',hide,true);
+  btn.addEventListener('click',function(){
+    var sel=window.getSelection();
+    var text=sel?sel.toString().trim():'';
+    if(!text)return;
+    try{navigator.clipboard.writeText(text);}catch(e){}
+    showToast('Скопировано');
+    haptic('light');
+    hide();
+    sel.removeAllRanges();
+  });
+}
+/* Раньше ползунок шрифта был чисто декоративным — кружок двигался только
+   от кнопок A−/A+, а по самой полоске тапнуть или провести пальцем было
+   нельзя. Здесь трек слушает Pointer Events (единый API для мыши и
+   тач-экрана в современных WebView) с фолбэком на touch-события для
+   более старых клиентов. Индекс пересчитывается из позиции пальца в
+   реальном времени по ходу движения, а не только по отпусканию. */
+var _fontDragging=false;
+function _fontIdxFromX(track,clientX){
+  var rect=track.getBoundingClientRect();
+  var ratio=(clientX-rect.left)/rect.width;
+  ratio=Math.max(0,Math.min(1,ratio));
+  return Math.round(ratio*(FS.length-1));
+}
+function initFontSlider(){
+  var track=document.getElementById('font-track');
+  if(!track||track._wired)return;
+  track._wired=true;
+  function onStart(clientX){
+    _fontDragging=true;
+    var idx=_fontIdxFromX(track,clientX);
+    if(idx!==fontIdx){applyFontIdx(idx);haptic('light');}
+  }
+  function onMove(clientX){
+    if(!_fontDragging)return;
+    var idx=_fontIdxFromX(track,clientX);
+    if(idx!==fontIdx){applyFontIdx(idx);haptic('light');}
+  }
+  function onEnd(){_fontDragging=false;}
+  if(window.PointerEvent){
+    track.addEventListener('pointerdown',function(e){try{track.setPointerCapture(e.pointerId);}catch(e2){}onStart(e.clientX);e.preventDefault();});
+    track.addEventListener('pointermove',function(e){onMove(e.clientX);});
+    track.addEventListener('pointerup',onEnd);
+    track.addEventListener('pointercancel',onEnd);
+  } else {
+    track.addEventListener('touchstart',function(e){onStart(e.touches[0].clientX);},{passive:true});
+    track.addEventListener('touchmove',function(e){onMove(e.touches[0].clientX);e.preventDefault();},{passive:false});
+    track.addEventListener('touchend',onEnd);
+    track.addEventListener('touchcancel',onEnd);
+  }
 }
 
 function initSeq(){
@@ -1172,6 +1262,8 @@ document.addEventListener('touchend',function(e){
 
 async function init(){
   applyTheme();
+  initFontSlider();
+  initSelectionCopy();
   // Загружаем библию и синхронизируем аккаунт параллельно — оба важны до первого рендера
   var biblePromise=Promise.race([loadBible(),new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},12000);})]).catch(function(e){console.error('Bible:',e);});
   var syncPromise=syncBackend().catch(function(){});
