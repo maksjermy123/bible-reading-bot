@@ -136,6 +136,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 </style>
 </head>
 <body>
+<div id="sync-warn" onclick="dismissSyncWarn()" title="Последние изменения не сохранились на сервере. Локально ничего не потеряно — попробуем ещё раз, как только появится связь. Нажми, чтобы скрыть." style="display:none;position:fixed;top:10px;right:10px;z-index:9999;background:#fff3cd;color:#856404;border:1px solid #ffe08a;border-radius:20px;padding:5px 11px;font-size:12px;font-weight:700;font-family:var(--fui);box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;display:flex;align-items:center;gap:4px">⚠️ не синхронизировано</div>
 <div id="pg-load"><div class="spin">📖</div><div style="font-size:15px;color:var(--acc);font-weight:600">Загружаем Библию...</div><div style="font-size:12px;color:var(--txt2)">Пожалуйста, подождите</div></div>
 <div class="pg" id="pg-ob"><div class="ob-wrap"><div class="ob-em" id="ob-em">📖</div><div class="ob-t" id="ob-t">Читай Библию каждый день</div><div class="ob-tx" id="ob-tx">Выбери план по силам и читай Слово Божье каждый день</div><div class="ob-dots"><div class="od on" id="od0"></div><div class="od" id="od1"></div><div class="od" id="od2"></div></div><button class="btn btn-acc" onclick="obNext()">Далее</button></div></div>
 <div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="my-plans"></div><div class="sec" id="suggested-lbl">Готовые планы</div><div id="plan-list"></div><div class="card" style="cursor:pointer" onclick="startChronoPlan()"><div class="card-top"><div class="card-ico">🕰️</div><div class="card-info"><div class="card-title">Хронологический Новый Завет</div><div class="card-meta">Выбери длительность сам</div></div><div class="badge">Гармония</div></div><div class="card-desc">Гармония четырёх Евангелий, Деяния, Послания и Откровение — в порядке реальных событий, а не порядке книг в каноне.</div></div><div class="card card-custom" style="cursor:pointer" onclick="startNewCustomPlan()"><div class="card-top"><div class="card-ico">✏️</div><div class="card-info"><div class="card-title">Составить свой план</div><div class="card-meta">Выбери книги и срок сам</div></div><div class="badge">Свой</div></div></div><div class="card" style="cursor:pointer" onclick="goPage('pg-seq');initSeq()"><div class="card-top"><div class="card-ico">📜</div><div class="card-info"><div class="card-title">Свободное чтение</div><div class="card-meta">Свободное чтение, без графика</div></div><div class="badge">Гибкий</div></div></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a></div>
@@ -159,7 +160,31 @@ var VC={"Бытие":[31,25,24,26,32,22,24,22,29,32,32,20,18,24,21,16,27,33,38,1
 var FS=[0.82,0.92,1.02,1.14,1.28];
 var PHRASES=['Твоя верность день за днём — это сила','Каждый шаг приближает к цели','Слово Божье преобразляет изнутри','Продолжай — ты на верном пути!','Читая Писание, ты слышишь Бога','Настойчивость — твой лучший друг'];
 
+/* Раньше все сетевые сбои (обрыв связи, 500-я с сервера, что угодно кроме
+   штатного "not registered", который разбирается отдельно) проглатывались
+   молча через catch(e){} — данные оставались только локально, а человек
+   узнавал об этом только тогда, когда открывал приложение на другом
+   устройстве и видел там старый прогресс. syncBadge(false) зажигает тихую
+   иконку в углу при любом таком сбое; syncBadge(true) гасит её при первом
+   же успешном обращении к серверу. Ничего не блокирует и не всплывает
+   поверх интерфейса — сознательно ненавязчиво, чтобы не пугать человека
+   алертами за то, в чём нет его вины. */
+var _syncWarnDismissed=false;
+function syncBadge(ok){
+  var el=document.getElementById('sync-warn');
+  if(!el)return;
+  if(ok){_syncWarnDismissed=false;el.style.display='none';return;}
+  if(_syncWarnDismissed)return;
+  el.style.display='flex';
+}
+function dismissSyncWarn(){
+  _syncWarnDismissed=true;
+  var el=document.getElementById('sync-warn');
+  if(el)el.style.display='none';
+}
+
 var tg=window.Telegram&&window.Telegram.WebApp;
+var tgInitData=(tg&&tg.initData)?tg.initData:'';
 if(tg){tg.ready();tg.expand();}
 var userId=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user?tg.initDataUnsafe.user.id:null;
 
@@ -382,7 +407,7 @@ async function startPlan(){
   app.activePlanId=selPlanId;
   app.progress[selPlanId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyTime:time,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings.notifyOn!==false};
   saveApp();
-  if(userId){try{await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:selPlanId,title:(getPlan(selPlanId)||{}).title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.settings.notifyOn!==false})});}catch(e){}}
+  if(userId){try{var _r0=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:selPlanId,title:(getPlan(selPlanId)||{}).title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.settings.notifyOn!==false,init_data:tgInitData})});syncBadge(_r0.ok);}catch(e){syncBadge(false);}}
   haptic('success');viewDay=null;goPage('pg-read');renderRead();
 }
 function continuePlan(id){app.activePlanId=id;saveApp();viewDay=null;goPage('pg-read');renderRead();}
@@ -405,7 +430,7 @@ async function delPlan(id){
 }
 async function unregisterOnServer(planId){
   try{
-    var r=await fetch(BACKEND+'/plan/unregister',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId})});
+    var r=await fetch(BACKEND+'/plan/unregister',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,init_data:tgInitData})});
     var data=await r.json();
     return !!(data&&data.ok);
   }catch(e){return false;}
@@ -654,10 +679,10 @@ async function markRead(){
   }
   if(userId){
     try{
-      var r=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,day_number:vd,local_date:t})});
+      var r=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,day_number:vd,local_date:t,init_data:tgInitData})});
       var data=await r.json();
       if(data.ok){
-        prog.streak=data.streak;prog.maxStreak=data.max_streak;saveApp();renderRead();
+        prog.streak=data.streak;prog.maxStreak=data.max_streak;saveApp();renderRead();syncBadge(true);
       } else if(data.error==='not registered'){
         /* В подавляющем большинстве случаев это НЕ "план правда удалили",
            а временный сбой — например, бэкенд на Render ещё "просыпался",
@@ -674,13 +699,14 @@ async function markRead(){
            там localStorage чистится ЦЕЛИКОМ и сознательно, а не по одному
            плану на основании единственного неудачного запроса. */
         try{
-          await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,title:(getPlan(app.activePlanId)||{}).title,notify_hour_msk:prog.notifyHourMsk,notify_minute_msk:prog.notifyMinuteMsk,notify_on:prog.notifyOn!==false})});
-          var r2=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,day_number:vd,local_date:t})});
+          await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,title:(getPlan(app.activePlanId)||{}).title,notify_hour_msk:prog.notifyHourMsk,notify_minute_msk:prog.notifyMinuteMsk,notify_on:prog.notifyOn!==false,init_data:tgInitData})});
+          var r2=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,day_number:vd,local_date:t,init_data:tgInitData})});
           var data2=await r2.json();
-          if(data2.ok){prog.streak=data2.streak;prog.maxStreak=data2.max_streak;saveApp();renderRead();}
-        }catch(e2){}
+          if(data2.ok){prog.streak=data2.streak;prog.maxStreak=data2.max_streak;saveApp();renderRead();syncBadge(true);}
+          else{syncBadge(false);}
+        }catch(e2){syncBadge(false);}
       }
-    }catch(e){}
+    }catch(e){syncBadge(false);}
   }
 }
 
@@ -923,8 +949,9 @@ async function startCustom(){
       saveApp();
       if(userId){
         try{
-          await fetch(BACKEND+'/plan/set_days',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:id,days_done:prog.daysDone})});
-        }catch(e){}
+          var _r1=await fetch(BACKEND+'/plan/set_days',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:id,days_done:prog.daysDone,init_data:tgInitData})});
+          syncBadge(_r1.ok);
+        }catch(e){syncBadge(false);}
       }
     } else saveApp();
     conEditId=null;
@@ -940,7 +967,7 @@ async function startCustom(){
   app.progress[planId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyTime:defTime,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings?app.settings.notifyOn!==false:true};
   saveApp();haptic('success');viewDay=null;goPage('pg-read');renderRead();
   if(userId){
-    try{await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,title:title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.progress[planId].notifyOn})});}catch(e){}
+    try{var _r2=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,title:title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.progress[planId].notifyOn,init_data:tgInitData})});syncBadge(_r2.ok);}catch(e){syncBadge(false);}
   }
 }
 
@@ -1020,7 +1047,7 @@ function syncNotify(){
   if(!userId) return;
   clearTimeout(_notifySyncTimers[planId]);
   _notifySyncTimers[planId]=setTimeout(function(){
-    fetch(BACKEND+'/plan/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,notify_hour_msk:mskHour,notify_minute_msk:mskMinute,notify_on:notifyOn})}).catch(function(){});
+    fetch(BACKEND+'/plan/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,notify_hour_msk:mskHour,notify_minute_msk:mskMinute,notify_on:notifyOn,init_data:tgInitData})}).then(function(r){syncBadge(r.ok);}).catch(function(){syncBadge(false);});
   },700);
 }
 
@@ -1035,7 +1062,7 @@ function pushState(){
     var json=JSON.stringify(app);
     if(json===_lastPushedJson) return; // ничего не изменилось
     _lastPushedJson=json;
-    fetch(BACKEND+'/state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,data:app})}).catch(function(){});
+    fetch(BACKEND+'/state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,data:app,init_data:tgInitData})}).then(function(r){syncBadge(r.ok);}).catch(function(){syncBadge(false);});
   },1200);
 }
 
@@ -1055,7 +1082,7 @@ function pushState(){
 async function checkAccountReset(){
   if(!userId) return;
   try{
-    var r=await fetch(BACKEND+'/account/status?user_id='+userId);
+    var r=await fetch(BACKEND+'/account/status?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData));
     var s=await r.json();
     var serverToken=s&&s.reset_token;
     if(!serverToken) return;
@@ -1072,7 +1099,7 @@ async function syncBackend(){
   if(!userId)return;
   await checkAccountReset();
   try{
-    var r=await fetch(BACKEND+'/state?user_id='+userId);
+    var r=await fetch(BACKEND+'/state?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData));
     var s=await r.json();
     if(s.exists && s.data){
       // На сервере уже есть сохранённое состояние — это единственный источник правды.
@@ -1084,7 +1111,8 @@ async function syncBackend(){
       // Это первое устройство пользователя — отправляем текущее локальное состояние как начальное.
       pushState();
     }
-  }catch(e){}
+    syncBadge(true);
+  }catch(e){syncBadge(false);}
   await syncCanonicalDaysDone();
 }
 
@@ -1102,12 +1130,14 @@ async function syncCanonicalDaysDone(){
   for(var i=0;i<planIds.length;i++){
     var planId=planIds[i];
     try{
-      var r=await fetch(BACKEND+'/plan/merge_days',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,days_done:app.progress[planId].daysDone||[]})});
+      var r=await fetch(BACKEND+'/plan/merge_days',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,days_done:app.progress[planId].daysDone||[],init_data:tgInitData})});
       var data=await r.json();
       if(data&&data.ok){
         app.progress[planId].daysDone=data.days_done||[];
+      } else {
+        syncBadge(false);
       }
-    }catch(e){}
+    }catch(e){syncBadge(false);}
   }
   saveApp();
 }
