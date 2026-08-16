@@ -1130,7 +1130,7 @@ async function syncCanonicalDaysDone(){
   for(var i=0;i<planIds.length;i++){
     var planId=planIds[i];
     try{
-      var r=await fetch(BACKEND+'/plan/merge_days',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,days_done:app.progress[planId].daysDone||[],init_data:tgInitData})});
+      var r=await fetch(BACKEND+'/plan/merge_days',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,days_done:app.progress[planId].daysDone||[],title:(getPlan(planId)||{}).title,init_data:tgInitData})});
       var data=await r.json();
       if(data&&data.ok){
         app.progress[planId].daysDone=data.days_done||[];
