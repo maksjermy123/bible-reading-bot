@@ -78,8 +78,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 .tab.on{border-color:var(--acc);background:var(--acc2);color:var(--acc);font-weight:600}
 .sc{background:var(--card);border:1px solid var(--brd);border-radius:var(--rad);padding:16px;margin-bottom:8px}
 .sch{font-size:12px;font-weight:700;color:var(--acc);margin-bottom:8px}
-.st{font-family:var(--ftxt);font-size:1rem;line-height:1.85;color:var(--txt);-webkit-user-select:text;user-select:text}
-#sel-copy-btn{position:fixed;z-index:9998;display:none;background:var(--txt);color:var(--bg);border:none;border-radius:20px;padding:9px 16px;font-size:13px;font-weight:700;font-family:var(--fui);box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer;align-items:center;gap:6px;transform:translateX(-50%)}
+.st{font-family:var(--ftxt);font-size:1rem;line-height:1.85;color:var(--txt);-webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default;touch-action:pan-y;cursor:text}
 .vn{font-size:10px;font-weight:700;color:var(--acc);vertical-align:super;margin-right:1px;cursor:pointer}
 .no-text{text-align:center;padding:20px;color:var(--txt2);font-size:13px;line-height:1.6}
 .font-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
@@ -150,7 +149,6 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 <div class="pg" id="pg-done"><div class="done-wrap"><div class="done-em">🎉</div><h2 style="font-size:24px;font-weight:800;margin-bottom:8px">План завершён!</h2><p style="font-size:14px;color:var(--txt2);line-height:1.6;margin-bottom:20px" id="done-txt"></p><button class="btn btn-acc" onclick="goPage('pg-sel')">Выбрать новый план</button></div></div>
 <div class="bnav" id="bnav" style="display:none"><button class="nb on" id="nb-read" onclick="switchTab('read')"><span class="nb-em">📖</span>Чтение</button><button class="nb" id="nb-bm" onclick="switchTab('bm')"><span class="nb-em">⭐</span>Закладки</button><button class="nb" id="nb-sel" onclick="switchTab('sel')"><span class="nb-em">🏠</span>Планы</button><button class="nb" id="nb-cfg" onclick="switchTab('cfg')"><span class="nb-em">⚙️</span>Настройки</button></div>
 <div id="toast"></div>
-<button id="sel-copy-btn">📋 Копировать</button>
 <script>
 var BACKEND='https://myradio-rrsk.onrender.com';
 var BOOK_NUM={"Бытие": 1, "Исход": 2, "Левит": 3, "Числа": 4, "Второзаконие": 5, "Иисус Навин": 6, "Судьи": 7, "Руфь": 8, "1 Царств": 9, "2 Царств": 10, "3 Царств": 11, "4 Царств": 12, "1 Паралипоменон": 13, "2 Паралипоменон": 14, "Ездра": 15, "Неемия": 16, "Есфирь": 17, "Иов": 18, "Псалтирь": 19, "Притчи": 20, "Екклесиаст": 21, "Песнь Песней": 22, "Исаия": 23, "Иеремия": 24, "Плач Иеремии": 25, "Иезекииль": 26, "Даниил": 27, "Осия": 28, "Иоиль": 29, "Амос": 30, "Авдий": 31, "Иона": 32, "Михей": 33, "Наум": 34, "Аввакум": 35, "Софония": 36, "Аггей": 37, "Захария": 38, "Малахия": 39, "Матфей": 40, "Марк": 41, "Лука": 42, "Иоанн": 43, "Деяния": 44, "Иаков": 45, "1 Петра": 46, "2 Петра": 47, "1 Иоанна": 48, "2 Иоанна": 49, "3 Иоанна": 50, "Иуда": 51, "Римлянам": 52, "1 Коринфянам": 53, "2 Коринфянам": 54, "Галатам": 55, "Ефесянам": 56, "Филиппийцам": 57, "Колоссянам": 58, "1 Фессалоникийцам": 59, "2 Фессалоникийцам": 60, "1 Тимофею": 61, "2 Тимофею": 62, "Титу": 63, "Филимону": 64, "Евреям": 65, "Откровение": 66};
@@ -190,6 +188,8 @@ var tg=window.Telegram&&window.Telegram.WebApp;
 var tgInitData=(tg&&tg.initData)?tg.initData:'';
 if(tg){tg.ready();tg.expand();}
 var userId=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user?tg.initDataUnsafe.user.id:null;
+var BIBLE_BOT_CHAT='https://t.me/mybible_reading_bot';
+var _accountRegisteredCache=null; // null=ещё не проверяли, иначе true/false
 
 /* Принудительный локальный сброс — открой t.me/<бот>/plan?startapp=wipe.
    Нужен в паре с админ-панелью /users (🧨 Сбросить всё): даже если стереть
@@ -793,40 +793,22 @@ function chFont(d){
    Работает поверх нативного выделения браузера (просто слушаем
    selectionchange), а не подменяет его — так что long-press → выделить
    → тянуть за маркеры продолжает работать, как ожидает пользователь. */
+/* Раньше здесь была самодельная всплывающая кнопка "Копировать" поверх
+   выделения — но на Android она наслаивалась на системное меню (у ОС уже
+   есть своё "Копировать" при выделении текста), а на iOS могла мешать
+   собственному распознаванию жеста выделения WebKit. Убрали: полагаемся
+   ЦЕЛИКОМ на нативное выделение и системное меню обеих платформ (оно и
+   так умеет копировать в буфер без единой строчки нашего JS). Здесь
+   остаётся только тихая обратная связь — слушаем нативное событие 'copy',
+   которое браузер сам генерирует, когда человек скопировал текст ЛЮБЫМ
+   системным способом внутри текста Писания, и просто показываем тост. */
 function initSelectionCopy(){
-  var btn=document.getElementById('sel-copy-btn');
-  if(!btn)return;
-  function hide(){btn.style.display='none';}
-  function updateFromSelection(){
+  document.addEventListener('copy',function(e){
     var sel=window.getSelection();
-    if(!sel||sel.isCollapsed||sel.rangeCount===0){hide();return;}
-    var text=sel.toString().trim();
-    if(!text){hide();return;}
-    var range=sel.getRangeAt(0);
-    var container=range.commonAncestorContainer;
-    var el=container.nodeType===1?container:container.parentElement;
-    if(!el||!el.closest('.st')){hide();return;}
-    var rect=range.getBoundingClientRect();
-    if(!rect||(!rect.width&&!rect.height)){hide();return;}
-    btn.style.display='flex';
-    btn.style.left=Math.min(Math.max(70,rect.left+rect.width/2),window.innerWidth-70)+'px';
-    var top=rect.top-46;
-    btn.style.top=(top<8?rect.bottom+10:top)+'px';
-  }
-  document.addEventListener('selectionchange',function(){
-    clearTimeout(btn._t);
-    btn._t=setTimeout(updateFromSelection,60);
-  });
-  window.addEventListener('scroll',hide,true);
-  btn.addEventListener('click',function(){
-    var sel=window.getSelection();
-    var text=sel?sel.toString().trim():'';
-    if(!text)return;
-    try{navigator.clipboard.writeText(text);}catch(e){}
+    var el=sel&&sel.anchorNode?(sel.anchorNode.nodeType===1?sel.anchorNode:sel.anchorNode.parentElement):null;
+    if(!el||!el.closest('.st'))return;
     showToast('Скопировано');
     haptic('light');
-    hide();
-    sel.removeAllRanges();
   });
 }
 /* Раньше ползунок шрифта был чисто декоративным — кружок двигался только
@@ -1179,11 +1161,24 @@ function pushState(){
    (устройство впервые видит эту проверку) — ничего не трогаем, просто
    запоминаем token: иначе первый же деплой этой правки стёр бы прогресс
    всем существующим пользователям поголовно. */
+/* Один запрос на /account/status, переиспользуемый и гейтом регистрации
+   в init(), и проверкой сброса ниже — раньше оба места дёргали его
+   отдельно, то есть дважды на каждый запуск приложения. */
+var _accountStatusPromise=null;
+function fetchAccountStatus(forceRefresh){
+  if(!userId) return Promise.resolve(null);
+  if(forceRefresh) _accountStatusPromise=null;
+  if(_accountStatusPromise) return _accountStatusPromise;
+  _accountStatusPromise=fetch(BACKEND+'/account/status?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData))
+    .then(function(r){return r.json();})
+    .catch(function(){return null;});
+  return _accountStatusPromise;
+}
+
 async function checkAccountReset(){
   if(!userId) return;
   try{
-    var r=await fetch(BACKEND+'/account/status?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData));
-    var s=await r.json();
+    var s=await fetchAccountStatus();
     var serverToken=s&&s.reset_token;
     if(!serverToken) return;
     var localToken=localStorage.getItem('bres');
@@ -1254,16 +1249,65 @@ function haptic(type){
 var swX=0;
 document.addEventListener('touchstart',function(e){swX=e.touches[0].clientX;},{passive:true});
 document.addEventListener('touchend',function(e){
+  /* Раньше этот обработчик был глобальным и безусловным — любое движение
+     пальца на 60px и больше запускало навигацию по дням/главам, даже
+     если человек в этот момент растягивал выделение текста (естественный
+     жест выделения на iOS: long-press, затем протянуть палец). В итоге
+     попытка выделить текст могла посреди жеста внезапно перекинуть на
+     другой день — выделение прерывалось. Обычный быстрый свайп выделения
+     не создаёт (для него нужен long-press), так что эта проверка не
+     мешает свайп-навигации нигде, кроме как ровно в момент активного
+     выделения. */
+  try{if(window.getSelection&&window.getSelection().toString())return;}catch(e2){}
   var dx=e.changedTouches[0].clientX-swX;if(Math.abs(dx)<60)return;
   var cur=document.querySelector('.pg.on');var id=cur?cur.id:'';
   if(id==='pg-read'){if(dx<0)goDay(1);else goDay(-1);}
   else if(id==='pg-seq'){if(dx<0)seqNext();else seqPrev();}
 },{passive:true});
 
+function openBotForRegistration(){
+  try{
+    if(tg&&tg.openTelegramLink) tg.openTelegramLink(BIBLE_BOT_CHAT);
+    else window.location.href=BIBLE_BOT_CHAT;
+  }catch(e){ window.location.href=BIBLE_BOT_CHAT; }
+}
+/* Telegram Bot API не даёт боту написать первым тому, кто с ним никогда
+   не переписывался — заход в Mini App по прямой ссылке (в т.ч. из виджета
+   "План" в мини-аппе Radio) сам по себе чат не создаёт. Без этого
+   напоминаниям было физически некуда приходить (обнаружили на iOS — на
+   Android Telegram, похоже, неявно шлёт скрытый /start при первом заходе,
+   а на iOS это ненадёжно, судя по всему из-за того же баннера Safari,
+   что мешает и переходам между мини-аппами). Пока пользователь не нажал
+   "Старт" в личке с ботом — показываем только этот экран, ничего не
+   грузим и не синхронизируем. */
+function renderAccountGate(){
+  var pg=document.getElementById('pg-load');
+  if(pg){
+    pg.innerHTML='<div class="spin">📖</div>'
+      +'<div style="font-size:16px;font-weight:700;text-align:center;max-width:300px;margin-top:6px">Сначала открой бота и нажми «Старт»</div>'
+      +'<div style="font-size:12px;color:var(--txt2);text-align:center;max-width:300px;margin-top:6px;line-height:1.5">Без этого шага бот не сможет присылать тебе напоминания — так уж устроен Telegram. После «Старта» вернись сюда через приветственное сообщение.</div>'
+      +'<button class="btn btn-acc" style="max-width:300px;margin-top:16px" onclick="openBotForRegistration()">Открыть бота →</button>';
+    pg.style.display='flex';
+  }
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
+  var nav=document.getElementById('bnav');if(nav)nav.style.display='none';
+}
+
 async function init(){
   applyTheme();
   initFontSlider();
   initSelectionCopy();
+  if(!userId){renderAccountGate();return;}
+  var acc=await fetchAccountStatus();
+  if(!acc||!acc.registered){
+    // Небольшая пауза и одна повторная проверка — на Android неявный
+    // /start от Telegram мог ещё не долететь до вебхука в момент самого
+    // первого запроса. Не хотим показать гейт человеку, который через
+    // долю секунды и так окажется зарегистрирован.
+    await new Promise(function(res){setTimeout(res,1300);});
+    acc=await fetchAccountStatus(true);
+    if(!acc||!acc.registered){renderAccountGate();return;}
+  }
   // Загружаем библию и синхронизируем аккаунт параллельно — оба важны до первого рендера
   var biblePromise=Promise.race([loadBible(),new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},12000);})]).catch(function(e){console.error('Bible:',e);});
   var syncPromise=syncBackend().catch(function(){});
