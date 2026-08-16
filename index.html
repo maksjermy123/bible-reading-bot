@@ -1166,6 +1166,21 @@ async function init(){
   var biblePromise=Promise.race([loadBible(),new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},12000);})]).catch(function(e){console.error('Bible:',e);});
   var syncPromise=syncBackend().catch(function(){});
   await Promise.all([biblePromise,syncPromise]);
+  /* Кнопка "Открыть план" в уведомлении передаёт ?plan=<id> в самой ссылке
+     (не через startapp, т.к. это web_app-кнопка с прямым URL, а не
+     t.me/bot/short?startapp= диплинк). Раньше открытие ЛЮБОГО напоминания
+     показывало последний активный локально план — если у пользователя два
+     параллельных плана, оба уведомления вели в одно и то же место. Ждём
+     конца syncBackend(), чтобы app.progress уже содержал актуальный список
+     планов этого аккаунта (включая те, что зарегистрированы на другом
+     устройстве) — иначе переключение могло не сработать на первом
+     открытии нового устройства. */
+  try{
+    var urlPlanId=new URLSearchParams(location.search).get('plan');
+    if(urlPlanId && app.progress && app.progress[urlPlanId] && getPlan(urlPlanId)){
+      app.activePlanId=urlPlanId;
+    }
+  }catch(e){}
   var pgLoad=document.getElementById('pg-load');if(pgLoad)pgLoad.style.display='none';
   if(!app.onboarded){renderOb();goPage('pg-ob');}
   else if(app.activePlanId&&getPlan(app.activePlanId)){viewDay=null;goPage('pg-read');renderRead();}
