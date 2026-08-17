@@ -769,7 +769,7 @@ function shareDay(){
   var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];if(!plan||!prog)return;
   var vd=viewDay!==null?viewDay:nextUnreadDay(plan,prog);
   var dd=plan.schedule[vd-1];if(!dd)return;
-  var text=dd.label+' (Синодальный перевод)\n\n📖 t.me/mybible_reading_bot/plan';
+  var text=dd.label+' (Синодальный перевод)\n\n📖 t.me/mybible_reading_bot';
   try{if(navigator.share)navigator.share({text:text});else{navigator.clipboard.writeText(text);showToast('Скопировано');}}
   catch(e){try{navigator.clipboard.writeText(text);showToast('Скопировано');}catch(e2){}}
   haptic('light');
