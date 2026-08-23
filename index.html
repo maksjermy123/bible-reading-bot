@@ -592,7 +592,11 @@ async function unregisterOnServer(planId){
     return !!(data&&data.ok);
   }catch(e){return false;}
 }
-function getPlan(id){return PLANS.find(function(p){return p.id===id;})||app.customPlans[id]||null;}
+function getPlan(id){
+  var p=PLANS.find(function(p){return p.id===id;})||app.customPlans[id]||null;
+  if(p&&!p.schedule&&PLANS_PERI[id])p.schedule=PLANS_PERI[id];
+  return p;
+}
 
 function localTimeToMsk(timeStr){
   var parts=timeStr.split(':').map(Number);
@@ -1625,6 +1629,10 @@ async function init(){
   applyTheme();
   initFontSlider();
   initSelectionCopy();
+  /* Расписания планов стартуют грузиться СРАЗУ, параллельно с любыми
+     проверками аккаунта - они нужны на любом экране и не должны зависеть
+     от того, какая ветка init() выполнится. */
+  var plansEarly=loadPlansPeri().catch(function(e){console.error('Plans:',e);});
   if(!userId){renderAccountGate();return;}
   /* Локальный фолбэк: если человек уже работал с приложением (onboarded,
      есть план), недоступность бэкенда не должна блокировать чтение -
@@ -1646,7 +1654,11 @@ async function init(){
   }
   // Загружаем библию и синхронизируем аккаунт параллельно — оба важны до первого рендера
   var biblePromise=Promise.race([loadBible(),new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},12000);})]).catch(function(e){console.error('Bible:',e);});
-  var plansPromise=Promise.race([loadPlansPeri(),new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},12000);})]).catch(function(e){console.error('Plans:',e);});
+  var plansPromise=Promise.race([plansEarly,new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},12000);})]).catch(function(e){console.error('Plans:',e);});
+  /* Если ранний запуск уже успел завершиться ошибкой - повторяем */
+  if(!Object.keys(PLANS_PERI).length){
+    try{await Promise.race([loadPlansPeri(),new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},8000);})]);}catch(e){}
+  }
   var syncPromise=syncBackend().catch(function(){});
   await Promise.all([biblePromise,plansPromise,syncPromise]);
   /* Кнопка "Открыть план" в уведомлении передаёт ?plan=<id> в самой ссылке
