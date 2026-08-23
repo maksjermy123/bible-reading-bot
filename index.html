@@ -145,7 +145,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 <div class="pg" id="pg-seq"><div class="hdr"><h1>📜 Свободное чтение</h1></div><div class="seq-nav"><select class="seq-sel" id="seq-book" onchange="seqBook()"></select><select class="seq-sel" id="seq-ch" onchange="seqRender()"></select></div><div class="sc" id="seq-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-out" style="margin-top:0;flex:1" onclick="seqPrev()">← Назад</button><button class="btn btn-acc" style="margin-top:0;flex:1" onclick="seqNext()">Далее →</button></div><button class="btn btn-out" style="margin-top:8px" onclick="addSeqBm()">⭐ Закладка</button><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
 <div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div id="con-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Начать план</button><button class="btn btn-out" onclick="conEditId=null;goPage('pg-sel')">Отмена</button></div>
 <div class="pg" id="pg-bm"><div class="hdr"><h1>⭐ Закладки</h1></div><div id="bm-list"></div><div id="bm-empty" style="display:none;text-align:center;padding:36px;color:var(--txt2);font-size:14px">Нет закладок.<br>Нажми ⭐ во время чтения.</div></div>
-<div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-empty" style="font-size:12px;color:var(--txt2);margin-bottom:10px;display:none">Сначала выбери план на вкладке «Планы»</div><select id="cfg-plan-sel" onchange="cfgSelectPlan(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px;margin-bottom:12px"></select><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid"><button onclick="setTheme('auto')" id="th-auto" class="th-btn"><div>🌗</div>Авто</button><button onclick="setTheme('light')" id="th-light" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn"><div>🌅</div>Сепия</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button><button onclick="setTheme('night')" id="th-night" class="th-btn"><div>🌃</div>Ночная</button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div id="font-track" style="flex:1;height:28px;display:flex;align-items:center;position:relative;touch-action:none;cursor:pointer"><div style="width:100%;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div></div>
+<div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-empty" style="font-size:12px;color:var(--txt2);margin-bottom:10px;display:none">Сначала выбери план на вкладке «Планы»</div><select id="cfg-plan-sel" onchange="cfgSelectPlan(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px;margin-bottom:12px"></select><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid"><button onclick="setTheme('auto')" id="th-auto" class="th-btn"><div>🌗</div>Авто</button><button onclick="setTheme('light')" id="th-light" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn"><div>🌅</div>Сепия</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button><button onclick="setTheme('night')" id="th-night" class="th-btn"><div>🌃</div>Ночная</button></div><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span>Номера стихов</span><button class="tog on" id="cfg-vn-tog" onclick="cfgTogVn()"></button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div id="font-track" style="flex:1;height:28px;display:flex;align-items:center;position:relative;touch-action:none;cursor:pointer"><div style="width:100%;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div></div>
 
 <div class="pg" id="pg-done"><div class="done-wrap"><div class="done-em">🎉</div><h2 style="font-size:24px;font-weight:800;margin-bottom:8px">План завершён!</h2><p style="font-size:14px;color:var(--txt2);line-height:1.6;margin-bottom:20px" id="done-txt"></p><button class="btn btn-acc" onclick="goPage('pg-sel')">Выбрать новый план</button><a class="chan-ban" style="margin-top:20px" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Хочешь двигаться дальше? Загляни на канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a></div></div>
 <div class="bnav" id="bnav" style="display:none"><button class="nb on" id="nb-read" onclick="switchTab('read')"><span class="nb-em">📖</span>Чтение</button><button class="nb" id="nb-bm" onclick="switchTab('bm')"><span class="nb-em">⭐</span>Закладки</button><button class="nb" id="nb-sel" onclick="switchTab('sel')"><span class="nb-em">🏠</span>Планы</button><button class="nb" id="nb-cfg" onclick="switchTab('cfg')"><span class="nb-em">⚙️</span>Настройки</button></div>
@@ -205,6 +205,16 @@ function dismissSyncWarn(){
   if(el)el.style.display='none';
 }
 
+/* fetch с таймаутом: без него зависший TCP (десктоп-клиент, корпоративная
+   сеть, холодный старт) вешал init() навсегда - экран "Загружаем Библию..."
+   не сменялся никогда. 8 секунд достаточно даже для медленного 3G. */
+function fetchT(url,opts){
+  opts=opts||{};
+  var ctl=(typeof AbortController!=='undefined')?new AbortController():null;
+  var t=setTimeout(function(){if(ctl)ctl.abort();},opts.timeout||8000);
+  if(ctl){opts.signal=ctl.signal;}
+  return fetch(url,opts).finally(function(){clearTimeout(t);});
+}
 var tg=window.Telegram&&window.Telegram.WebApp;
 var tgInitData=(tg&&tg.initData)?tg.initData:'';
 if(tg){tg.ready();tg.expand();}
@@ -239,7 +249,19 @@ var bible=null;
 var app=loadApp();
 var viewDay=null;
 var activeTab=0;
+/* Память позиции чтения: при возврате в мини-апп человек попадает туда же,
+   где остановился (план, день, вкладка, прокрутка), а не в начало дня. */
+var _lastPos=null;
+try{_lastPos=JSON.parse(localStorage.getItem('lastPos')||'null');}catch(e){}
+var _scrollSaveT=null;
+function saveReadPos(){
+  if(!_lastPos)return;
+  _lastPos.scrollY=window.scrollY||0;
+  clearTimeout(_scrollSaveT);
+  _scrollSaveT=setTimeout(function(){try{localStorage.setItem('lastPos',JSON.stringify(_lastPos));}catch(e){}},300);
+}
 var fontIdx=parseInt(localStorage.getItem('fi')||'2');
+var showVerseNums=localStorage.getItem('vn')!=='0'; /* '0' = скрыть номера */
 /* Режим темы: 'auto' (следует за системой) или конкретная тема.
    В 'auto' фактическая тема берётся из Telegram colorScheme (iOS/Android/Desktop)
    или prefers-color-scheme (обычный браузер) и обновляется на лету при смене
@@ -386,6 +408,12 @@ function cycleTheme(){
   else if(theme==='light'||theme==='sepia'){theme='dark';}
   else{themeMode='auto';}
   applyTheme();renderCfg();haptic('light');
+}
+function cfgTogVn(){
+  showVerseNums=!showVerseNums;
+  try{localStorage.setItem('vn',showVerseNums?'1':'0');}catch(e){}
+  var b=document.getElementById('cfg-vn-tog');if(b)b.className='tog'+(showVerseNums?' on':'');
+  renderRead();haptic('light');
 }
 function setTheme(t){
   themeMode=(t==='auto')?'auto':'manual';
@@ -665,6 +693,11 @@ function renderStreakBadge(streak,lag,maxStreak){
 }
 
 function renderRead(){
+  try{
+    var p=getPlan(app.activePlanId);
+    if(p){_lastPos={planId:app.activePlanId,day:(viewDay!==null?viewDay:nextUnreadDay(p,app.progress[app.activePlanId])),tab:activeTab,scrollY:0};
+      localStorage.setItem('lastPos',JSON.stringify(_lastPos));}
+  }catch(e){}
   selRangeStart=null;
   var plan=getPlan(app.activePlanId);
   var prog=app.progress[app.activePlanId];
@@ -763,7 +796,7 @@ function renderSc(tab){
   verses.forEach(function(o){
     if(prevC!==null&&o.c!==prevC)h+='<div class="ch-br"><b>'+o.c+'</b></div>';
     prevC=o.c;
-    h+='<span><sup class="vn" onclick="copyV('+o.v+',this)">'+o.v+'</sup>'+o.t+' </span>';
+    h+='<span>'+(showVerseNums?'<sup class="vn" onclick="copyV('+o.v+',this)">'+o.v+'</sup>':'')+o.t+' </span>';
   });
   h+='</div>';
   el.innerHTML=h;
@@ -824,7 +857,17 @@ async function markRead(){
   prog.streak=ns;prog.lastRead=t;
   if(!prog.daysDone)prog.daysDone=[];
   if(prog.daysDone.indexOf(vd)<0)prog.daysDone.push(vd);
+  /* Снимок для undo: случайный тап по "Прочитал" не должен портить стрик */
+  var _undo={day:vd,streak:prog.streak,maxStreak:prog.maxStreak,lastRead:prog.lastRead,
+             daysDone:prog.daysDone.slice(),milestones:(prog.milestonesShown||[]).slice()};
   saveApp();haptic('success');
+  showUndoToast(function(){
+    prog.streak=_undo.streak;prog.maxStreak=_undo.maxStreak;prog.lastRead=_undo.lastRead;
+    prog.daysDone=_undo.daysDone;prog.milestonesShown=_undo.milestones;
+    saveApp();renderRead();
+    try{fetchT(BACKEND+'/plan/unread',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,day_number:_undo.day,init_data:tgInitData})});}catch(e){}
+  });
   var ph=document.getElementById('r-phrase');
   if(ph){ph.textContent=PHRASES[Math.floor(Math.random()*PHRASES.length)];setTimeout(function(){ph.textContent='';},3000);}
   /* После отметки — переходим к следующему непрочитанному дню (если пользователь
@@ -1300,6 +1343,7 @@ function renderCfg(){
   if(lbl)lbl.textContent=prog?('Напоминания '+(prog.notifyOn!==false?'включены':'выключены')):'Нет плана для настройки';
   if(ti)ti.value=(prog&&prog.notifyTime)||'08:00';
   ['auto','light','sepia','dark','night'].forEach(function(t){var b=document.getElementById('th-'+t);if(b)b.classList.toggle('sel',(t==='auto')?(themeMode==='auto'):(themeMode==='manual'&&theme===t));});
+var vnb=document.getElementById('cfg-vn-tog');if(vnb)vnb.className='tog'+(showVerseNums?' on':'');
   var fi=document.getElementById('font-ind');if(fi)fi.style.left=(fontIdx/(FS.length-1)*100-4)+'%';
   var tz=document.getElementById('cfg-tz-note');
   if(tz){var off=-new Date().getTimezoneOffset()/60;tz.textContent='Время указано по твоему часовому поясу (UTC'+(off>=0?'+':'')+off+')';}
@@ -1392,7 +1436,7 @@ function fetchAccountStatus(forceRefresh){
   if(!userId) return Promise.resolve(null);
   if(forceRefresh) _accountStatusPromise=null;
   if(_accountStatusPromise) return _accountStatusPromise;
-  _accountStatusPromise=fetch(BACKEND+'/account/status?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData))
+  _accountStatusPromise=fetchT(BACKEND+'/account/status?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData))
     .then(function(r){return r.json();})
     .catch(function(){return null;});
   return _accountStatusPromise;
@@ -1417,7 +1461,7 @@ async function syncBackend(){
   if(!userId)return;
   await checkAccountReset();
   try{
-    var r=await fetch(BACKEND+'/state?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData));
+    var r=await fetchT(BACKEND+'/state?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData));
     var s=await r.json();
     if(s.exists && s.data){
       // На сервере уже есть сохранённое состояние — это единственный источник правды.
@@ -1477,47 +1521,3 @@ function showMilestone(n){
   var title=document.getElementById('milestone-title');
   var text=document.getElementById('milestone-text');
   if(title)title.textContent=n+' '+swWord(n)+'! 🎉';
-  if(text)text.textContent='Отличная серия — так держать! Если хочешь двигаться ещё глубже, у нас есть канал с материалами для размышления.';
-  modal.style.display='flex';
-  haptic('success');
-}
-function closeMilestone(){
-  var modal=document.getElementById('milestone-modal');if(modal)modal.style.display='none';
-}
-function haptic(type){
-  try{if(type==='success')tg&&tg.HapticFeedback&&tg.HapticFeedback.notificationOccurred('success');else tg&&tg.HapticFeedback&&tg.HapticFeedback.impactOccurred(type);}catch(e){}
-}
-
-var swX=0;
-document.addEventListener('touchstart',function(e){swX=e.touches[0].clientX;},{passive:true});
-document.addEventListener('touchend',function(e){
-  /* Раньше этот обработчик был глобальным и безусловным — любое движение
-     пальца на 60px и больше запускало навигацию по дням/главам, даже
-     если человек в этот момент растягивал выделение текста (естественный
-     жест выделения на iOS: long-press, затем протянуть палец). В итоге
-     попытка выделить текст могла посреди жеста внезапно перекинуть на
-     другой день — выделение прерывалось. Обычный быстрый свайп выделения
-     не создаёт (для него нужен long-press), так что эта проверка не
-     мешает свайп-навигации нигде, кроме как ровно в момент активного
-     выделения. */
-  try{if(window.getSelection&&window.getSelection().toString())return;}catch(e2){}
-  var dx=e.changedTouches[0].clientX-swX;if(Math.abs(dx)<60)return;
-  var cur=document.querySelector('.pg.on');var id=cur?cur.id:'';
-  if(id==='pg-read'){if(dx<0)goDay(1);else goDay(-1);}
-  else if(id==='pg-seq'){if(dx<0)seqNext();else seqPrev();}
-},{passive:true});
-
-function openBotForRegistration(){
-  try{
-    if(tg&&tg.openTelegramLink) tg.openTelegramLink(BIBLE_BOT_CHAT);
-    else window.location.href=BIBLE_BOT_CHAT;
-  }catch(e){ window.location.href=BIBLE_BOT_CHAT; }
-}
-/* Telegram Bot API не даёт боту написать первым тому, кто с ним никогда
-   не переписывался — заход в Mini App по прямой ссылке (в т.ч. из виджета
-   "План" в мини-аппе Radio) сам по себе чат не создаёт. Без этого
-   напоминаниям было физически некуда приходить (обнаружили на iOS — на
-   Android Telegram, похоже, неявно шлёт скрытый /start при первом заходе,
-   а на iOS это ненадёжно, судя по всему из-за того же баннера Safari,
-   что мешает и переходам между мини-аппами). Пока пользователь не нажал
-   "Старт" в личке с ботом — показываем только этот экран, ничего не
