@@ -432,7 +432,18 @@ async function startPlan(){
   if(!app.settings)app.settings={};
   app.settings.notifyTime=time;app.settings.notifyHourMsk=msk.hour;app.settings.notifyMinuteMsk=msk.minute;
   app.activePlanId=selPlanId;
-  app.progress[selPlanId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyTime:time,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings.notifyOn!==false};
+  /* Повторное нажатие «Начать план» не должно стирать уже прочитанные дни.
+     Обновляем только настройки уведомлений, а новый объект создаём лишь
+     при первом выборе плана. */
+  var existingProgress=app.progress[selPlanId];
+  if(existingProgress){
+    existingProgress.notifyTime=time;
+    existingProgress.notifyHourMsk=msk.hour;
+    existingProgress.notifyMinuteMsk=msk.minute;
+    existingProgress.notifyOn=app.settings.notifyOn!==false;
+  }else{
+    app.progress[selPlanId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyTime:time,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings.notifyOn!==false};
+  }
   saveApp();
   if(userId){try{var _r0=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:selPlanId,title:(getPlan(selPlanId)||{}).title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.settings.notifyOn!==false,init_data:tgInitData})});syncBadge(_r0.ok);}catch(e){syncBadge(false);}}
   haptic('success');viewDay=null;goPage('pg-read');renderRead();
