@@ -5,11 +5,17 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>План чтения Библии</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,500;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f5f0e8;--card:#fffdf8;--acc:#2e7d32;--acc2:#e8f5e9;--txt:#000;--txt2:#555;--brd:#ddd8ce;--rad:14px;--fui:-apple-system,Helvetica,Arial,sans-serif;--ftxt:Georgia,serif}
-.dark{--bg:#1a1a1a;--card:#242424;--acc:#4caf50;--acc2:#1b2e1c;--txt:#f0f0f0;--txt2:#aaa;--brd:#333}
-.sepia{--bg:#f4ecd8;--card:#f0e6cc;--txt:#3e2f1c;--txt2:#6b5744}
-.night{--bg:#1a1a2e;--card:#16213e;--txt:#c8c8d0;--txt2:#8888a0;--acc:#4caf50;--acc2:#0d2010}
+/* Фирменный зелёный свободного продукта: свежий #3E8E52 */
+:root{--bg:#FAFBF8;--card:#fff;--acc:#3E8E52;--acc2:#EAF3EA;--txt:#12180F;--txt2:#5A6B5E;--brd:#E4EDE2;--rad:14px;--fui:'Inter',-apple-system,Helvetica,Arial,sans-serif;--ftxt:'Source Serif 4',Georgia,serif}
+.dark{--bg:#14181D;--card:#1B222B;--acc:#57A86B;--acc2:#1F2A22;--txt:#dfe8ef;--txt2:#8fa396;--brd:#252c35}
+/* Тема "Светлая" = бывшая Сепия (тёплый кремовый фон). Чисто-белая светлая
+   тема удалена по решению владельца. */
+.sepia{--bg:#F7F1E3;--card:#FDFAF2;--txt:#3a3020;--txt2:#7a6b52}
+.night{--bg:#14181D;--card:#1B222B;--txt:#dfe8ef;--txt2:#8fa396;--acc:#57A86B;--acc2:#1F2A22}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100vh;padding-bottom:70px}
 .pg{display:none;padding:16px;max-width:480px;margin:0 auto}
@@ -111,10 +117,12 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 .dur-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .dur-row input{flex:1;padding:10px;border:1px solid var(--brd);border-radius:8px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px}
 .prev-box{font-size:12px;color:var(--txt2);padding:8px;background:var(--acc2);border-radius:7px;margin-bottom:10px;line-height:1.5}
-.chan-ban{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--brd);border-radius:11px;padding:9px 13px;margin-top:12px;text-decoration:none;cursor:pointer}
+.chan-ban{display:flex;align-items:center;gap:12px;background:var(--card);border:2px solid var(--brd);border-radius:var(--rad);padding:16px;margin-top:10px;margin-bottom:10px;text-decoration:none;cursor:pointer;transition:border-color .15s}
 .chan-ban:active{opacity:.7}
-.chan-txt{flex:1;font-size:12px;color:var(--txt2)}
-.chan-txt b{color:var(--txt);font-size:13px}
+.chan-ico{font-size:28px}
+.chan-txt{flex:1;font-size:13px;color:var(--txt2);line-height:1.4}
+.chan-txt b{color:var(--txt);font-size:15px;font-weight:700;display:block}
+.chan-arrow{color:var(--acc);font-size:18px;font-weight:700}
 .cfg-box{background:var(--card);border:1px solid var(--brd);border-radius:var(--rad);padding:14px;margin-bottom:10px}
 .cfg-box h3{font-size:14px;font-weight:600;margin-bottom:10px}
 .th-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
@@ -140,14 +148,14 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 <div id="sync-warn" onclick="dismissSyncWarn()" title="Последние изменения не сохранились на сервере. Локально ничего не потеряно — попробуем ещё раз, как только появится связь. Нажми, чтобы скрыть." style="display:none;position:fixed;top:10px;right:10px;z-index:9999;background:#fff3cd;color:#856404;border:1px solid #ffe08a;border-radius:20px;padding:5px 11px;font-size:12px;font-weight:700;font-family:var(--fui);box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;display:flex;align-items:center;gap:4px">⚠️ не синхронизировано</div>
 <div id="pg-load"><div class="spin">📖</div><div style="font-size:15px;color:var(--acc);font-weight:600">Загружаем Библию...</div><div style="font-size:12px;color:var(--txt2)">Пожалуйста, подождите</div></div>
 <div class="pg" id="pg-ob"><div class="ob-wrap"><div class="ob-em" id="ob-em">📖</div><div class="ob-t" id="ob-t">Читай Библию каждый день</div><div class="ob-tx" id="ob-tx">Выбери план по силам и читай Слово Божье каждый день</div><div class="ob-dots"><div class="od on" id="od0"></div><div class="od" id="od1"></div><div class="od" id="od2"></div></div><button class="btn btn-acc" onclick="obNext()">Далее</button></div></div>
-<div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="my-plans"></div><div class="sec" id="suggested-lbl">Готовые планы</div><div id="plan-list"></div><div class="card" style="cursor:pointer" onclick="startChronoPlan()"><div class="card-top"><div class="card-ico">🕰️</div><div class="card-info"><div class="card-title">Хронологический Новый Завет</div><div class="card-meta">Выбери длительность сам</div></div><div class="badge">Гармония</div></div><div class="card-desc">Гармония четырёх Евангелий, Деяния, Послания и Откровение — в порядке реальных событий, а не порядке книг в каноне.</div></div><div class="card card-custom" style="cursor:pointer" onclick="startNewCustomPlan()"><div class="card-top"><div class="card-ico">✏️</div><div class="card-info"><div class="card-title">Составить свой план</div><div class="card-meta">Выбери книги и срок сам</div></div><div class="badge">Свой</div></div></div><div class="card" style="cursor:pointer" onclick="goPage('pg-seq');initSeq()"><div class="card-top"><div class="card-ico">📜</div><div class="card-info"><div class="card-title">Свободное чтение</div><div class="card-meta">Свободное чтение, без графика</div></div><div class="badge">Гибкий</div></div></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a></div>
+<div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="my-plans"></div><div class="sec" id="suggested-lbl">Готовые планы</div><div id="plan-list"></div><div class="card" style="cursor:pointer" onclick="startChronoPlan()"><div class="card-top"><div class="card-ico">🕰️</div><div class="card-info"><div class="card-title">Хронологический Новый Завет</div><div class="card-meta">Выбери длительность сам</div></div><div class="badge">Гармония</div></div><div class="card-desc">Гармония четырёх Евангелий, Деяния, Послания и Откровение — в порядке реальных событий, а не порядке книг в каноне.</div></div><div class="card card-custom" style="cursor:pointer" onclick="startNewCustomPlan()"><div class="card-top"><div class="card-ico">✏️</div><div class="card-info"><div class="card-title">Составить свой план</div><div class="card-meta">Выбери книги и срок сам</div></div><div class="badge">Свой</div></div></div><div class="card" style="cursor:pointer" onclick="goPage('pg-seq');initSeq()"><div class="card-top"><div class="card-ico">📜</div><div class="card-info"><div class="card-title">Свободное чтение</div><div class="card-meta">Свободное чтение, без графика</div></div><div class="badge">Гибкий</div></div></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span class="chan-ico">📻</span><span class="chan-txt">Канал<b>«От чтения к Преображению»</b></span><span class="chan-arrow">→</span></a></div>
 <div class="pg" id="pg-read"><div class="topbar"><button class="streak-btn" id="streak-badge" onclick="toggleStats()"><span style="font-size:20px" id="streak-ico">🔥</span><span class="streak-n" id="r-streak">0</span><span class="streak-l" id="r-streak-l">дней подряд</span></button><div style="display:flex;gap:5px"><button class="ico-btn" onclick="cycleTheme()" id="theme-btn">☀️</button><button class="ico-btn" onclick="goPage('pg-cfg')">⚙️</button></div></div><div id="stats-panel" style="display:none"><div class="stats-box"><div class="sg"><div class="si"><div class="sv" id="s-pct">0%</div><div class="sk">выполнено</div></div><div class="si"><div class="sv" id="s-done">0</div><div class="sk">дней готово</div></div><div class="si"><div class="sv" id="s-left">0</div><div class="sk">осталось</div></div><div class="si"><div class="sv" id="s-streak">0</div><div class="sk">дней подряд</div></div><div class="si"><div class="sv" id="s-max">0</div><div class="sk">рекорд</div></div><div class="si"><div class="sv" id="s-start">—</div><div class="sk">начат</div></div></div><div class="pb"><div class="pf" id="s-bar" style="width:0%"></div></div><div class="pl" id="s-plan-t"></div><button class="sec-tog" onclick="toggleCal()">📅 Календарь <span id="cal-arr">▼</span></button><div id="cal-wrap" style="display:none"><div class="cal-grid" id="cal-grid"></div></div></div></div><div class="cstat" id="r-cstat"></div><div class="pb" style="margin-bottom:10px"><div class="pf" id="r-bar" style="width:0%"></div></div><div class="day-nav"><button class="nav-btn" id="btn-prev" onclick="goDay(-1)">←</button><div class="day-info"><div class="day-n" id="r-day-n">День 1</div><div class="day-d" id="r-day-d"></div></div><button class="nav-btn" id="btn-next" onclick="goDay(1)">→</button></div><div id="to-today" style="margin-bottom:10px;display:none"><button onclick="goToday()" style="width:100%;font-size:15px;font-weight:800;color:#fff;background:var(--acc);border:none;border-radius:10px;padding:13px;cursor:pointer;font-family:var(--fui);box-shadow:0 3px 12px rgba(0,0,0,.18)">📖 К непрочитанному →</button></div><div class="ref-lbl"><span id="r-ref">—</span><button class="ico-btn" onclick="addBm()">⭐</button></div><div class="tabs" id="r-tabs"></div><div class="sc" id="r-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button><a class="tlink" id="r-tlink" target="_blank"><span style="font-size:16px">📚</span> Читать другой перевод</a><div class="phrase" id="r-phrase"></div></div>
 <div class="pg" id="pg-seq"><div class="hdr"><h1>📜 Свободное чтение</h1></div><div class="seq-nav"><select class="seq-sel" id="seq-book" onchange="seqBook()"></select><select class="seq-sel" id="seq-ch" onchange="seqRender()"></select></div><div class="sc" id="seq-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-out" style="margin-top:0;flex:1" onclick="seqPrev()">← Назад</button><button class="btn btn-acc" style="margin-top:0;flex:1" onclick="seqNext()">Далее →</button></div><button class="btn btn-out" style="margin-top:8px" onclick="addSeqBm()">⭐ Закладка</button><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
 <div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div id="con-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Начать план</button><button class="btn btn-out" onclick="conEditId=null;goPage('pg-sel')">Отмена</button></div>
 <div class="pg" id="pg-bm"><div class="hdr"><h1>⭐ Закладки</h1></div><div id="bm-list"></div><div id="bm-empty" style="display:none;text-align:center;padding:36px;color:var(--txt2);font-size:14px">Нет закладок.<br>Нажми ⭐ во время чтения.</div></div>
-<div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-empty" style="font-size:12px;color:var(--txt2);margin-bottom:10px;display:none">Сначала выбери план на вкладке «Планы»</div><select id="cfg-plan-sel" onchange="cfgSelectPlan(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px;margin-bottom:12px"></select><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid"><button onclick="setTheme('auto')" id="th-auto" class="th-btn"><div>🌗</div>Авто</button><button onclick="setTheme('light')" id="th-light" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn"><div>🌅</div>Сепия</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button></div><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span>Номера стихов</span><button class="tog on" id="cfg-vn-tog" onclick="cfgTogVn()"></button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div id="font-track" style="flex:1;height:28px;display:flex;align-items:center;position:relative;touch-action:none;cursor:pointer"><div style="width:100%;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div></div>
+<div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-empty" style="font-size:12px;color:var(--txt2);margin-bottom:10px;display:none">Сначала выбери план на вкладке «Планы»</div><select id="cfg-plan-sel" onchange="cfgSelectPlan(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px;margin-bottom:12px"></select><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid" style="grid-template-columns:repeat(3,1fr)"><button onclick="setTheme('auto')" id="th-auto" class="th-btn"><div>🌗</div>Авто</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button></div><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span>Номера стихов</span><button class="tog on" id="cfg-vn-tog" onclick="cfgTogVn()"></button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div id="font-track" style="flex:1;height:28px;display:flex;align-items:center;position:relative;touch-action:none;cursor:pointer"><div style="width:100%;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div></div>
 
-<div class="pg" id="pg-done"><div class="done-wrap"><div class="done-em">🎉</div><h2 style="font-size:24px;font-weight:800;margin-bottom:8px">План завершён!</h2><p style="font-size:14px;color:var(--txt2);line-height:1.6;margin-bottom:20px" id="done-txt"></p><button class="btn btn-acc" onclick="goPage('pg-sel')">Выбрать новый план</button><a class="chan-ban" style="margin-top:20px" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Хочешь двигаться дальше? Загляни на канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a></div></div>
+<div class="pg" id="pg-done"><div class="done-wrap"><div class="done-em">🎉</div><h2 style="font-size:24px;font-weight:800;margin-bottom:8px">План завершён!</h2><p style="font-size:14px;color:var(--txt2);line-height:1.6;margin-bottom:20px" id="done-txt"></p><button class="btn btn-acc" onclick="goPage('pg-sel')">Выбрать новый план</button><a class="chan-ban" style="margin-top:20px" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span class="chan-ico">📻</span><span class="chan-txt">Хочешь двигаться дальше?<b>Канал «От чтения к Преображению»</b></span><span class="chan-arrow">→</span></a></div></div>
 <div class="bnav" id="bnav" style="display:none"><button class="nb on" id="nb-read" onclick="switchTab('read')"><span class="nb-em">📖</span>Чтение</button><button class="nb" id="nb-bm" onclick="switchTab('bm')"><span class="nb-em">⭐</span>Закладки</button><button class="nb" id="nb-sel" onclick="switchTab('sel')"><span class="nb-em">🏠</span>Планы</button><button class="nb" id="nb-cfg" onclick="switchTab('cfg')"><span class="nb-em">⚙️</span>Настройки</button></div>
 <div id="toast"></div>
 <div id="milestone-modal" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeMilestone()">
@@ -156,7 +164,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
     <h2 style="font-size:21px;font-weight:800;margin-bottom:8px;color:var(--txt)" id="milestone-title"></h2>
     <p style="font-size:14px;color:var(--txt2);line-height:1.6;margin-bottom:18px" id="milestone-text"></p>
     <button class="btn btn-acc" style="margin-top:0" onclick="closeMilestone()">Продолжить чтение</button>
-    <a class="chan-ban" style="margin-top:12px" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span style="font-size:18px">📻</span><span class="chan-txt">Канал <b>«От чтения к Преображению»</b></span><span style="color:var(--acc)">→</span></a>
+    <a class="chan-ban" style="margin-top:12px" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span class="chan-ico">📻</span><span class="chan-txt">Канал<b>«От чтения к Преображению»</b></span><span class="chan-arrow">→</span></a>
   </div>
 </div>
 <script>
@@ -290,13 +298,13 @@ var showVerseNums=localStorage.getItem('vn')!=='0'; /* '0' = скрыть ном
    или prefers-color-scheme (обычный браузер) и обновляется на лету при смене
    день/ночь на устройстве. */
 var themeMode=localStorage.getItem('themeMode')||'auto';
-var theme=localStorage.getItem('theme')||'light';
+var theme=localStorage.getItem('theme')||'sepia';
 var _sysMQ=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
 function systemWantsDark(){
   try{if(tg&&tg.colorScheme)return tg.colorScheme==='dark';}catch(e){}
   return _sysMQ?_sysMQ.matches:false;
 }
-function resolveAutoTheme(){return systemWantsDark()?'dark':'light';}
+function resolveAutoTheme(){return systemWantsDark()?'dark':'sepia';}
 var showStats=false;
 var showCal=false;
 var seqBI=0,seqCI=0;
@@ -415,13 +423,16 @@ function buildChronoSchedule(days){
 var conChrono=false;
 function startChronoPlan(){conChrono=true;conEditId=null;goPage('pg-con');initCon();}
 
-var THEMES=['light','dark','sepia'];
-var THEME_ICO={light:'☀️',dark:'🌙',sepia:'🌅'};
-/* У кого была выбрана удалённая тема "Ночная" - автоматический переход на "Тёмную". */
+var THEMES=['sepia','dark'];
+var THEME_ICO={sepia:'☀️',dark:'🌙'};
+/* У кого была выбрана удалённая тема "Ночная" - автоматический переход на "Тёмную".
+   У кого была чисто-белая "Светлая" (light) - переход на новую "Светлую" (sepia). */
 if(theme==='night'){theme='dark';try{localStorage.setItem('theme','dark');}catch(e){}}
+if(theme==='light'){theme='sepia';try{localStorage.setItem('theme','sepia');}catch(e){}}
 function applyTheme(){
   if(themeMode==='auto')theme=resolveAutoTheme();
   else if(theme==='night')theme='dark'; /* тема "Ночная" удалена */
+  else if(theme==='light')theme='sepia'; /* чисто-белая "Светлая" удалена */
   document.body.className=theme==='dark'?'dark':theme==='sepia'?'sepia':'';
   var b=document.getElementById('theme-btn');
   if(b)b.textContent=themeMode==='auto'?'🌗':(THEME_ICO[theme]||'☀️');
@@ -430,8 +441,8 @@ function applyTheme(){
 }
 /* Переключение кнопкой ☀️ в топбаре: auto -> светлая -> тёмная -> auto */
 function cycleTheme(){
-  if(themeMode==='auto'){themeMode='manual';theme='light';}
-  else if(theme==='light'||theme==='sepia'){theme='dark';}
+  if(themeMode==='auto'){themeMode='manual';theme='sepia';}
+  else if(theme==='sepia'){theme='dark';}
   else{themeMode='auto';}
   applyTheme();renderCfg();haptic('light');
 }
@@ -456,6 +467,7 @@ function setTheme(t){
 })();
 
 function goPage(id){
+  haptic('light');
   document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
   var el=document.getElementById(id);if(el)el.classList.add('on');
   var nav=document.getElementById('bnav');
@@ -537,6 +549,7 @@ function renderSel(){
 }
 
 function selPlan(id){
+  haptic('light');
   selPlanId=id;
   document.querySelectorAll('.card[data-id]').forEach(function(c){c.classList.toggle('sel',c.dataset.id===id);});
   var sa=document.getElementById('start-area');
@@ -570,7 +583,7 @@ async function startPlan(){
   if(userId){try{var _r0=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:selPlanId,title:(getPlan(selPlanId)||{}).title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.settings.notifyOn!==false,init_data:tgInitData})});syncBadge(_r0.ok);}catch(e){syncBadge(false);}}
   haptic('success');viewDay=null;goPage('pg-read');renderRead();
 }
-function continuePlan(id){app.activePlanId=id;saveApp();viewDay=null;goPage('pg-read');renderRead();}
+function continuePlan(id){haptic('light');app.activePlanId=id;saveApp();viewDay=null;goPage('pg-read');renderRead();}
 async function delPlan(id){
   if(!confirm('Удалить план? Прогресс будет потерян.'))return;
   delete app.progress[id];delete app.customPlans[id];
@@ -826,7 +839,7 @@ function renderSc(tab){
   verses.forEach(function(o){
     if(prevC!==null&&o.c!==prevC)h+='<div class="ch-br"><b>'+o.c+'</b></div>';
     prevC=o.c;
-    h+='<span>'+(showVerseNums?'<sup class="vn" onclick="copyV('+o.v+',this)">'+o.v+'</sup>':'')+o.t+' </span>';
+    h+='<span>'+(showVerseNums?'<sup class="vn" onclick="copyV('+o.c+','+o.v+',this)">'+o.v+'</sup>':'')+o.t+' </span>';
   });
   h+='</div>';
   el.innerHTML=h;
@@ -992,7 +1005,7 @@ function addBm(){
    тап — начало отрывка, второй тап (по другому стиху) — конец, и в буфer
    уходит весь отрывок разом с указанием места Писания — именно то, что
    раньше давало только настоящее текстовое выделение. */
-var selRangeStart=null; // {vn, tabIdx} или null
+var selRangeStart=null; // {c, vn, tabIdx} или null
 function _ruVerses(n){
   var n10=n%10, n100=n%100;
   if(n100>=11&&n100<=14)return 'стихов';
@@ -1000,16 +1013,22 @@ function _ruVerses(n){
   if(n10>=2&&n10<=4)return 'стиха';
   return 'стихов';
 }
-function copyV(vn,el){
+function copyV(cv,vn,el){
   var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];if(!plan||!prog)return;
   var vd=viewDay!==null?viewDay:nextUnreadDay(plan,prog);
   var dd=plan.schedule[vd-1];if(!dd)return;
   var tabs=buildTabs(dd.refs);var tab=tabs[activeTab];
-  var verses=getV(tab.book,tab.ch,tab.vf,tab.vt);if(!verses)return;
-  var sv=tab.vf||1;
+  /* Отрезок дня может пересекать главы ({c1,v1,c2,v2}) - берём полный
+     диапазон через getVRange. Старая версия брала только главу начала
+     (getV(book,ch,...)), поэтому в 202 межглавных табах копирование
+     молча обрезалось на конце главы. */
+  var vr=getVRange(tab.book,tab.c1,tab.v1,tab.c2,tab.v2);if(!vr||!vr.length)return;
+  /* позиция каждого стиха отрезка: "глава:стих" -> индекс в vr,
+     чтобы диапазон корректно строился и через границы глав */
+  var pos={};for(var pi=0;pi<vr.length;pi++)pos[vr[pi].c+':'+vr[pi].v]=pi;
 
   if(!selRangeStart || selRangeStart.tabIdx!==activeTab){
-    selRangeStart={vn:vn,tabIdx:activeTab};
+    selRangeStart={c:cv,vn:vn,tabIdx:activeTab};
     document.querySelectorAll('.vn').forEach(function(s){s.classList.remove('vn-sel');});
     el.classList.add('vn-sel');
     showToast('Нажми последний стих отрывка (или этот же — для одного)');
@@ -1017,21 +1036,34 @@ function copyV(vn,el){
     return;
   }
 
-  var a=Math.min(selRangeStart.vn,vn), b=Math.max(selRangeStart.vn,vn);
+  var ia=pos[selRangeStart.c+':'+selRangeStart.vn], ib=pos[cv+':'+vn];
   selRangeStart=null;
   document.querySelectorAll('.vn').forEach(function(s){s.classList.remove('vn-sel');});
+  if(ia===undefined||ib===undefined)return;
 
-  var lines=[];
-  for(var v=a; v<=b; v++){
-    var idx=v-sv;
-    if(idx<0||idx>=verses.length)continue;
-    lines.push(v+' '+verses[idx]);
+  var lo=Math.min(ia,ib), hi=Math.max(ia,ib);
+  var sc=vr[lo].c, sv=vr[lo].v, ec=vr[hi].c, ev=vr[hi].v;
+  if(sc===ec){
+    /* одна глава - прежний компактный формат одной строкой */
+    var lines=[];
+    for(var i=lo;i<=hi;i++)lines.push(vr[i].v+' '+vr[i].t);
+    var ref=tab.book+' '+sc+(sv===ev?(':'+sv):(':'+sv+'-'+ev));
+    var text=ref+' — '+lines.join(' ')+' (Синодальный перевод)';
+  }else{
+    /* несколько глав - ссылка охватывает весь выбор, главы разделены
+       подзаголовками [Книга N], каждый стих - с его номера */
+    var mlines=[];
+    var prevC=null;
+    for(var j=lo;j<=hi;j++){
+      var o=vr[j];
+      if(o.c!==prevC){prevC=o.c;if(mlines.length)mlines.push('');mlines.push('['+tab.book+' '+o.c+']');}
+      mlines.push(o.v+' '+o.t);
+    }
+    var ref=tab.book+' '+sc+':'+sv+' – '+ec+':'+ev;
+    var text=ref+'\n'+mlines.join('\n')+'\n(Синодальный перевод)';
   }
-  if(!lines.length)return;
-  var ref=tab.book+' '+tab.ch+(a===b?(':'+a):(':'+a+'-'+b));
-  var text=ref+' — '+lines.join(' ')+' (Синодальный перевод)';
   try{navigator.clipboard.writeText(text);}catch(e){}
-  showToast((b-a+1)+' '+_ruVerses(b-a+1)+' скопировано');
+  showToast((hi-lo+1)+' '+_ruVerses(hi-lo+1)+' скопировано');
   haptic('light');
 }
 
@@ -1372,7 +1404,7 @@ function renderCfg(){
   if(ti)ti.disabled=!prog;
   if(lbl)lbl.textContent=prog?('Напоминания '+(prog.notifyOn!==false?'включены':'выключены')):'Нет плана для настройки';
   if(ti)ti.value=(prog&&prog.notifyTime)||'08:00';
-  ['auto','light','sepia','dark'].forEach(function(t){var b=document.getElementById('th-'+t);if(b)b.classList.toggle('sel',(t==='auto')?(themeMode==='auto'):(themeMode==='manual'&&theme===t));});
+  ['auto','sepia','dark'].forEach(function(t){var b=document.getElementById('th-'+t);if(b)b.classList.toggle('sel',(t==='auto')?(themeMode==='auto'):(themeMode==='manual'&&theme===t));});
 var vnb=document.getElementById('cfg-vn-tog');if(vnb)vnb.className='tog'+(showVerseNums?' on':'');
   var fi=document.getElementById('font-ind');if(fi)fi.style.left=(fontIdx/(FS.length-1)*100-4)+'%';
   var tz=document.getElementById('cfg-tz-note');
