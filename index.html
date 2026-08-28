@@ -485,7 +485,7 @@ function switchTab(tab){
   if(tab==='read'){goPage('pg-read');renderRead();}
   else if(tab==='seq'){goPage('pg-seq');initSeq();}
   else if(tab==='bm'){goPage('pg-bm');renderBm();}
-  else if(tab==='cfg'){goPage('pg-cfg');renderCfg();}
+  else if(tab==='cfg'){goPage('pg-cfg');renderCfg();refreshServerPlans();}
   else{goPage('pg-sel');renderSel();}
 }
 
@@ -508,43 +508,70 @@ var selPlanId=null;
 function renderSel(){
   var mp=document.getElementById('my-plans');
   var sl=document.getElementById('suggested-lbl');
-  var existing=Object.keys(app.progress).filter(function(id){return getPlan(id);});
-  if(existing.length){
-    var html='<div class="sec">Мои планы</div>';
-    existing.forEach(function(id){
-      var pl=getPlan(id);if(!pl)return;
-      var prog=app.progress[id];
-      var done=(prog.daysDone||[]).length;
-      var pct=Math.round(done/pl.days*100);
-      var isAct=id===app.activePlanId;
-      var isCustom=id.charAt(0)==='c';
-      html+='<div class="card'+(isAct?' sel':'')+'">'+
-        '<div class="card-top" onclick="continuePlan(\''+id+'\')" style="cursor:pointer">'+
-        '<div class="card-ico">'+pl.icon+'</div>'+
-        '<div class="card-info"><div class="card-title">'+pl.title+'</div>'+
-        '<div class="card-meta">'+pct+'% &middot; '+done+'/'+pl.days+' дней'+(isAct?' &middot; активный':'')+'</div></div>'+
+  var plEl=document.getElementById('plan-list');
+  /* КАТАЛОГ = единственное место системного плана. Раньше зарегистрированный
+     план уезжал копией в «Мои планы» сверху, а предложение оставалось в
+     каталоге — при нескольких планах страница дублировалась (до 10+ карточек).
+     Теперь выбранный план ОСТАЁТСЯ на своём месте и трансформируется:
+     прогресс + «Продолжить/Удалить»; удаление возвращает обычное предложение. */
+  if(plEl)plEl.innerHTML=PLANS.map(function(p){
+    var prog=app.progress[p.id];
+    if(!prog){
+      return '<div class="card" data-id="'+p.id+'" onclick="selPlan(\''+p.id+'\')">'+
+        '<div class="card-top"><div class="card-ico">'+p.icon+'</div>'+
+        '<div class="card-info"><div class="card-title">'+p.title+'</div>'+
+        '<div class="card-meta">'+p.days+' дней</div></div>'+
+        '<div class="badge">'+(DIFF[p.diff]||'')+'</div></div>'+
+        '<div class="card-desc">'+p.desc+'</div></div>';
+    }
+    var done=(prog.daysDone||[]).length;
+    var pct=Math.min(100,Math.round(done/p.days*100));
+    var isAct=p.id===app.activePlanId;
+    return '<div class="card'+(isAct?' sel':'')+'" data-id="'+p.id+'">'+
+      '<div class="card-top" onclick="continuePlan(\''+p.id+'\')" style="cursor:pointer">'+
+        '<div class="card-ico">'+p.icon+'</div>'+
+        '<div class="card-info"><div class="card-title">'+p.title+'</div>'+
+        '<div class="card-meta">'+pct+'% &middot; '+done+'/'+p.days+' дней'+(isAct?' &middot; читаю сейчас':'')+'</div></div>'+
         '<div class="badge" style="background:var(--acc);color:#fff">→</div></div>'+
-        '<div style="display:flex;gap:6px;margin-top:8px">'+
-        '<button onclick="delPlan(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">🗑 Удалить</button>'+
-        (isCustom?'<button onclick="editCustomPlan(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">✏️ Изменить</button>':'')+
-        '<button onclick="continuePlan(\''+id+'\')" style="flex:2;padding:7px;border:none;border-radius:7px;background:var(--acc);color:#fff;font-size:12px;cursor:pointer;font-family:var(--fui);font-weight:600">Продолжить →</button>'+
-        '</div></div>';
-    });
-    if(mp)mp.innerHTML=html;
-    if(sl)sl.style.display='block';
-  } else {
-    if(mp)mp.innerHTML='';
-    if(sl)sl.style.display='none';
-  }
-  var pl=document.getElementById('plan-list');
-  if(pl)pl.innerHTML=PLANS.map(function(p){
-    return '<div class="card" data-id="'+p.id+'" onclick="selPlan(\''+p.id+'\')">'+
-      '<div class="card-top"><div class="card-ico">'+p.icon+'</div>'+
-      '<div class="card-info"><div class="card-title">'+p.title+'</div>'+
-      '<div class="card-meta">'+p.days+' дней</div></div>'+
-      '<div class="badge">'+(DIFF[p.diff]||'')+'</div></div>'+
-      '<div class="card-desc">'+p.desc+'</div></div>';
+      '<div style="display:flex;gap:6px;margin-top:8px">'+
+        '<button onclick="delPlan(\''+p.id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">🗑 Удалить</button>'+
+        '<button onclick="continuePlan(\''+p.id+'\')" style="flex:2;padding:7px;border:none;border-radius:7px;background:var(--acc);color:#fff;font-size:12px;cursor:pointer;font-family:var(--fui);font-weight:600">Продолжить →</button>'+
+      '</div></div>';
   }).join('');
+  if(sl)sl.style.display='block';
+  /* «Мои планы» теперь только для ВНЕСИСТЕМНЫХ планов: кастомные
+     (конструктор «Составить свой план»/хронологический с длительностью)
+     и сервер-онли регистрации без карточки в каталоге. Их некуда ставить
+     «на место» — им нужна отдельная секция. */
+  var customIds=Object.keys(app.progress).filter(function(id){
+    return !PLANS.some(function(p){return p.id===id;});
+  });
+  if(mp){
+    if(!customIds.length){mp.innerHTML='';}
+    else{
+      var html='<div class="sec">Мои планы</div>';
+      customIds.forEach(function(id){
+        var pl=getPlan(id);
+        var prog=app.progress[id];
+        var done=(prog.daysDone||[]).length;
+        var days=pl&&pl.days?pl.days:(prog.days||0);
+        var meta=days?(Math.min(100,Math.round(done/days*100))+'% &middot; '+done+'/'+days+' дней'):(done?('прочитано дней: '+done):'ещё не начинался');
+        var isAct=id===app.activePlanId;
+        html+='<div class="card'+(isAct?' sel':'')+'" data-id="'+id+'">'+
+          '<div class="card-top"'+(pl?' onclick="continuePlan(\''+id+'\')" style="cursor:pointer"':'')+'>'+
+          '<div class="card-ico">'+(pl?pl.icon:'📚')+'</div>'+
+          '<div class="card-info"><div class="card-title">'+_anyPlanTitle(id)+'</div>'+
+          '<div class="card-meta">'+meta+(isAct?' &middot; активный':'')+'</div></div>'+
+          '<div class="badge" style="background:var(--acc);color:#fff">→</div></div>'+
+          '<div style="display:flex;gap:6px;margin-top:8px">'+
+          '<button onclick="delPlan(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">🗑 Удалить</button>'+
+          (app.customPlans[id]?'<button onclick="editCustomPlan(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">✏️ Изменить</button>':'')+
+          (pl?'<button onclick="continuePlan(\''+id+'\')" style="flex:2;padding:7px;border:none;border-radius:7px;background:var(--acc);color:#fff;font-size:12px;cursor:pointer;font-family:var(--fui);font-weight:600">Продолжить →</button>':'')+
+          '</div></div>';
+      });
+      mp.innerHTML=html;
+    }
+  }
   var sa=document.getElementById('start-area');if(sa)sa.remove();
 }
 
@@ -611,6 +638,23 @@ async function unregisterOnServer(planId){
 function getPlan(id){
   var p=PLANS.find(function(p){return p.id===id;})||app.customPlans[id]||null;
   if(p&&!p.schedule&&PLANS_PERI[id])p.schedule=PLANS_PERI[id];
+  /* Фолбэк для унаследованных планов (bible_180/bible_90/nt_30/chrono_<N>...):
+     регистрации живы в app.progress и на сервере, а определения из массива
+     PLANS уже удалены. Раньше getPlan() отдавал null - такие планы исчезали
+     со вкладки «Планы», из настроек (пустое меню времени) и не открывались.
+     Собираем объект по расписанию из PLANS_PERI: длина даёт число дней,
+     префикс id - заголовок. */
+  if(!p&&typeof id==='string'){
+    var s2=PLANS_PERI[id];
+    if(s2&&s2.length){
+      var n=s2.length;
+      var ttl=id.indexOf('nt_')===0?('Новый Завет за '+n+' дней')
+              :id.indexOf('chrono')===0?('Хронологический план за '+n+' дней')
+              :('Библия за '+n+' дней');
+      p={id:id,title:ttl,icon:(id.indexOf('nt_')===0?'✝️':(id.indexOf('chrono')===0?'🕰️':'📚')),
+         days:n,diff:'custom',desc:'План предыдущей версии приложения',schedule:s2};
+    }
+  }
   return p;
 }
 
@@ -748,7 +792,14 @@ function renderRead(){
   var cur=curDayNum(plan,prog);
   var landing=nextUnreadDay(plan,prog);
   var vd=viewDay!==null?viewDay:landing;
-  var dd=plan.schedule[vd-1];if(!dd)return;
+  var dd=plan.schedule[vd-1];
+  if(!dd){
+    /* План дочитан (vd за пределами расписания): раньше renderRead молча
+       выходил, экран не перерисовывался и кнопка оставалась от предыдущего
+       плана - выглядело как зависание. */
+    if((prog.daysDone||[]).length>=plan.days){goPage('pg-done');}
+    return;
+  }
   var done=(prog.daysDone||[]).length;
   var pct=Math.round(done/plan.days*100);
   var streak=effStreak(prog);
@@ -783,7 +834,7 @@ function renderRead(){
   }
   renderSc(tabs[activeTab]);
   el=document.getElementById('r-tlink');if(el&&tabs[activeTab])el.href=bbLink(tabs[activeTab].book,tabs[activeTab].ch);
-  updReadBtn(tabs,vd>cur,isDayRead,vd);
+  updReadBtn(tabs,vd>cur,isDayRead,isLanding,vd,done>=plan.days);
 }
 
 /* Все стихи отрезка (возможно, через несколько глав) в порядке следования. */
@@ -845,13 +896,29 @@ function renderSc(tab){
   el.innerHTML=h;
 }
 
-function updReadBtn(tabs,isFuture,isDayRead,vd){
+function updReadBtn(tabs,isFuture,isDayRead,isLanding,vd,isPlanDone){
   var btn=document.getElementById('r-read-btn');if(!btn)return;
   var isLast=activeTab>=tabs.length-1;
-  if(isFuture){
+  if(isPlanDone){
+    /* План прочитан целиком: раньше кнопка оставалась disabled
+       «✓ День N прочитан» и выглядела зависшей. */
+    btn.textContent='🎉 План прочитан полностью';
+    btn.disabled=false;btn.className='read-btn';
+    btn.onclick=function(){goPage('pg-done');};
+  } else if(isFuture){
     btn.textContent='Этот день ещё не открыт';
     btn.disabled=true;btn.className='read-btn done';btn.onclick=null;
+  } else if(isDayRead&&isLanding){
+    /* Догнали график: непрочитанных дней в пределах «сегодня» не осталось.
+       Раньше это было мёртвое состояние (disabled, onclick=null) — пользователь
+       воспринимал как зависание, особенно при нескольких планах, созданных
+       одним днём. Теперь кнопка активна и ведёт к выбору плана. */
+    btn.textContent='🌅 На сегодня всё';
+    btn.disabled=false;btn.className='read-btn';
+    btn.onclick=function(){goPage('pg-sel');};
   } else if(isDayRead){
+    /* Просмотр уже прочитанного дня через календарь/стрелки: только тут
+       неактивная кнопка уместна. */
     btn.textContent='✓ День '+vd+' прочитан';
     btn.disabled=true;btn.className='read-btn done';btn.onclick=null;
   } else if(!isLast){
@@ -875,7 +942,7 @@ function setTab(i){
   var tabs=buildTabs(dd.refs);
   renderSc(tabs[i]);
   var tl=document.getElementById('r-tlink');if(tl)tl.href=bbLink(tabs[i].book,tabs[i].ch);
-  updReadBtn(tabs,vd>cur,(prog.daysDone||[]).indexOf(vd)>=0,vd);
+  updReadBtn(tabs,vd>cur,(prog.daysDone||[]).indexOf(vd)>=0,vd===landing,vd,(prog.daysDone||[]).length>=plan.days);
   haptic('light');
 }
 function goDay(d){
@@ -900,17 +967,16 @@ async function markRead(){
   prog.streak=ns;prog.lastRead=t;
   if(!prog.daysDone)prog.daysDone=[];
   if(prog.daysDone.indexOf(vd)<0)prog.daysDone.push(vd);
-  /* Снимок для undo: случайный тап по "Прочитал" не должен портить стрик */
-  var _undo={day:vd,streak:prog.streak,maxStreak:prog.maxStreak,lastRead:prog.lastRead,
-             daysDone:prog.daysDone.slice(),milestones:(prog.milestonesShown||[]).slice()};
+  /* Раньше здесь был toast «Отменить» с откатом локального состояния и
+     POST /plan/unread. Удалён по решению владельца: откат ненадёжен по
+     построению — ответ /plan/read мог прийти ПОСЛЕ отката и вернуть
+     прочитанное состояние (плюс merge_days на сервере склеивает дни через
+     union, возвращая «отменённый» день при следующей синхронизации).
+     Надёжный undo потребовал бы отложенной записи на сервер — ценой потери
+     дня при закрытии приложения до записи. Случайный тап теперь не страшен:
+     лишний прочитанный день не портит max_streak, а навигация по календарю
+     позволяет перечитать любой день. */
   saveApp();haptic('success');
-  showUndoToast(function(){
-    prog.streak=_undo.streak;prog.maxStreak=_undo.maxStreak;prog.lastRead=_undo.lastRead;
-    prog.daysDone=_undo.daysDone;prog.milestonesShown=_undo.milestones;
-    saveApp();renderRead();
-    try{fetchT(BACKEND+'/plan/unread',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,day_number:_undo.day,init_data:tgInitData})});}catch(e){}
-  });
   var ph=document.getElementById('r-phrase');
   if(ph){ph.textContent=PHRASES[Math.floor(Math.random()*PHRASES.length)];setTimeout(function(){ph.textContent='';},3000);}
   /* После отметки — переходим к следующему непрочитанному дню (если пользователь
@@ -1382,8 +1448,84 @@ async function startCustom(){
 }
 
 var cfgPlanId=null; // какой план сейчас настраивается на вкладке "Настройки" — независимо от того, какой план читается
+/* Заголовок плана для настроек: getPlan() знает только текущие системные
+   планы (3 шт.) и локальные кастомные. Но у пользователей есть регистрации
+   СТАРЫХ планов (bible_180, bible_90, nt_30, chrono_<N>...), строки которых
+   живут на сервере и в app.progress, а определения в PLANS уже удалены.
+   Раньше такие планы отфильтровывались как неизвестные - выпадающий список
+   в настройках пустел, и время напоминания нельзя было поменять ни для
+   одного из них. Теперь каждый зарегистрированный план всегда виден:
+   заголовок восстанавливается по длине расписания из PLANS_PERI (все 5
+   наборов там есть) или из сохранённого названия. */
+/* Планы, зарегистрированные на сервере, но отсутствующие в локальном
+   app.progress (пользователь зашёл с другого устройства / чистый localStorage /
+   кэш). Раньше настройки собирали список только из app.progress — на десктопе
+   и TelegramWeb после синхронизации меню времени оказывалось пустым, хотя на
+   телефоне с накопленным локальным состоянием всё было видно. Источник
+   правды для списка — /plan/status без plan_id: сводка ВСЕХ планов аккаунта
+   (read-only, специально без initData-проверки для кросс-мини-аппа). */
+var _serverPlansRows=null;
+function refreshServerPlans(){
+  if(!userId||!tgInitData)return Promise.resolve();
+  return fetchT(BACKEND+'/plan/status?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData))
+    .then(function(r){return r.json();})
+    .then(function(s){
+      if(s&&s.registered&&Array.isArray(s.plans)){_serverPlansRows=s.plans;renderCfg();}
+    })
+    .catch(function(){/* офлайн: показываем только локальные */});
+}
+
+function _anyPlanTitle(id){
+  var p=getPlan(id);
+  if(p&&p.title)return p.title;
+  var sched=PLANS_PERI[id];
+  var n=sched&&sched.length?sched.length:null;
+  if(n){
+    if(id.indexOf('nt_')===0)return 'Новый Завет за '+n+' дней';
+    if(id.indexOf('chrono')===0)return 'Хронологический план за '+n+' дней';
+    if(id.indexOf('bible')===0)return 'Библия за '+n+' дней';
+    return 'План на '+n+' дней';
+  }
+  if(_serverPlansRows)for(var i=0;i<_serverPlansRows.length;i++){
+    if(_serverPlansRows[i].plan_id===id&&_serverPlansRows[i].title)return _serverPlansRows[i].title;
+  }
+  var pr=(app&&app.progress)?app.progress[id]:null;
+  return (pr&&(pr.title||pr.label))||id;
+}
+/* Локальная заглушка прогресса для сервер-онли плана: без неё cfgSaveTime/
+   cfgTogNot/syncNotify игнорировали бы изменения времени для плана, которого
+   нет в localStorage этого устройства. Заглушка содержит только настройки
+   напоминаний (daysDone пуст — чтение по такому плану открывается только
+   после появления расписания), и штатно уходит на сервер через pushState. */
+function _ensureCfgProg(){
+  var p=app.progress[cfgPlanId];
+  if(!p){
+    p={daysDone:[],serverOnly:true,notifyOn:true,notifyTime:'08:00',
+       notifyHourMsk:8,notifyMinuteMsk:0,startDate:today()};
+    if(_serverPlansRows)for(var i=0;i<_serverPlansRows.length;i++){
+      var r0=_serverPlansRows[i];
+      if(r0.plan_id===cfgPlanId){
+        p.notifyOn=r0.notify_on!==false;
+        p.notifyHourMsk=(r0.notify_hour_msk!=null)?r0.notify_hour_msk:8;
+        p.notifyMinuteMsk=(r0.notify_minute_msk!=null)?r0.notify_minute_msk:0;
+        p.notifyTime=(p.notifyHourMsk<10?'0':'')+p.notifyHourMsk+':'+(p.notifyMinuteMsk<10?'0':'')+p.notifyMinuteMsk;
+      }
+    }
+    app.progress[cfgPlanId]=p;
+  }
+  return p;
+}
 function renderCfg(){
-  var ids=Object.keys(app.progress||{}).filter(function(id){return getPlan(id);});
+  /* ВАЖНО: без фильтра по getPlan() - показываем ВСЕ зарегистрированные
+     планы пользователя, включая унаследованные, иначе меню пусто и
+     настройки времени недоступны именно тем, у кого больше всего планов. */
+  var ids=Object.keys(app.progress||{});
+  /* Склейка с серверными регистрациями: план может быть в аккаунте, но
+     отсутствовать в localStorage этого устройства. */
+  var known={};ids.forEach(function(x){known[x]=1;});
+  (_serverPlansRows||[]).forEach(function(row){
+    if(row.plan_id&&!known[row.plan_id]){known[row.plan_id]=1;ids.push(row.plan_id);}
+  });
   // Сохраняем предыдущий выбор, если план всё ещё существует; иначе — активный план чтения; иначе первый попавшийся.
   if(!cfgPlanId||ids.indexOf(cfgPlanId)<0){
     cfgPlanId=(app.activePlanId&&ids.indexOf(app.activePlanId)>=0)?app.activePlanId:(ids[0]||null);
@@ -1392,13 +1534,36 @@ function renderCfg(){
   var empty=document.getElementById('cfg-plan-empty');
   if(sel){
     sel.innerHTML=ids.map(function(id){
-      var t=getPlan(id).title;
-      return '<option value="'+id+'"'+(id===cfgPlanId?' selected':'')+'>'+t+(id===app.activePlanId?' (читаю сейчас)':'')+'</option>';
+      var t=_anyPlanTitle(id);
+      /* Явные цвета опций: нативный дропдаун десктопных клиентов рендерит
+         список на системном фоне — наследованный var(--txt) тёмной темы
+         давал «светлый текст на светлом фоне» = визуально пустое меню
+         (на iOS пикер системный и с этим не сталкивался). */
+      return '<option value="'+id+'"'+(id===cfgPlanId?' selected':'')
+        +' style="background:#fff;color:#12180F">'
+        +t+(id===app.activePlanId?' (читаю сейчас)':'')+'</option>';
     }).join('');
+    /* Подсказка ОС, какой цветовой схемы придерживаться для нативного
+       списка опций (тёмная тема -> тёмный фон меню). */
+    sel.style.colorScheme=(theme==='dark')?'dark':'light';
     sel.style.display=ids.length?'block':'none';
   }
   if(empty)empty.style.display=ids.length?'none':'block';
   var prog=cfgPlanId?app.progress[cfgPlanId]:null;
+  var serverRow=null;
+  if(!prog&&_serverPlansRows){
+    for(var sri=0;sri<_serverPlansRows.length;sri++){
+      if(_serverPlansRows[sri].plan_id===cfgPlanId){serverRow=_serverPlansRows[sri];break;}
+    }
+  }
+  if(!prog&&serverRow){
+    var sh=(serverRow.notify_hour_msk!=null)?serverRow.notify_hour_msk:8;
+    var sm=(serverRow.notify_minute_msk!=null)?serverRow.notify_minute_msk:0;
+    prog={serverOnly:true,daysDone:[],
+      notifyOn:serverRow.notify_on!==false,
+      notifyHourMsk:sh,notifyMinuteMsk:sm,
+      notifyTime:(sh<10?'0':'')+sh+':'+(sm<10?'0':'')+sm};
+  }
   var tog=document.getElementById('cfg-not-tog');var lbl=document.getElementById('cfg-not-lbl');var ti=document.getElementById('cfg-time');
   if(tog){tog.disabled=!prog;tog.className='tog'+(prog&&prog.notifyOn!==false?' on':'');}
   if(ti)ti.disabled=!prog;
@@ -1416,14 +1581,14 @@ function cfgSelectPlan(id){
   haptic('light');
 }
 function cfgTogNot(){
-  if(!cfgPlanId||!app.progress[cfgPlanId])return;
-  var prog=app.progress[cfgPlanId];
+  if(!cfgPlanId)return;
+  var prog=_ensureCfgProg();
   prog.notifyOn=!(prog.notifyOn!==false);
   saveApp();syncNotify();renderCfg();haptic('light');
 }
 function cfgSaveTime(v){
-  if(!cfgPlanId||!app.progress[cfgPlanId])return;
-  var prog=app.progress[cfgPlanId];
+  if(!cfgPlanId)return;
+  var prog=_ensureCfgProg();
   prog.notifyTime=v;
   var msk=localTimeToMsk(v);
   prog.notifyHourMsk=msk.hour;
@@ -1616,22 +1781,9 @@ document.addEventListener('touchend',function(e){
   else if(id==='pg-seq'){if(dx<0)seqNext();else seqPrev();}
 },{passive:true});
 
-/* Тост с кнопкой "Отменить" после отметки дня прочитанным. Через 6 секунд
-   исчезает - и отметка становится окончательной. */
-function showUndoToast(onUndo){
-  var old=document.getElementById('undo-toast');if(old)old.remove();
-  var d=document.createElement('div');d.id='undo-toast';
-  d.style.cssText='position:fixed;bottom:70px;left:50%;transform:translateX(-50%);z-index:9999;'
-    +'background:#333;color:#fff;border-radius:22px;padding:10px 16px;font-size:13px;'
-    +'font-family:var(--fui);box-shadow:0 4px 14px rgba(0,0,0,.25);display:flex;align-items:center;gap:12px;white-space:nowrap';
-  d.innerHTML='<span>День отмечен прочитанным</span>';
-  var b=document.createElement('button');
-  b.textContent='Отменить';
-  b.style.cssText='background:none;border:none;color:#8bc34a;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;padding:0';
-  b.onclick=function(){clearTimeout(d._t);d.remove();onUndo();};
-  d.appendChild(b);document.body.appendChild(d);
-  d._t=setTimeout(function(){d.remove();},6000);
-}
+/* Тост с кнопкой «Отменить» после отметки дня прочитанным удалён по
+   решению владельца — см. комментарий в markRead: откат ненадёжен из-за
+   гонки с ответом /plan/read и union-склейки дней на сервере. */
 function openBotForRegistration(){
   try{
     if(tg&&tg.openTelegramLink) tg.openTelegramLink(BIBLE_BOT_CHAT);
