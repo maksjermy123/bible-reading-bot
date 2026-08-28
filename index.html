@@ -611,8 +611,31 @@ async function startPlan(){
   haptic('success');viewDay=null;goPage('pg-read');renderRead();
 }
 function continuePlan(id){haptic('light');app.activePlanId=id;saveApp();viewDay=null;goPage('pg-read');renderRead();}
+/* Собственное окно подтверждения вместо нативного confirm(): браузер
+   prepend'ит к нативному диалогу адрес страницы («maksjermy123.github.io
+   Удалить план?…»), и убрать эту приписку из confirm() невозможно.
+   Окно в стиле приложения — и эстетика, и единый вид на всех платформах. */
+function appConfirm(message,onOk){
+  var ov=document.createElement('div');
+  ov.id='app-confirm';
+  ov.style.cssText='position:fixed;left:0;top:0;right:0;bottom:0;z-index:10000;'
+    +'background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:24px';
+  var card=document.createElement('div');
+  card.style.cssText='background:var(--card);color:var(--txt);border:2px solid var(--brd);'
+    +'border-radius:var(--rad);padding:18px;max-width:320px;width:100%;font-family:var(--fui)';
+  card.innerHTML='<div style="font-size:14px;line-height:1.5;margin-bottom:14px">'+message+'</div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button id="ac-no" style="flex:1;padding:12px;border:1px solid var(--brd);border-radius:9px;background:none;color:var(--txt2);font-size:13px;cursor:pointer;font-family:inherit">Отмена</button>'
+    +'<button id="ac-yes" style="flex:1;padding:12px;border:none;border-radius:9px;background:var(--acc);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Удалить</button>'
+    +'</div>';
+  ov.appendChild(card);document.body.appendChild(ov);
+  function close(){ov.remove();}
+  document.getElementById('ac-no').onclick=close;
+  document.getElementById('ac-yes').onclick=function(){close();onOk();};
+  ov.onclick=function(e){if(e.target===ov)close();};
+}
 async function delPlan(id){
-  if(!confirm('Удалить план? Прогресс будет потерян.'))return;
+  appConfirm('Удалить план? Прогресс будет потерян.',async function(){
   delete app.progress[id];delete app.customPlans[id];
   if(app.activePlanId===id)app.activePlanId=null;
   saveApp();haptic('light');renderSel();
@@ -627,6 +650,7 @@ async function delPlan(id){
   var ok=await unregisterOnServer(id);
   if(!ok)ok=await unregisterOnServer(id); // одна повторная попытка при сбое сети
   if(!ok)showToast('⚠️ Не удалось удалить план на сервере — попробуй ещё раз');
+  });
 }
 async function unregisterOnServer(planId){
   try{
