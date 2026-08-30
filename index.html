@@ -186,17 +186,31 @@ var NT_CHRONO_TITLES=["Пролог. Слово стало плотию", "Св�
    localStorage; init() ждёт его так же, как loadBible(). */
 var PLANS_PERI={};
 var PLANS_PERI_VER='v1';
+function _bindPlanSchedules(){
+  PLANS.forEach(function(p){
+    if(!p.schedule){
+      p.schedule = PLANS_PERI[p.id] || (p.id === 'chrono_365' ? PLANS_PERI.bible_365 : null);
+    }
+  });
+}
 function loadPlansPeri(){
   try{
     if(localStorage.getItem('pp_ver')===PLANS_PERI_VER){
       var s=localStorage.getItem('pp_data');
-      if(s){PLANS_PERI=JSON.parse(s);return Promise.resolve();}
+      if(s){
+        PLANS_PERI=JSON.parse(s);
+        if(!PLANS_PERI.chrono_365&&PLANS_PERI.bible_365) PLANS_PERI.chrono_365=PLANS_PERI.bible_365;
+        _bindPlanSchedules();
+        return Promise.resolve();
+      }
     }
   }catch(e){}
   return fetch('plans.json?v='+PLANS_PERI_VER)
     .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
     .then(function(p){
       PLANS_PERI=p;
+      if(!PLANS_PERI.chrono_365&&PLANS_PERI.bible_365) PLANS_PERI.chrono_365=PLANS_PERI.bible_365;
+      _bindPlanSchedules();
       try{
         localStorage.setItem('pp_data',JSON.stringify(p));
         localStorage.setItem('pp_ver',PLANS_PERI_VER);
@@ -204,9 +218,9 @@ function loadPlansPeri(){
     });
 }
 var PLANS=[
- {id:"nt_90",title:"Новый Завет за 90 дней",icon:"✝️",days:90,diff:"recommended",desc:"Весь Новый Завет от Матфея до Откровения за три месяца.",schedule:PLANS_PERI.nt_90},
- {id:"chrono_365",title:"Хронологический план за год",icon:"🕰️",days:365,diff:"challenging",desc:"Весь канон в порядке исторических событий, эпоха за эпохой — по смысловым отрывкам.",schedule:PLANS_PERI.bible_365},
- {id:"bible_365",title:"Библия за год",icon:"📚",days:365,diff:"challenging",desc:"Весь канон от Бытия до Откровения по смысловым отрывкам (перикопам).",schedule:PLANS_PERI.bible_365}
+ {id:"nt_90",title:"Новый Завет за 90 дней",icon:"✝️",days:90,diff:"recommended",desc:"Весь Новый Завет от Матфея до Откровения за три месяца.",schedule:null},
+ {id:"chrono_365",title:"Хронологический план за год",icon:"🕰️",days:365,diff:"challenging",desc:"Весь канон в порядке исторических событий, эпоха за эпохой — по смысловым отрывкам.",schedule:null},
+ {id:"bible_365",title:"Библия за год",icon:"📚",days:365,diff:"challenging",desc:"Весь канон от Бытия до Откровения по смысловым отрывкам (перикопам).",schedule:null}
 ];
 var VC={"Бытие":[31,25,24,26,32,22,24,22,29,32,32,20,18,24,21,16,27,33,38,18,34,24,20,67,34,35,46,22,35,43,55,32,20,31,29,43,36,30,23,23,57,38,34,34,28,34,31,22,33,26],"Исход":[22,25,22,31,23,30,25,32,35,29,10,51,22,31,27,36,16,27,25,26,36,31,33,18,40,37,21,43,46,38,18,35,23,35,35,38,29,31,43,38],"Левит":[17,16,17,35,19,30,38,36,24,20,47,8,59,56,33,34,16,30,37,27,24,33,44,23,55,46,34],"Числа":[54,34,51,49,31,27,89,26,23,36,35,15,34,45,41,50,13,32,22,29,35,41,30,25,18,65,23,31,39,17,54,42,55,29,34,13],"Второзаконие":[46,37,29,49,33,25,26,20,29,22,32,32,18,29,23,22,20,22,21,20,23,30,25,22,19,19,26,68,29,20,30,52,29,12],"Иисус Навин":[18,24,17,24,16,26,26,35,27,43,23,24,33,15,63,10,18,28,51,9,45,34,16,33],"Судьи":[36,23,31,24,31,40,25,35,57,18,40,15,25,20,20,31,13,31,30,48,25],"Руфь":[22,23,18,22],"1 Царств":[28,36,21,22,12,21,17,22,27,27,15,25,23,52,35,23,58,30,24,43,15,23,28,23,44,25,12,25,11,31,13],"2 Царств":[27,32,39,12,25,23,29,18,13,19,27,31,39,33,37,23,29,33,43,26,22,51,39,25],"3 Царств":[53,46,28,34,18,38,51,66,28,29,43,33,34,31,34,34,24,46,21,43,29,53],"4 Царств":[18,25,27,44,27,33,20,29,37,36,21,21,25,29,38,20,41,37,37,21,26,20,37,20,30],"1 Паралипоменон":[54,55,24,43,26,81,40,40,44,14,47,40,14,17,29,43,27,17,19,8,30,19,32,31,31,32,34,21,30],"2 Паралипоменон":[17,18,17,22,14,42,22,18,31,19,23,16,22,15,19,14,19,34,11,37,20,12,21,27,28,23,9,27,36,27,21,33,25,33,27,23],"Ездра":[11,70,13,24,17,22,28,36,15,44],"Неемия":[11,20,32,23,19,19,73,18,38,39,36,47,31],"Есфирь":[22,23,15,17,14,14,10,17,32,3],"Иов":[22,13,26,21,27,30,21,22,35,22,20,25,28,22,35,22,16,21,29,29,34,30,17,25,6,14,23,28,25,31,40,22,33,37,16,33,24,41,35,27,26,17],"Псалтирь":[6,12,9,9,13,11,18,10,39,7,9,6,7,5,11,15,51,15,10,14,32,6,10,22,12,14,9,11,13,25,11,22,23,28,13,40,23,14,18,14,12,5,27,18,12,10,15,21,23,21,11,7,9,24,14,12,12,18,14,9,13,12,11,14,20,8,36,37,6,24,20,28,23,11,13,21,72,13,20,17,8,19,13,14,17,7,19,53,17,16,16,5,23,11,13,12,9,9,5,8,29,22,35,45,48,43,14,31,7,10,10,9,26,9,10,2,29,176,7,8,9,4,8,5,6,5,6,8,8,3,18,3,3,21,26,9,8,24,14,10,7,12,15,21,10,11,9,14,9,6],"Притчи":[33,22,35,27,23,35,27,36,18,32,31,28,25,35,33,33,28,24,29,30,31,29,35,34,28,28,27,28,27,33,31],"Екклесиаст":[18,26,22,17,19,12,29,17,18,20,10,14],"Песнь Песней":[16,17,11,16,16,12,14,14],"Исаия":[31,22,25,6,30,13,25,22,21,34,16,6,22,32,9,14,14,7,25,6,17,25,18,23,12,21,13,29,24,33,9,20,24,17,10,22,38,22,8,31,29,25,28,28,25,13,15,22,26,11,23,15,12,17,13,12,21,14,21,22,11,12,19,12,25,24],"Иеремия":[19,37,25,31,31,30,34,22,26,25,23,17,27,22,21,21,27,23,15,18,14,30,40,10,38,24,22,17,32,24,40,44,26,22,19,32,21,28,18,16,18,22,13,30,5,28,7,47,39,46,64,34],"Плач Иеремии":[22,22,66,22,22],"Иезекииль":[28,10,27,17,17,14,27,18,11,22,25,28,23,23,8,63,24,32,14,49,32,31,49,27,17,21,36,26,21,26,18,32,33,31,15,38,28,23,29,49,26,20,27,31,25,24,23,35],"Даниил":[21,49,33,34,31,28,28,27,27,21,45,13],"Осия":[11,23,5,19,15,11,16,14,17,15,12,14,15,10],"Иоиль":[20,32,21],"Амос":[15,16,15,13,27,14,17,14,15],"Авдий":[21],"Иона":[16,11,10,11],"Михей":[16,13,12,13,15,16,20],"Наум":[15,13,19],"Аввакум":[17,20,19],"Софония":[18,15,20],"Аггей":[15,23],"Захария":[21,13,10,14,11,15,14,23,17,12,17,14,9,21],"Малахия":[14,17,18,6],"Матфей":[25,23,17,25,48,34,29,34,38,42,30,50,58,36,39,28,27,35,30,34,46,46,39,51,46,75,66,20],"Марк":[45,28,35,41,43,56,37,38,50,52,33,44,37,72,47,20],"Лука":[80,52,38,44,39,49,50,56,62,42,54,59,35,35,32,31,37,43,48,47,38,71,56,53],"Иоанн":[51,25,36,54,47,71,53,59,41,42,57,50,38,31,27,33,26,40,42,31,25],"Деяния":[26,47,26,37,42,15,60,40,43,48,30,25,52,28,41,40,34,28,40,38,40,30,35,27,27,32,44,31],"Римлянам":[32,29,31,25,21,23,25,39,33,21,36,21,14,26,33,24],"1 Коринфянам":[31,16,23,21,13,20,40,13,27,33,34,31,13,40,58,24],"2 Коринфянам":[24,17,18,18,21,18,16,24,15,18,32,21,13],"Галатам":[24,21,29,31,26,18],"Ефесянам":[23,22,21,32,33,24],"Филиппийцам":[30,30,21,23],"Колоссянам":[29,23,25,18],"1 Фессалоникийцам":[10,20,13,18,28],"2 Фессалоникийцам":[12,17,18],"1 Тимофею":[20,15,16,16,25,21],"2 Тимофею":[18,26,17,22],"Титу":[16,15,15],"Филимону":[25],"Евреям":[14,18,19,16,14,20,28,13,28,39,40,29,25],"Иаков":[27,26,18,17,20],"1 Петра":[25,25,22,19,14],"2 Петра":[21,22,18],"1 Иоанна":[10,29,24,21,21],"2 Иоанна":[13],"3 Иоанна":[15],"Иуда":[25],"Откровение":[20,29,22,11,14,17,17,13,21,11,19,17,18,20,8,21,18,24,21,15,27,21]};
 var FS=[0.82,0.92,1.02,1.14,1.28];
@@ -724,6 +738,7 @@ async function startPlan(){
   app.activePlanId=selPlanId;
   app.progress[selPlanId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyTime:time,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings.notifyOn!==false,title:(getPlan(selPlanId)||{}).title};
   saveApp();
+  pushState(true);
   if(userId){try{var _r0=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:selPlanId,title:(getPlan(selPlanId)||{}).title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.settings.notifyOn!==false,init_data:tgInitData})});syncBadge(_r0.ok);}catch(e){syncBadge(false);}}
   haptic('success');viewDay=null;goPage('pg-read');renderRead();
 }
@@ -774,7 +789,9 @@ async function unregisterOnServer(planId){
 }
 function getPlan(id){
   var p=PLANS.find(function(p){return p.id===id;})||(app.customPlans&&app.customPlans[id])||null;
-  if(p&&!p.schedule&&PLANS_PERI[id])p.schedule=PLANS_PERI[id];
+  if(p&&!p.schedule){
+    p.schedule=PLANS_PERI[id]||(id==='chrono_365'?PLANS_PERI.bible_365:null);
+  }
   if(!p&&typeof id==='string'){
     if(id.indexOf('chrono_nt_')===0){
       var daysMatch=parseInt(id.replace('chrono_nt_',''))||180;
@@ -783,7 +800,7 @@ function getPlan(id){
       if(app&&app.customPlans){app.customPlans[id]=p;}
       return p;
     }
-    var s2=PLANS_PERI[id];
+    var s2=PLANS_PERI[id]||(id==='chrono_365'?PLANS_PERI.bible_365:null);
     if(s2&&s2.length){
       var n=s2.length;
       var ttl=id.indexOf('nt_')===0?('Новый Завет за '+n+' дней')
@@ -1015,6 +1032,11 @@ function renderSc(tab){
   var verses=getVRange(tab.book,tab.c1,tab.v1,tab.c2,tab.v2);
   var fs=FS[fontIdx];
   if(!verses||!verses.length){
+    if(!bible){
+      el.innerHTML='<div style="padding:40px 20px;text-align:center;color:var(--txt2)"><div style="font-size:26px;margin-bottom:10px">📖</div><div>Загрузка текста Библии...</div></div>';
+      loadBible().then(function(){ renderRead(); }).catch(function(){});
+      return;
+    }
     el.innerHTML='<div class="no-text">'+tab.label+'<br><br>Текст недоступен<br><a href="'+bbLink(tab.book,tab.c1)+'" target="_blank" style="color:var(--acc)">Читать на bible.by</a></div>';
     return;
   }
@@ -1565,6 +1587,7 @@ async function startCustom(){
       prog.daysDone=(prog.daysDone||[]).filter(function(d){return d<=schedule.length;});
       prog.title=title;
       saveApp();
+      pushState(true);
       if(userId){
         try{
           var _r1=await fetch(BACKEND+'/plan/set_days',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:id,days_done:prog.daysDone,init_data:tgInitData})});
@@ -1576,6 +1599,7 @@ async function startCustom(){
       var msk=localTimeToMsk(defTime);
       app.progress[id]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyTime:defTime,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings?app.settings.notifyOn!==false:true,title:title};
       saveApp();
+      pushState(true);
       if(userId){
         try{var _r2=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:id,title:title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.progress[id].notifyOn,init_data:tgInitData})});syncBadge(_r2.ok);}catch(e){syncBadge(false);}
       }
@@ -1593,7 +1617,9 @@ async function startCustom(){
   var defTime=(app.settings&&app.settings.notifyTime)||'08:00';
   var msk=localTimeToMsk(defTime);
   app.progress[planId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyTime:defTime,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings?app.settings.notifyOn!==false:true,title:title};
-  saveApp();haptic('success');viewDay=null;goPage('pg-read');renderRead();
+  saveApp();
+  pushState(true);
+  haptic('success');viewDay=null;goPage('pg-read');renderRead();
   if(userId){
     try{var _r3=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,title:title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.progress[planId].notifyOn,init_data:tgInitData})});syncBadge(_r3.ok);}catch(e){syncBadge(false);}
   }
@@ -1783,15 +1809,20 @@ function syncNotify(){
 var _statePushTimer=null;
 var _lastPushedJson=null;
 
-function pushState(){
+function pushState(immediate){
   if(!userId) return;
   clearTimeout(_statePushTimer);
-  _statePushTimer=setTimeout(function(){
+  var doPush=function(){
     var json=JSON.stringify(app);
     if(json===_lastPushedJson) return; // ничего не изменилось
     _lastPushedJson=json;
     fetch(BACKEND+'/state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,data:app,init_data:tgInitData})}).then(function(r){syncBadge(r.ok);}).catch(function(){syncBadge(false);});
-  },1200);
+  };
+  if(immediate){
+    doPush();
+  } else {
+    _statePushTimer=setTimeout(doPush, 1200);
+  }
 }
 
 /* Отличает "это новое устройство/новый пользователь" от "этого
@@ -1843,14 +1874,30 @@ async function syncBackend(){
     var r=await fetchT(BACKEND+'/state?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData));
     var s=await r.json();
     if(s.exists && s.data){
-      // На сервере уже есть сохранённое состояние — это единственный источник правды.
-      // Загружаем его вместо локального (гарантирует одинаковый прогресс на всех устройствах).
-      app=s.data;
+      var serverApp=s.data;
+      if(!serverApp.customPlans) serverApp.customPlans={};
+      if(!serverApp.progress) serverApp.progress={};
+      // Сохраняем локально созданные кастомные планы и прогресс, если сервер их ещё не получил
+      if(app&&app.customPlans){
+        Object.keys(app.customPlans).forEach(function(k){
+          if(!serverApp.customPlans[k]){
+            serverApp.customPlans[k]=app.customPlans[k];
+          }
+        });
+      }
+      if(app&&app.progress){
+        Object.keys(app.progress).forEach(function(k){
+          if(!serverApp.progress[k]){
+            serverApp.progress[k]=app.progress[k];
+          }
+        });
+      }
+      app=serverApp;
       saveApp();
       _lastPushedJson=JSON.stringify(app);
+      pushState(true);
     } else {
-      // Это первое устройство пользователя — отправляем текущее локальное состояние как начальное.
-      pushState();
+      pushState(true);
     }
     syncBadge(true);
   }catch(e){syncBadge(false);}
