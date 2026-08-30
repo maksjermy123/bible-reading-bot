@@ -148,10 +148,10 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 <div id="sync-warn" onclick="dismissSyncWarn()" title="Последние изменения не сохранились на сервере. Локально ничего не потеряно — попробуем ещё раз, как только появится связь. Нажми, чтобы скрыть." style="display:none;position:fixed;top:10px;right:10px;z-index:9999;background:#fff3cd;color:#856404;border:1px solid #ffe08a;border-radius:20px;padding:5px 11px;font-size:12px;font-weight:700;font-family:var(--fui);box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;display:flex;align-items:center;gap:4px">⚠️ не синхронизировано</div>
 <div id="pg-load"><div class="spin">📖</div><div style="font-size:15px;color:var(--acc);font-weight:600">Загружаем Библию...</div><div style="font-size:12px;color:var(--txt2)">Пожалуйста, подождите</div></div>
 <div class="pg" id="pg-ob"><div class="ob-wrap"><div class="ob-em" id="ob-em">📖</div><div class="ob-t" id="ob-t">Читай Библию каждый день</div><div class="ob-tx" id="ob-tx">Выбери план по силам и читай Слово Божье каждый день</div><div class="ob-dots"><div class="od on" id="od0"></div><div class="od" id="od1"></div><div class="od" id="od2"></div></div><button class="btn btn-acc" onclick="obNext()">Далее</button></div></div>
-<div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="my-plans"></div><div class="sec" id="suggested-lbl">Готовые планы</div><div id="plan-list"></div><div class="card" style="cursor:pointer" onclick="startChronoPlan()"><div class="card-top"><div class="card-ico">🕰️</div><div class="card-info"><div class="card-title">Хронологический Новый Завет</div><div class="card-meta">Выбери длительность сам</div></div><div class="badge">Гармония</div></div><div class="card-desc">Гармония четырёх Евангелий, Деяния, Послания и Откровение — в порядке реальных событий, а не порядке книг в каноне.</div></div><div class="card card-custom" style="cursor:pointer" onclick="startNewCustomPlan()"><div class="card-top"><div class="card-ico">✏️</div><div class="card-info"><div class="card-title">Составить свой план</div><div class="card-meta">Выбери книги и срок сам</div></div><div class="badge">Свой</div></div></div><div class="card" style="cursor:pointer" onclick="goPage('pg-seq');initSeq()"><div class="card-top"><div class="card-ico">📜</div><div class="card-info"><div class="card-title">Свободное чтение</div><div class="card-meta">Свободное чтение, без графика</div></div><div class="badge">Гибкий</div></div></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span class="chan-ico">📻</span><span class="chan-txt">Канал<b>«От чтения к Преображению»</b></span><span class="chan-arrow">→</span></a></div>
+<div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="plan-list"></div><div class="card" style="cursor:pointer" onclick="goPage('pg-seq');initSeq()"><div class="card-top"><div class="card-ico">📜</div><div class="card-info"><div class="card-title">Свободное чтение</div><div class="card-meta">Свободное чтение, без графика</div></div><div class="badge">Гибкий</div></div></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span class="chan-ico">📻</span><span class="chan-txt">Канал<b>«От чтения к Преображению»</b></span><span class="chan-arrow">→</span></a></div>
 <div class="pg" id="pg-read"><div class="topbar"><button class="streak-btn" id="streak-badge" onclick="toggleStats()"><span style="font-size:20px" id="streak-ico">🔥</span><span class="streak-n" id="r-streak">0</span><span class="streak-l" id="r-streak-l">дней подряд</span></button><div style="display:flex;gap:5px"><button class="ico-btn" onclick="cycleTheme()" id="theme-btn">☀️</button><button class="ico-btn" onclick="goPage('pg-cfg')">⚙️</button></div></div><div id="stats-panel" style="display:none"><div class="stats-box"><div class="sg"><div class="si"><div class="sv" id="s-pct">0%</div><div class="sk">выполнено</div></div><div class="si"><div class="sv" id="s-done">0</div><div class="sk">дней готово</div></div><div class="si"><div class="sv" id="s-left">0</div><div class="sk">осталось</div></div><div class="si"><div class="sv" id="s-streak">0</div><div class="sk">дней подряд</div></div><div class="si"><div class="sv" id="s-max">0</div><div class="sk">рекорд</div></div><div class="si"><div class="sv" id="s-start">—</div><div class="sk">начат</div></div></div><div class="pb"><div class="pf" id="s-bar" style="width:0%"></div></div><div class="pl" id="s-plan-t"></div><button class="sec-tog" onclick="toggleCal()">📅 Календарь <span id="cal-arr">▼</span></button><div id="cal-wrap" style="display:none"><div class="cal-grid" id="cal-grid"></div></div></div></div><div class="cstat" id="r-cstat"></div><div class="pb" style="margin-bottom:10px"><div class="pf" id="r-bar" style="width:0%"></div></div><div class="day-nav"><button class="nav-btn" id="btn-prev" onclick="goDay(-1)">←</button><div class="day-info"><div class="day-n" id="r-day-n">День 1</div><div class="day-d" id="r-day-d"></div></div><button class="nav-btn" id="btn-next" onclick="goDay(1)">→</button></div><div id="to-today" style="margin-bottom:10px;display:none"><button onclick="goToday()" style="width:100%;font-size:15px;font-weight:800;color:#fff;background:var(--acc);border:none;border-radius:10px;padding:13px;cursor:pointer;font-family:var(--fui);box-shadow:0 3px 12px rgba(0,0,0,.18)">📖 К непрочитанному →</button></div><div class="ref-lbl"><span id="r-ref">—</span><button class="ico-btn" onclick="addBm()">⭐</button></div><div class="tabs" id="r-tabs"></div><div class="sc" id="r-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button><a class="tlink" id="r-tlink" target="_blank"><span style="font-size:16px">📚</span> Читать другой перевод</a><div class="phrase" id="r-phrase"></div></div>
 <div class="pg" id="pg-seq"><div class="hdr"><h1>📜 Свободное чтение</h1></div><div class="seq-nav"><select class="seq-sel" id="seq-book" onchange="seqBook()"></select><select class="seq-sel" id="seq-ch" onchange="seqRender()"></select></div><div class="sc" id="seq-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-out" style="margin-top:0;flex:1" onclick="seqPrev()">← Назад</button><button class="btn btn-acc" style="margin-top:0;flex:1" onclick="seqNext()">Далее →</button></div><button class="btn btn-out" style="margin-top:8px" onclick="addSeqBm()">⭐ Закладка</button><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
-<div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div id="con-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Начать план</button><button class="btn btn-out" onclick="conEditId=null;goPage('pg-sel')">Отмена</button></div>
+<div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div id="con-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Начать план</button><button class="btn btn-out" onclick="conEditId=null;conChrono=false;goPage('pg-sel')">Отмена</button></div>
 <div class="pg" id="pg-bm"><div class="hdr"><h1>⭐ Закладки</h1></div><div id="bm-list"></div><div id="bm-empty" style="display:none;text-align:center;padding:36px;color:var(--txt2);font-size:14px">Нет закладок.<br>Нажми ⭐ во время чтения.</div></div>
 <div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-empty" style="font-size:12px;color:var(--txt2);margin-bottom:10px;display:none">Сначала выбери план на вкладке «Планы»</div><select id="cfg-plan-sel" onchange="cfgSelectPlan(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px;margin-bottom:12px"></select><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid" style="grid-template-columns:repeat(3,1fr)"><button onclick="setTheme('auto')" id="th-auto" class="th-btn"><div>🌗</div>Авто</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button></div><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span>Номера стихов</span><button class="tog on" id="cfg-vn-tog" onclick="cfgTogVn()"></button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div id="font-track" style="flex:1;height:28px;display:flex;align-items:center;position:relative;touch-action:none;cursor:pointer"><div style="width:100%;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div></div>
 
@@ -203,15 +203,20 @@ function loadPlansPeri(){
       }catch(e){}
     });
 }
+/* chrono_365 УБРАН из каталога: он ссылался на то же расписание PLANS_PERI.
+   bible_365, что и «Библия за год», то есть каталог предлагал два одинаковых
+   плана с разными названиями. Регистрации chrono_365 у старых пользователей
+   продолжают работать через фолбэк getPlan('chrono_365') (карточка остаётся
+   в общем списке, оффер больше не показывается), а параллельные
+   chrono_365+bible_365 схлопывает migratePlanSlots(). */
 var PLANS=[
  {id:"nt_90",title:"Новый Завет за 90 дней",icon:"✝️",days:90,diff:"recommended",desc:"Весь Новый Завет от Матфея до Откровения за три месяца.",schedule:PLANS_PERI.nt_90},
- {id:"chrono_365",title:"Хронологический план за год",icon:"🕰️",days:365,diff:"challenging",desc:"Весь канон в порядке исторических событий, эпоха за эпохой — по смысловым отрывкам.",schedule:PLANS_PERI.bible_365},
  {id:"bible_365",title:"Библия за год",icon:"📚",days:365,diff:"challenging",desc:"Весь канон от Бытия до Откровения по смысловым отрывкам (перикопам).",schedule:PLANS_PERI.bible_365}
 ];
 var VC={"Бытие":[31,25,24,26,32,22,24,22,29,32,32,20,18,24,21,16,27,33,38,18,34,24,20,67,34,35,46,22,35,43,55,32,20,31,29,43,36,30,23,23,57,38,34,34,28,34,31,22,33,26],"Исход":[22,25,22,31,23,30,25,32,35,29,10,51,22,31,27,36,16,27,25,26,36,31,33,18,40,37,21,43,46,38,18,35,23,35,35,38,29,31,43,38],"Левит":[17,16,17,35,19,30,38,36,24,20,47,8,59,56,33,34,16,30,37,27,24,33,44,23,55,46,34],"Числа":[54,34,51,49,31,27,89,26,23,36,35,15,34,45,41,50,13,32,22,29,35,41,30,25,18,65,23,31,39,17,54,42,55,29,34,13],"Второзаконие":[46,37,29,49,33,25,26,20,29,22,32,32,18,29,23,22,20,22,21,20,23,30,25,22,19,19,26,68,29,20,30,52,29,12],"Иисус Навин":[18,24,17,24,16,26,26,35,27,43,23,24,33,15,63,10,18,28,51,9,45,34,16,33],"Судьи":[36,23,31,24,31,40,25,35,57,18,40,15,25,20,20,31,13,31,30,48,25],"Руфь":[22,23,18,22],"1 Царств":[28,36,21,22,12,21,17,22,27,27,15,25,23,52,35,23,58,30,24,43,15,23,28,23,44,25,12,25,11,31,13],"2 Царств":[27,32,39,12,25,23,29,18,13,19,27,31,39,33,37,23,29,33,43,26,22,51,39,25],"3 Царств":[53,46,28,34,18,38,51,66,28,29,43,33,34,31,34,34,24,46,21,43,29,53],"4 Царств":[18,25,27,44,27,33,20,29,37,36,21,21,25,29,38,20,41,37,37,21,26,20,37,20,30],"1 Паралипоменон":[54,55,24,43,26,81,40,40,44,14,47,40,14,17,29,43,27,17,19,8,30,19,32,31,31,32,34,21,30],"2 Паралипоменон":[17,18,17,22,14,42,22,18,31,19,23,16,22,15,19,14,19,34,11,37,20,12,21,27,28,23,9,27,36,27,21,33,25,33,27,23],"Ездра":[11,70,13,24,17,22,28,36,15,44],"Неемия":[11,20,32,23,19,19,73,18,38,39,36,47,31],"Есфирь":[22,23,15,17,14,14,10,17,32,3],"Иов":[22,13,26,21,27,30,21,22,35,22,20,25,28,22,35,22,16,21,29,29,34,30,17,25,6,14,23,28,25,31,40,22,33,37,16,33,24,41,35,27,26,17],"Псалтирь":[6,12,9,9,13,11,18,10,39,7,9,6,7,5,11,15,51,15,10,14,32,6,10,22,12,14,9,11,13,25,11,22,23,28,13,40,23,14,18,14,12,5,27,18,12,10,15,21,23,21,11,7,9,24,14,12,12,18,14,9,13,12,11,14,20,8,36,37,6,24,20,28,23,11,13,21,72,13,20,17,8,19,13,14,17,7,19,53,17,16,16,5,23,11,13,12,9,9,5,8,29,22,35,45,48,43,14,31,7,10,10,9,26,9,10,2,29,176,7,8,9,4,8,5,6,5,6,8,8,3,18,3,3,21,26,9,8,24,14,10,7,12,15,21,10,11,9,14,9,6],"Притчи":[33,22,35,27,23,35,27,36,18,32,31,28,25,35,33,33,28,24,29,30,31,29,35,34,28,28,27,28,27,33,31],"Екклесиаст":[18,26,22,17,19,12,29,17,18,20,10,14],"Песнь Песней":[16,17,11,16,16,12,14,14],"Исаия":[31,22,25,6,30,13,25,22,21,34,16,6,22,32,9,14,14,7,25,6,17,25,18,23,12,21,13,29,24,33,9,20,24,17,10,22,38,22,8,31,29,25,28,28,25,13,15,22,26,11,23,15,12,17,13,12,21,14,21,22,11,12,19,12,25,24],"Иеремия":[19,37,25,31,31,30,34,22,26,25,23,17,27,22,21,21,27,23,15,18,14,30,40,10,38,24,22,17,32,24,40,44,26,22,19,32,21,28,18,16,18,22,13,30,5,28,7,47,39,46,64,34],"Плач Иеремии":[22,22,66,22,22],"Иезекииль":[28,10,27,17,17,14,27,18,11,22,25,28,23,23,8,63,24,32,14,49,32,31,49,27,17,21,36,26,21,26,18,32,33,31,15,38,28,23,29,49,26,20,27,31,25,24,23,35],"Даниил":[21,49,33,34,31,28,28,27,27,21,45,13],"Осия":[11,23,5,19,15,11,16,14,17,15,12,14,15,10],"Иоиль":[20,32,21],"Амос":[15,16,15,13,27,14,17,14,15],"Авдий":[21],"Иона":[16,11,10,11],"Михей":[16,13,12,13,15,16,20],"Наум":[15,13,19],"Аввакум":[17,20,19],"Софония":[18,15,20],"Аггей":[15,23],"Захария":[21,13,10,14,11,15,14,23,17,12,17,14,9,21],"Малахия":[14,17,18,6],"Матфей":[25,23,17,25,48,34,29,34,38,42,30,50,58,36,39,28,27,35,30,34,46,46,39,51,46,75,66,20],"Марк":[45,28,35,41,43,56,37,38,50,52,33,44,37,72,47,20],"Лука":[80,52,38,44,39,49,50,56,62,42,54,59,35,35,32,31,37,43,48,47,38,71,56,53],"Иоанн":[51,25,36,54,47,71,53,59,41,42,57,50,38,31,27,33,26,40,42,31,25],"Деяния":[26,47,26,37,42,15,60,40,43,48,30,25,52,28,41,40,34,28,40,38,40,30,35,27,27,32,44,31],"Римлянам":[32,29,31,25,21,23,25,39,33,21,36,21,14,26,33,24],"1 Коринфянам":[31,16,23,21,13,20,40,13,27,33,34,31,13,40,58,24],"2 Коринфянам":[24,17,18,18,21,18,16,24,15,18,32,21,13],"Галатам":[24,21,29,31,26,18],"Ефесянам":[23,22,21,32,33,24],"Филиппийцам":[30,30,21,23],"Колоссянам":[29,23,25,18],"1 Фессалоникийцам":[10,20,13,18,28],"2 Фессалоникийцам":[12,17,18],"1 Тимофею":[20,15,16,16,25,21],"2 Тимофею":[18,26,17,22],"Титу":[16,15,15],"Филимону":[25],"Евреям":[14,18,19,16,14,20,28,13,28,39,40,29,25],"Иаков":[27,26,18,17,20],"1 Петра":[25,25,22,19,14],"2 Петра":[21,22,18],"1 Иоанна":[10,29,24,21,21],"2 Иоанна":[13],"3 Иоанна":[15],"Иуда":[25],"Откровение":[20,29,22,11,14,17,17,13,21,11,19,17,18,20,8,21,18,24,21,15,27,21]};
 var FS=[0.82,0.92,1.02,1.14,1.28];
 
-var PHRASES=['Твоя верность день за днём — это сила','Каждый шаг приближает к цели','Слово Божье преобразляет изнутри','Продолжай — ты на верном пути!','Читая Писание, ты слышишь Бога','Настойчивость — твой лучший друг'];
+var PHRASES=['Твоя верность день за днём — это сила','Каждый шаг приближает к цели','Слово Божье преображает изнутри','Продолжай — ты на верном пути!','Читая Писание, ты слышишь Бога','Настойчивость — твой лучший друг'];
 
 /* Раньше все сетевые сбои (обрыв связи, 500-я с сервера, что угодно кроме
    штатного "not registered", который разбирается отдельно) проглатывались
@@ -421,7 +426,16 @@ function buildChronoSchedule(days){
   return schedule;
 }
 var conChrono=false;
-function startChronoPlan(){conChrono=true;conEditId=null;goPage('pg-con');initCon();}
+/* Слот «Хронологический НЗ» существует в ОДНОМ экземпляре: если план уже
+   создан — тап по карточке-офферу (или повторный «Начать») открывает
+   существующий план на редактирование, а не конструктор нового. Раньше
+   каждый проход конструктора создавал новый id c{timestamp} — у
+   пользователя появлялись две-три одинаковые карточки. */
+function startChronoPlan(){
+  var _ex=_findChronoCustomId();
+  if(_ex){editCustomPlan(_ex);return;}
+  conChrono=true;conEditId=null;goPage('pg-con');initCon();
+}
 
 var THEMES=['sepia','dark'];
 var THEME_ICO={sepia:'☀️',dark:'🌙'};
@@ -506,20 +520,18 @@ var DIFF={easy:'Лёгкий',recommended:'Рекомендуем',challenging:'
 var selPlanId=null;
 
 function renderSel(){
-  var sl=document.getElementById('suggested-lbl');
+  /* ЕДИНЫЙ список планов — без секций «Мои планы»/«Готовые планы»:
+     пользователю не важно, откуда пришёл план (каталог, конструктор или
+     старая версия приложения). Правило слота: у каждого предложения ровно
+     ОДНА живая карточка. Выбрал оффер — на его месте появилась карточка
+     плана, оффер исчез; удалил план — оффер вернулся на то же место.
+     Повторный тап по занятому слоту открывает существующий план, а не
+     создаёт копию (дедуп в startCustom/startChronoPlan + migratePlanSlots). */
   var plEl=document.getElementById('plan-list');
-  /* ЕДИНЫЙ список планов без верхней секции:
-     1) системные планы — зарегистрированный остаётся НА СВОЁМ МЕСТЕ и
-        трансформируется (прогресс + Продолжить/Удалить), невыбранный —
-        обычное предложение;
-     2) подстрока «Мои планы» — для внесистемных планов (кастомный
-        конструктор, хронологический с длительностью, сервер-онли без
-        карточки в каталоге);
-     3) ниже по HTML — конструкторы «Хронологический НЗ» и «Составить свой
-        план». Никаких дублей и карточек друг на друге. */
-  var html=PLANS.map(function(p){
-    var prog=app.progress[p.id];
-    if(!prog){
+  var html='';
+  /* 1) Каталог (nt_90, bible_365): оффер или живая карточка НА ТОМ ЖЕ МЕСТЕ. */
+  html+=PLANS.map(function(p){
+    if(!app.progress[p.id]){
       return '<div class="card" data-id="'+p.id+'" onclick="selPlan(\''+p.id+'\')">'+
         '<div class="card-top"><div class="card-ico">'+p.icon+'</div>'+
         '<div class="card-info"><div class="card-title">'+p.title+'</div>'+
@@ -527,50 +539,153 @@ function renderSel(){
         '<div class="badge">'+(DIFF[p.diff]||'')+'</div></div>'+
         '<div class="card-desc">'+p.desc+'</div></div>';
     }
-    var done=(prog.daysDone||[]).length;
-    var pct=Math.min(100,Math.round(done/p.days*100));
-    var isAct=p.id===app.activePlanId;
-    return '<div class="card'+(isAct?' sel':'')+'" data-id="'+p.id+'">'+
-      '<div class="card-top" onclick="continuePlan(\''+p.id+'\')" style="cursor:pointer">'+
-        '<div class="card-ico">'+p.icon+'</div>'+
-        '<div class="card-info"><div class="card-title">'+p.title+'</div>'+
-        '<div class="card-meta">'+pct+'% &middot; '+done+'/'+p.days+' дней'+(isAct?' &middot; читаю сейчас':'')+'</div></div>'+
-        '<div class="badge" style="background:var(--acc);color:#fff">→</div></div>'+
-      '<div style="display:flex;gap:6px;margin-top:8px">'+
-        '<button onclick="delPlan(\''+p.id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">🗑 Удалить</button>'+
-        '<button onclick="continuePlan(\''+p.id+'\')" style="flex:2;padding:7px;border:none;border-radius:7px;background:var(--acc);color:#fff;font-size:12px;cursor:pointer;font-family:var(--fui);font-weight:600">Продолжить →</button>'+
-      '</div></div>';
+    return _planCardHtml(p.id,getPlan(p.id),p.title,p.days);
   }).join('');
-  var customIds=Object.keys(app.progress).filter(function(id){
-    return !PLANS.some(function(p){return p.id===id;});
-  });
-  if(customIds.length){
-    html+='<div class="sec">Мои планы</div>';
-    customIds.forEach(function(id){
-      var pl=getPlan(id);
-      var prog=app.progress[id];
-      var done=(prog.daysDone||[]).length;
-      var days=pl&&pl.days?pl.days:(prog.days||0);
-      var meta=days?(Math.min(100,Math.round(done/days*100))+'% &middot; '+done+'/'+days+' дней'):(done?('прочитано дней: '+done):'ещё не начинался');
-      var isAct=id===app.activePlanId;
-      html+='<div class="card'+(isAct?' sel':'')+'" data-id="'+id+'">'+
-        '<div class="card-top"'+(pl?' onclick="continuePlan(\''+id+'\')" style="cursor:pointer"':'')+'>'+
-        '<div class="card-ico">'+(pl?pl.icon:'📚')+'</div>'+
-        '<div class="card-info"><div class="card-title">'+_anyPlanTitle(id)+'</div>'+
-        '<div class="card-meta">'+meta+(isAct?' &middot; активный':'')+'</div></div>'+
-        '<div class="badge" style="background:var(--acc);color:#fff">→</div></div>'+
-        '<div style="display:flex;gap:6px;margin-top:8px">'+
-        '<button onclick="delPlan(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">🗑 Удалить</button>'+
-        (app.customPlans[id]?'<button onclick="editCustomPlan(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">✏️ Изменить</button>':'')+
-        (pl?'<button onclick="continuePlan(\''+id+'\')" style="flex:2;padding:7px;border:none;border-radius:7px;background:var(--acc);color:#fff;font-size:12px;cursor:pointer;font-family:var(--fui);font-weight:600">Продолжить →</button>':'')+
-        '</div></div>';
-    });
+  /* 2) Слот «Хронологический Новый Завет»: живая карточка (всегда ровно
+     одна — дубли скрывает _pickKeeper и подчищает migratePlanSlots)
+     либо оффер конструктора. */
+  var chronoId=_findChronoCustomId();
+  if(chronoId){
+    var plC=app.customPlans[chronoId];
+    html+=_planCardHtml(chronoId,plC,plC.title||'Хронологический Новый Завет',_planDaysCount(plC));
+  }else{
+    html+='<div class="card" style="cursor:pointer" onclick="startChronoPlan()"><div class="card-top"><div class="card-ico">🕰️</div><div class="card-info"><div class="card-title">Хронологический Новый Завет</div><div class="card-meta">Выбери длительность сам</div></div><div class="badge">Гармония</div></div><div class="card-desc">Гармония четырёх Евангелий, Деяния, Послания и Откровение — в порядке реальных событий, а не порядке книг в каноне.</div></div>';
   }
+  /* 3) Слот «Составить свой план»: живые карточки своих планов + мелкая
+     ссылка «+ ещё свой план» (второй и дальнейшие — только через неё,
+     чтобы оффер не наслаивался). Пока своего плана нет — оффер-карточка. */
+  var customIds=Object.keys(app.customPlans||{}).filter(function(id){return app.customPlans[id]&&!app.customPlans[id].chrono;});
+  var _slotGroups={};
+  customIds.forEach(function(id){var k=_booksKeyOf(app.customPlans[id]);(_slotGroups[k]=_slotGroups[k]||[]).push(id);});
+  var keeperIds=Object.keys(_slotGroups).map(function(k){return _pickKeeper(_slotGroups[k]);});
+  if(keeperIds.length){
+    keeperIds.forEach(function(id){
+      var plK=app.customPlans[id];
+      html+=_planCardHtml(id,plK,plK.title||'Свой план',_planDaysCount(plK));
+    });
+    html+='<div style="text-align:center;margin:12px 0 2px"><span onclick="startNewCustomPlan()" style="color:var(--txt2);font-size:12px;cursor:pointer;text-decoration:underline">+ ещё свой план</span></div>';
+  }else{
+    html+='<div class="card card-custom" style="cursor:pointer" onclick="startNewCustomPlan()"><div class="card-top"><div class="card-ico">✏️</div><div class="card-info"><div class="card-title">Составить свой план</div><div class="card-meta">Выбери книги и срок сам</div></div><div class="badge">Свой</div></div></div>';
+  }
+  /* 4) Начатые планы без определения в приложении (bible_180, nt_30,
+     chrono_365 и другие наследники старых версий) — просто карточки в
+     общем списке, без отдельной секции: продолжить или удалить. */
+  var known={};
+  PLANS.forEach(function(p){known[p.id]=1;});
+  /* customPlans целиком (включая скрытые до миграции дубли) — они не
+     «наследники», а слоты: их рисует блок 2–3 или скрывает дедуп. */
+  Object.keys(app.customPlans||{}).forEach(function(id){known[id]=1;});
+  Object.keys(app.progress).forEach(function(id){
+    if(known[id])return;
+    var plO=getPlan(id);
+    html+=_planCardHtml(id,plO,_anyPlanTitle(id),plO?(plO.days||_planDaysCount(plO)):0);
+  });
   if(plEl)plEl.innerHTML=html;
-  if(sl)sl.style.display='block';
-  /* Контейнер my-plans больше не используется — всегда пустой. */
-  var mp=document.getElementById('my-plans');if(mp)mp.innerHTML='';
   var sa=document.getElementById('start-area');if(sa)sa.remove();
+}
+
+/* ── Слоты планов: карточка, дедуп, миграция дублей ────────── */
+/* Живая карточка одного плана: прогресс + Продолжить/Изменить/Удалить.
+   Общий вид для каталога, хроно-слота, своих планов и наследников. */
+function _planCardHtml(id,pl,title,days){
+  var prog=app.progress[id]||{};
+  var done=(prog.daysDone||[]).length;
+  var meta=days?(Math.min(100,Math.round(done/days*100))+'% &middot; '+done+'/'+days+' дней'):(done?('прочитано дней: '+done):'ещё не начинался');
+  var isAct=id===app.activePlanId;
+  return '<div class="card'+(isAct?' sel':'')+'" data-id="'+id+'">'+
+    '<div class="card-top"'+(pl?' onclick="continuePlan(\''+id+'\')" style="cursor:pointer"':'')+'>'+
+    '<div class="card-ico">'+(pl?pl.icon:'📚')+'</div>'+
+    '<div class="card-info"><div class="card-title">'+title+'</div>'+
+    '<div class="card-meta">'+meta+(isAct?' &middot; читаю сейчас':'')+'</div></div>'+
+    '<div class="badge" style="background:var(--acc);color:#fff">→</div></div>'+
+    '<div style="display:flex;gap:6px;margin-top:8px">'+
+    '<button onclick="delPlan(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">🗑 Удалить</button>'+
+    (app.customPlans[id]?'<button onclick="editCustomPlan(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">✏️ Изменить</button>':'')+
+    (pl?'<button onclick="continuePlan(\''+id+'\')" style="flex:2;padding:7px;border:none;border-radius:7px;background:var(--acc);color:#fff;font-size:12px;cursor:pointer;font-family:var(--fui);font-weight:600">Продолжить →</button>':'')+
+    '</div></div>';
+}
+function _planDaysCount(pl){
+  return (pl&&pl.totalDays)||(pl&&pl.days)||(pl&&pl.schedule?pl.schedule.length:0)||0;
+}
+function _booksKeyOf(pl){
+  return (((pl&&pl.books)||[]).slice().sort().join(','))+'|'+_planDaysCount(pl);
+}
+/* Из группы одинаковых слотов остаётся один: больше прочитанных дней,
+   при равенстве — более поздний старт. Рендер показывает только его;
+   остальные скрывает из списка и подчищает migratePlanSlots(). */
+function _pickKeeper(ids){
+  if(!ids||!ids.length)return null;
+  if(ids.length===1)return ids[0];
+  var best=ids[0];
+  for(var i=1;i<ids.length;i++){
+    var a=app.progress[best]||{},b=app.progress[ids[i]]||{};
+    var da=(a.daysDone||[]).length,db=(b.daysDone||[]).length;
+    if(db>da||(db===da&&String(b.startDate||'')>String(a.startDate||'')))best=ids[i];
+  }
+  return best;
+}
+function _findChronoCustomId(){
+  var ids=Object.keys(app.customPlans||{}).filter(function(id){return app.customPlans[id]&&app.customPlans[id].chrono;});
+  return _pickKeeper(ids);
+}
+/* Миграция дублей, созданных старыми версиями (два «Хронологический
+   НЗ · 180», два своих плана с тем же набором книг и сроком, параллельные
+   chrono_365+bible_365 с одинаковым расписанием). Прогресс НЕ теряется:
+   дни дубля переносятся в оставшийся план через /plan/set_days, затем дубль
+   снимается с регистрации на сервере. Если сеть/сервер недоступны — ничего
+   не удаляем и повторяем при следующем запуске. */
+var _slotsMigrated=false;
+async function migratePlanSlots(){
+  if(_slotsMigrated)return;_slotsMigrated=true;
+  var changed=false;
+  async function collapse(dropId,keepId){
+    if(!dropId||dropId===keepId)return;
+    try{
+      var keepPl=getPlan(keepId);
+      var maxDay=(keepPl&&(keepPl.days||_planDaysCount(keepPl)))||400;
+      var kk=(app.progress[keepId]&&app.progress[keepId].daysDone)||[];
+      var dd=(app.progress[dropId]&&app.progress[dropId].daysDone)||[];
+      var seen={},union=[];
+      kk.forEach(function(d){if(d>=1&&d<=maxDay&&!seen[d]){seen[d]=1;union.push(d);}});
+      dd.forEach(function(d){if(d>=1&&d<=maxDay&&!seen[d]){seen[d]=1;union.push(d);}});
+      if(userId&&union.length){
+        var r=await fetch(BACKEND+'/plan/set_days',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:keepId,days_done:union,init_data:tgInitData})});
+        if(!r.ok)return; /* дни не перенеслись — ничего не удаляем */
+      }
+      if(userId){
+        var unreg=await unregisterOnServer(dropId);
+        if(!unreg)return; /* сервер не подтвердил удаление — повторим при следующем запуске */
+      }
+      delete app.progress[dropId];delete app.customPlans[dropId];
+      if(app.activePlanId===dropId)app.activePlanId=keepId;
+      changed=true;
+    }catch(e){/* сеть легла — оставляем оба плана, повторим позже */}
+  }
+  /* A. Дубли «Хронологический НЗ» (разные c{timestamp} с chrono:true). */
+  var chronoIds=Object.keys(app.customPlans||{}).filter(function(id){return app.customPlans[id]&&app.customPlans[id].chrono;});
+  if(chronoIds.length>1){
+    var keep=_pickKeeper(chronoIds);
+    for(var i=0;i<chronoIds.length;i++){if(chronoIds[i]!==keep)await collapse(chronoIds[i],keep);}
+  }
+  /* B. Свои планы с одинаковым набором книг И сроком. */
+  var customs=Object.keys(app.customPlans||{}).filter(function(id){return app.customPlans[id]&&!app.customPlans[id].chrono;});
+  var groups={};
+  customs.forEach(function(id){var k=_booksKeyOf(app.customPlans[id]);(groups[k]=groups[k]||[]).push(id);});
+  var gk=Object.keys(groups);
+  for(var g=0;g<gk.length;g++){
+    var grp=groups[gk[g]];
+    if(grp.length>1){
+      var keep2=_pickKeeper(grp);
+      for(var j=0;j<grp.length;j++){if(grp[j]!==keep2)await collapse(grp[j],keep2);}
+    }
+  }
+  /* C. chrono_365 вместе с bible_365 — это одно и то же расписание. */
+  if(app.progress['chrono_365']&&app.progress['bible_365']){
+    var pa=app.progress['chrono_365']||{},pb=app.progress['bible_365']||{};
+    var keepC=((pa.daysDone||[]).length>=(pb.daysDone||[]).length)?'chrono_365':'bible_365';
+    await collapse(keepC==='chrono_365'?'bible_365':'chrono_365',keepC);
+  }
+  if(changed){saveApp();renderSel();}
 }
 
 function selPlan(id){
@@ -578,7 +693,7 @@ function selPlan(id){
   selPlanId=id;
   document.querySelectorAll('.card[data-id]').forEach(function(c){c.classList.toggle('sel',c.dataset.id===id);});
   var sa=document.getElementById('start-area');
-  if(!sa){sa=document.createElement('div');sa.id='start-area';document.getElementById('plan-list').after(sa);}
+  if(!sa){sa=document.createElement('div');sa.id='start-area';var _ac=document.querySelector('.card[data-id="'+id+'"]');if(_ac)_ac.after(sa);else document.getElementById('plan-list').after(sa);}
   var s=app.settings||{};
   sa.innerHTML='<div class="sec">Время напоминания</div>'+
     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
@@ -666,6 +781,15 @@ function getPlan(id){
      со вкладки «Планы», из настроек (пустое меню времени) и не открывались.
      Собираем объект по расписанию из PLANS_PERI: длина даёт число дней,
      префикс id - заголовок. */
+  if(!p&&typeof id==='string'){
+    /* chrono_365 больше нет в PLANS (это был дубль bible_365), но у старых
+       пользователей регистрация жива в progress и на сервере. Фолбэк
+       сохраняет карточку, чтение и настройки для таких регистраций. */
+    if(id==='chrono_365'&&PLANS_PERI.bible_365&&PLANS_PERI.bible_365.length){
+      p={id:id,title:'Хронологический план за год',icon:'🕰️',days:365,diff:'challenging',
+         desc:'План предыдущей версии приложения',schedule:PLANS_PERI.bible_365};
+    }
+  }
   if(!p&&typeof id==='string'){
     var s2=PLANS_PERI[id];
     if(s2&&s2.length){
@@ -1432,6 +1556,31 @@ function buildCustomSchedule(days){
 async function startCustom(){
   var days=parseInt(document.getElementById('con-days').value)||(conChrono?180:30);
   if(!conChrono&&!conSel.length)return;
+  /* ДЕДУП СЛОТА: повторное «Начать» того же предложения не создаёт вторую
+     карточку. Хроно-НЗ всегда один: та же длительность — просто открываем
+     существующий план, другая — пересобираем ЕГО ЖЕ расписание (edit).
+     То же для своего плана с тем же набором книг. */
+  if(!conEditId){
+    if(conChrono){
+      var _ex=_findChronoCustomId();
+      if(_ex){
+        if(_planDaysCount(app.customPlans[_ex])===days){continuePlan(_ex);return;}
+        conEditId=_ex;
+      }
+    }else{
+      var _key=conSel.slice().sort().join(',');
+      var _ex2=null,_ex2same=false;
+      Object.keys(app.customPlans).forEach(function(id){
+        var pl=app.customPlans[id];
+        if(pl.chrono||_ex2)return;
+        if(((pl.books||[]).slice().sort().join(','))===_key){_ex2=id;_ex2same=_planDaysCount(pl)===days;}
+      });
+      if(_ex2){
+        if(_ex2same){continuePlan(_ex2);return;}
+        conEditId=_ex2;
+      }
+    }
+  }
   var schedule=conChrono?buildChronoSchedule(days):buildCustomSchedule(days);
   var title=conChrono?('🕰️ Хронологический Новый Завет · '+days+' дней'):(conSel.length===1?conSel[0]+' за '+days+' дней':'Свой план · '+days+' дней');
   if(conEditId&&app.customPlans[conEditId]){
@@ -1489,7 +1638,7 @@ var cfgPlanId=null; // какой план сейчас настраиваетс
 var _serverPlansRows=null;
 function refreshServerPlans(){
   if(!userId||!tgInitData)return Promise.resolve();
-  return fetchT(BACKEND+'/plan/status?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData))
+  return fetchT(BACKEND+'/plan/status?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData),{headers:_authHeaders()})
     .then(function(r){return r.json();})
     .then(function(s){
       if(s&&s.registered&&Array.isArray(s.plans)){_serverPlansRows=s.plans;renderCfg();}
@@ -1652,15 +1801,40 @@ function syncNotify(){
 // ── Единый аккаунт: полная синхронизация состояния между устройствами ──
 var _statePushTimer=null;
 var _lastPushedJson=null;
+var _serverUpdatedAt=null; // updated_at последней известной нам серверной записи (для 409)
 
 function pushState(){
   if(!userId) return;
   clearTimeout(_statePushTimer);
-  _statePushTimer=setTimeout(function(){
+  _statePushTimer=setTimeout(async function(){
     var json=JSON.stringify(app);
     if(json===_lastPushedJson) return; // ничего не изменилось
     _lastPushedJson=json;
-    fetch(BACKEND+'/state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,data:app,init_data:tgInitData})}).then(function(r){syncBadge(r.ok);}).catch(function(){syncBadge(false);});
+    try{
+      var body={user_id:userId,data:app,init_data:tgInitData};
+      // 409-защита от last-write-wins (два устройства): шлём метку серверной
+      // записи, от которой пишем. Если сервер уже новее — он ответит 409, и
+      // мы НЕ затираем чужую запись, а забираем серверную версию себе.
+      if(_serverUpdatedAt) body.base_updated_at=_serverUpdatedAt;
+      var r=await fetch(BACKEND+'/state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      if(r.status===409){
+        // Сервер новее: берём его состояние как источник правды (это запись
+        // другого устройства). Канонические дни всё равно восстановятся через
+        // /plan/merge_days, а настройки/закладки останутся от последней записи.
+        var rr=await fetchT(BACKEND+'/state?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData),{headers:_authHeaders()});
+        var s2=await rr.json();
+        if(s2&&s2.exists&&s2.data){
+          app=s2.data;saveApp();_lastPushedJson=JSON.stringify(app);_serverUpdatedAt=s2.updated_at||null;
+        }
+        syncBadge(true);return;
+      }
+      if(r.ok){
+        try{var j=await r.json();if(j&&j.updated_at)_serverUpdatedAt=j.updated_at;else _serverUpdatedAt=null;}catch(e){_serverUpdatedAt=null;}
+        syncBadge(true);
+      } else {
+        syncBadge(false);
+      }
+    }catch(e){syncBadge(false);}
   },1200);
 }
 
@@ -1681,11 +1855,18 @@ function pushState(){
    в init(), и проверкой сброса ниже — раньше оба места дёргали его
    отдельно, то есть дважды на каждый запуск приложения. */
 var _accountStatusPromise=null;
+/* initData уходит в заголовке X-Telegram-Init-Data, а не в query: подпись
+   в URL попадала в логи Render/прокси/Referer. Query-параметр оставлен
+   в этих трёх GET-ах как fallback на один релиз — сервер читает сначала
+   заголовок, потом query; после обновления бэкенда повсюду query можно снять. */
+function _authHeaders(){
+  return tgInitData?{'X-Telegram-Init-Data':tgInitData}:{};
+}
 function fetchAccountStatus(forceRefresh){
   if(!userId) return Promise.resolve(null);
   if(forceRefresh) _accountStatusPromise=null;
   if(_accountStatusPromise) return _accountStatusPromise;
-  _accountStatusPromise=fetchT(BACKEND+'/account/status?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData))
+  _accountStatusPromise=fetchT(BACKEND+'/account/status?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData),{headers:_authHeaders()})
     .then(function(r){return r.json();})
     .catch(function(){return null;});
   return _accountStatusPromise;
@@ -1710,7 +1891,7 @@ async function syncBackend(){
   if(!userId)return;
   await checkAccountReset();
   try{
-    var r=await fetchT(BACKEND+'/state?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData));
+    var r=await fetchT(BACKEND+'/state?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData),{headers:_authHeaders()});
     var s=await r.json();
     if(s.exists && s.data){
       // На сервере уже есть сохранённое состояние — это единственный источник правды.
@@ -1718,8 +1899,13 @@ async function syncBackend(){
       app=s.data;
       saveApp();
       _lastPushedJson=JSON.stringify(app);
+      // Метка серверной записи — база для 409-защиты в pushState(): если
+      // другое устройство запишет состояние раньше нас, наш пуш с этой
+      // меткой сервер отвергнет, и мы перезальём серверную версию.
+      _serverUpdatedAt=s.updated_at||null;
     } else {
       // Это первое устройство пользователя — отправляем текущее локальное состояние как начальное.
+      _serverUpdatedAt=null;
       pushState();
     }
     syncBadge(true);
@@ -1870,6 +2056,10 @@ async function init(){
   }
   var syncPromise=syncBackend().catch(function(){});
   await Promise.all([biblePromise,plansPromise,syncPromise]);
+  /* Дубли слотов (два «Хронологический НЗ · 180», chrono_365+bible_365 и
+     т.п.) схлопываем ДО первого рендера — у кого они были, увидят одну
+     карточку на месте оффера. */
+  await migratePlanSlots();
   /* Кнопка "Открыть план" в уведомлении передаёт ?plan=<id> в самой ссылке
      (не через startapp, т.к. это web_app-кнопка с прямым URL, а не
      t.me/bot/short?startapp= диплинк). Раньше открытие ЛЮБОГО напоминания
