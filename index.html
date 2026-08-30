@@ -506,15 +506,18 @@ var DIFF={easy:'Лёгкий',recommended:'Рекомендуем',challenging:'
 var selPlanId=null;
 
 function renderSel(){
-  var mp=document.getElementById('my-plans');
   var sl=document.getElementById('suggested-lbl');
   var plEl=document.getElementById('plan-list');
-  /* КАТАЛОГ = единственное место системного плана. Раньше зарегистрированный
-     план уезжал копией в «Мои планы» сверху, а предложение оставалось в
-     каталоге — при нескольких планах страница дублировалась (до 10+ карточек).
-     Теперь выбранный план ОСТАЁТСЯ на своём месте и трансформируется:
-     прогресс + «Продолжить/Удалить»; удаление возвращает обычное предложение. */
-  if(plEl)plEl.innerHTML=PLANS.map(function(p){
+  /* ЕДИНЫЙ список планов без верхней секции:
+     1) системные планы — зарегистрированный остаётся НА СВОЁМ МЕСТЕ и
+        трансформируется (прогресс + Продолжить/Удалить), невыбранный —
+        обычное предложение;
+     2) подстрока «Мои планы» — для внесистемных планов (кастомный
+        конструктор, хронологический с длительностью, сервер-онли без
+        карточки в каталоге);
+     3) ниже по HTML — конструкторы «Хронологический НЗ» и «Составить свой
+        план». Никаких дублей и карточек друг на друге. */
+  var html=PLANS.map(function(p){
     var prog=app.progress[p.id];
     if(!prog){
       return '<div class="card" data-id="'+p.id+'" onclick="selPlan(\''+p.id+'\')">'+
@@ -538,40 +541,35 @@ function renderSel(){
         '<button onclick="continuePlan(\''+p.id+'\')" style="flex:2;padding:7px;border:none;border-radius:7px;background:var(--acc);color:#fff;font-size:12px;cursor:pointer;font-family:var(--fui);font-weight:600">Продолжить →</button>'+
       '</div></div>';
   }).join('');
-  if(sl)sl.style.display='block';
-  /* «Мои планы» теперь только для ВНЕСИСТЕМНЫХ планов: кастомные
-     (конструктор «Составить свой план»/хронологический с длительностью)
-     и сервер-онли регистрации без карточки в каталоге. Их некуда ставить
-     «на место» — им нужна отдельная секция. */
   var customIds=Object.keys(app.progress).filter(function(id){
     return !PLANS.some(function(p){return p.id===id;});
   });
-  if(mp){
-    if(!customIds.length){mp.innerHTML='';}
-    else{
-      var html='<div class="sec">Мои планы</div>';
-      customIds.forEach(function(id){
-        var pl=getPlan(id);
-        var prog=app.progress[id];
-        var done=(prog.daysDone||[]).length;
-        var days=pl&&pl.days?pl.days:(prog.days||0);
-        var meta=days?(Math.min(100,Math.round(done/days*100))+'% &middot; '+done+'/'+days+' дней'):(done?('прочитано дней: '+done):'ещё не начинался');
-        var isAct=id===app.activePlanId;
-        html+='<div class="card'+(isAct?' sel':'')+'" data-id="'+id+'">'+
-          '<div class="card-top"'+(pl?' onclick="continuePlan(\''+id+'\')" style="cursor:pointer"':'')+'>'+
-          '<div class="card-ico">'+(pl?pl.icon:'📚')+'</div>'+
-          '<div class="card-info"><div class="card-title">'+_anyPlanTitle(id)+'</div>'+
-          '<div class="card-meta">'+meta+(isAct?' &middot; активный':'')+'</div></div>'+
-          '<div class="badge" style="background:var(--acc);color:#fff">→</div></div>'+
-          '<div style="display:flex;gap:6px;margin-top:8px">'+
-          '<button onclick="delPlan(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">🗑 Удалить</button>'+
-          (app.customPlans[id]?'<button onclick="editCustomPlan(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">✏️ Изменить</button>':'')+
-          (pl?'<button onclick="continuePlan(\''+id+'\')" style="flex:2;padding:7px;border:none;border-radius:7px;background:var(--acc);color:#fff;font-size:12px;cursor:pointer;font-family:var(--fui);font-weight:600">Продолжить →</button>':'')+
-          '</div></div>';
-      });
-      mp.innerHTML=html;
-    }
+  if(customIds.length){
+    html+='<div class="sec">Мои планы</div>';
+    customIds.forEach(function(id){
+      var pl=getPlan(id);
+      var prog=app.progress[id];
+      var done=(prog.daysDone||[]).length;
+      var days=pl&&pl.days?pl.days:(prog.days||0);
+      var meta=days?(Math.min(100,Math.round(done/days*100))+'% &middot; '+done+'/'+days+' дней'):(done?('прочитано дней: '+done):'ещё не начинался');
+      var isAct=id===app.activePlanId;
+      html+='<div class="card'+(isAct?' sel':'')+'" data-id="'+id+'">'+
+        '<div class="card-top"'+(pl?' onclick="continuePlan(\''+id+'\')" style="cursor:pointer"':'')+'>'+
+        '<div class="card-ico">'+(pl?pl.icon:'📚')+'</div>'+
+        '<div class="card-info"><div class="card-title">'+_anyPlanTitle(id)+'</div>'+
+        '<div class="card-meta">'+meta+(isAct?' &middot; активный':'')+'</div></div>'+
+        '<div class="badge" style="background:var(--acc);color:#fff">→</div></div>'+
+        '<div style="display:flex;gap:6px;margin-top:8px">'+
+        '<button onclick="delPlan(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">🗑 Удалить</button>'+
+        (app.customPlans[id]?'<button onclick="editCustomPlan(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">✏️ Изменить</button>':'')+
+        (pl?'<button onclick="continuePlan(\''+id+'\')" style="flex:2;padding:7px;border:none;border-radius:7px;background:var(--acc);color:#fff;font-size:12px;cursor:pointer;font-family:var(--fui);font-weight:600">Продолжить →</button>':'')+
+        '</div></div>';
+    });
   }
+  if(plEl)plEl.innerHTML=html;
+  if(sl)sl.style.display='block';
+  /* Контейнер my-plans больше не используется — всегда пустой. */
+  var mp=document.getElementById('my-plans');if(mp)mp.innerHTML='';
   var sa=document.getElementById('start-area');if(sa)sa.remove();
 }
 
