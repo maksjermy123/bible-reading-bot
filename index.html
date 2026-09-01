@@ -151,7 +151,9 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 <div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="plan-list"></div><div class="card" style="cursor:pointer" onclick="goPage('pg-seq');initSeq()"><div class="card-top"><div class="card-ico">📜</div><div class="card-info"><div class="card-title">Свободное чтение</div><div class="card-meta">Свободное чтение, без графика</div></div><div class="badge">Гибкий</div></div></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span class="chan-ico">📻</span><span class="chan-txt">Канал<b>«От чтения к Преображению»</b></span><span class="chan-arrow">→</span></a></div>
 <div class="pg" id="pg-read"><div class="topbar"><button class="streak-btn" id="streak-badge" onclick="toggleStats()"><span style="font-size:20px" id="streak-ico">🔥</span><span class="streak-n" id="r-streak">0</span><span class="streak-l" id="r-streak-l">дней подряд</span></button><div style="display:flex;gap:5px"><button class="ico-btn" onclick="cycleTheme()" id="theme-btn">☀️</button><button class="ico-btn" onclick="goPage('pg-cfg')">⚙️</button></div></div><div id="stats-panel" style="display:none"><div class="stats-box"><div class="sg"><div class="si"><div class="sv" id="s-pct">0%</div><div class="sk">выполнено</div></div><div class="si"><div class="sv" id="s-done">0</div><div class="sk">дней готово</div></div><div class="si"><div class="sv" id="s-left">0</div><div class="sk">осталось</div></div><div class="si"><div class="sv" id="s-streak">0</div><div class="sk">дней подряд</div></div><div class="si"><div class="sv" id="s-max">0</div><div class="sk">рекорд</div></div><div class="si"><div class="sv" id="s-start">—</div><div class="sk">начат</div></div></div><div class="pb"><div class="pf" id="s-bar" style="width:0%"></div></div><div class="pl" id="s-plan-t"></div><button class="sec-tog" onclick="toggleCal()">📅 Календарь <span id="cal-arr">▼</span></button><div id="cal-wrap" style="display:none"><div class="cal-grid" id="cal-grid"></div></div></div></div><div class="cstat" id="r-cstat"></div><div class="pb" style="margin-bottom:10px"><div class="pf" id="r-bar" style="width:0%"></div></div><div class="day-nav"><button class="nav-btn" id="btn-prev" onclick="goDay(-1)">←</button><div class="day-info"><div class="day-n" id="r-day-n">День 1</div><div class="day-d" id="r-day-d"></div></div><button class="nav-btn" id="btn-next" onclick="goDay(1)">→</button></div><div id="to-today" style="margin-bottom:10px;display:none"><button onclick="goToday()" style="width:100%;font-size:15px;font-weight:800;color:#fff;background:var(--acc);border:none;border-radius:10px;padding:13px;cursor:pointer;font-family:var(--fui);box-shadow:0 3px 12px rgba(0,0,0,.18)">📖 К непрочитанному →</button></div><div class="ref-lbl"><span id="r-ref">—</span><button class="ico-btn" onclick="addBm()">⭐</button></div><div class="tabs" id="r-tabs"></div><div class="sc" id="r-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button><a class="tlink" id="r-tlink" target="_blank"><span style="font-size:16px">📚</span> Читать другой перевод</a><div class="phrase" id="r-phrase"></div></div>
 <div class="pg" id="pg-seq"><div class="hdr"><h1>📜 Свободное чтение</h1></div><div class="seq-nav"><select class="seq-sel" id="seq-book" onchange="seqBook()"></select><select class="seq-sel" id="seq-ch" onchange="seqRender()"></select></div><div class="sc" id="seq-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-out" style="margin-top:0;flex:1" onclick="seqPrev()">← Назад</button><button class="btn btn-acc" style="margin-top:0;flex:1" onclick="seqNext()">Далее →</button></div><button class="btn btn-out" style="margin-top:8px" onclick="addSeqBm()">⭐ Закладка</button><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
-<div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div id="con-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Начать план</button><button class="btn btn-out" onclick="conEditId=null;conChrono=false;goPage('pg-sel')">Отмена</button></div>
+<div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div id="con-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="con-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="con-not-tog" onclick="conTogNot()"></button></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Выбрать план</button><button class="btn btn-out" onclick="conEditId=null;conChrono=false;goPage('pg-sel');renderSel()">Вернуться</button></div>
+<div class="pg" id="pg-setup"><div class="hdr"><h1 id="setup-title">📖 План</h1></div><div class="prev-box" id="setup-meta" style="margin-bottom:14px"></div><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="setup-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="setup-not-tog" onclick="setupTogNot()"></button></div><button class="btn btn-acc" onclick="startPlan()">Выбрать план</button><button class="btn btn-out" onclick="setupBack()">Вернуться</button></div>
+
 <div class="pg" id="pg-bm"><div class="hdr"><h1>⭐ Закладки</h1></div><div id="bm-list"></div><div id="bm-empty" style="display:none;text-align:center;padding:36px;color:var(--txt2);font-size:14px">Нет закладок.<br>Нажми ⭐ во время чтения.</div></div>
 <div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-empty" style="font-size:12px;color:var(--txt2);margin-bottom:10px;display:none">Сначала выбери план на вкладке «Планы»</div><select id="cfg-plan-sel" onchange="cfgSelectPlan(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px;margin-bottom:12px"></select><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid" style="grid-template-columns:repeat(3,1fr)"><button onclick="setTheme('auto')" id="th-auto" class="th-btn"><div>🌗</div>Авто</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button></div><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span>Номера стихов</span><button class="tog on" id="cfg-vn-tog" onclick="cfgTogVn()"></button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div id="font-track" style="flex:1;height:28px;display:flex;align-items:center;position:relative;touch-action:none;cursor:pointer"><div style="width:100%;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div></div>
 
@@ -203,15 +205,17 @@ function loadPlansPeri(){
       }catch(e){}
     });
 }
-/* chrono_365 УБРАН из каталога: он ссылался на то же расписание PLANS_PERI.
-   bible_365, что и «Библия за год», то есть каталог предлагал два одинаковых
-   плана с разными названиями. Регистрации chrono_365 у старых пользователей
-   продолжают работать через фолбэк getPlan('chrono_365') (карточка остаётся
-   в общем списке, оффер больше не показывается), а параллельные
-   chrono_365+bible_365 схлопывает migratePlanSlots(). */
+/* chrono_365 («Хронологический план за год») снова в каталоге. История:
+   раньше он ссылался на то же расписание PLANS_PERI.bible_365, что и
+   «Библия за год», и был убран как дубль. Вернули как полноценный план
+   того же трека: отдельного ключа в plans.json нет (не удваиваем размер
+   файла), расписание подключается алиасом в getPlan(). Автослияние
+   chrono_365+bible_365 в migratePlanSlots() удалено — иначе оно молча
+   стирало бы один из планов у тех, кто начал оба. */
 var PLANS=[
  {id:"nt_90",title:"Новый Завет за 90 дней",icon:"✝️",days:90,diff:"recommended",desc:"Весь Новый Завет от Матфея до Откровения за три месяца.",schedule:PLANS_PERI.nt_90},
- {id:"bible_365",title:"Библия за год",icon:"📚",days:365,diff:"challenging",desc:"Весь канон от Бытия до Откровения по смысловым отрывкам (перикопам).",schedule:PLANS_PERI.bible_365}
+ {id:"bible_365",title:"Библия за год",icon:"📚",days:365,diff:"challenging",desc:"Весь канон от Бытия до Откровения по смысловым отрывкам (перикопам).",schedule:PLANS_PERI.bible_365},
+ {id:"chrono_365",title:"Хронологический план за год",icon:"🕰️",days:365,diff:"challenging",desc:"Весь канон от Бытия до Откровения за год — тот же трек отрывков, что и у «Библии за год».",schedule:PLANS_PERI.chrono_365}
 ];
 var VC={"Бытие":[31,25,24,26,32,22,24,22,29,32,32,20,18,24,21,16,27,33,38,18,34,24,20,67,34,35,46,22,35,43,55,32,20,31,29,43,36,30,23,23,57,38,34,34,28,34,31,22,33,26],"Исход":[22,25,22,31,23,30,25,32,35,29,10,51,22,31,27,36,16,27,25,26,36,31,33,18,40,37,21,43,46,38,18,35,23,35,35,38,29,31,43,38],"Левит":[17,16,17,35,19,30,38,36,24,20,47,8,59,56,33,34,16,30,37,27,24,33,44,23,55,46,34],"Числа":[54,34,51,49,31,27,89,26,23,36,35,15,34,45,41,50,13,32,22,29,35,41,30,25,18,65,23,31,39,17,54,42,55,29,34,13],"Второзаконие":[46,37,29,49,33,25,26,20,29,22,32,32,18,29,23,22,20,22,21,20,23,30,25,22,19,19,26,68,29,20,30,52,29,12],"Иисус Навин":[18,24,17,24,16,26,26,35,27,43,23,24,33,15,63,10,18,28,51,9,45,34,16,33],"Судьи":[36,23,31,24,31,40,25,35,57,18,40,15,25,20,20,31,13,31,30,48,25],"Руфь":[22,23,18,22],"1 Царств":[28,36,21,22,12,21,17,22,27,27,15,25,23,52,35,23,58,30,24,43,15,23,28,23,44,25,12,25,11,31,13],"2 Царств":[27,32,39,12,25,23,29,18,13,19,27,31,39,33,37,23,29,33,43,26,22,51,39,25],"3 Царств":[53,46,28,34,18,38,51,66,28,29,43,33,34,31,34,34,24,46,21,43,29,53],"4 Царств":[18,25,27,44,27,33,20,29,37,36,21,21,25,29,38,20,41,37,37,21,26,20,37,20,30],"1 Паралипоменон":[54,55,24,43,26,81,40,40,44,14,47,40,14,17,29,43,27,17,19,8,30,19,32,31,31,32,34,21,30],"2 Паралипоменон":[17,18,17,22,14,42,22,18,31,19,23,16,22,15,19,14,19,34,11,37,20,12,21,27,28,23,9,27,36,27,21,33,25,33,27,23],"Ездра":[11,70,13,24,17,22,28,36,15,44],"Неемия":[11,20,32,23,19,19,73,18,38,39,36,47,31],"Есфирь":[22,23,15,17,14,14,10,17,32,3],"Иов":[22,13,26,21,27,30,21,22,35,22,20,25,28,22,35,22,16,21,29,29,34,30,17,25,6,14,23,28,25,31,40,22,33,37,16,33,24,41,35,27,26,17],"Псалтирь":[6,12,9,9,13,11,18,10,39,7,9,6,7,5,11,15,51,15,10,14,32,6,10,22,12,14,9,11,13,25,11,22,23,28,13,40,23,14,18,14,12,5,27,18,12,10,15,21,23,21,11,7,9,24,14,12,12,18,14,9,13,12,11,14,20,8,36,37,6,24,20,28,23,11,13,21,72,13,20,17,8,19,13,14,17,7,19,53,17,16,16,5,23,11,13,12,9,9,5,8,29,22,35,45,48,43,14,31,7,10,10,9,26,9,10,2,29,176,7,8,9,4,8,5,6,5,6,8,8,3,18,3,3,21,26,9,8,24,14,10,7,12,15,21,10,11,9,14,9,6],"Притчи":[33,22,35,27,23,35,27,36,18,32,31,28,25,35,33,33,28,24,29,30,31,29,35,34,28,28,27,28,27,33,31],"Екклесиаст":[18,26,22,17,19,12,29,17,18,20,10,14],"Песнь Песней":[16,17,11,16,16,12,14,14],"Исаия":[31,22,25,6,30,13,25,22,21,34,16,6,22,32,9,14,14,7,25,6,17,25,18,23,12,21,13,29,24,33,9,20,24,17,10,22,38,22,8,31,29,25,28,28,25,13,15,22,26,11,23,15,12,17,13,12,21,14,21,22,11,12,19,12,25,24],"Иеремия":[19,37,25,31,31,30,34,22,26,25,23,17,27,22,21,21,27,23,15,18,14,30,40,10,38,24,22,17,32,24,40,44,26,22,19,32,21,28,18,16,18,22,13,30,5,28,7,47,39,46,64,34],"Плач Иеремии":[22,22,66,22,22],"Иезекииль":[28,10,27,17,17,14,27,18,11,22,25,28,23,23,8,63,24,32,14,49,32,31,49,27,17,21,36,26,21,26,18,32,33,31,15,38,28,23,29,49,26,20,27,31,25,24,23,35],"Даниил":[21,49,33,34,31,28,28,27,27,21,45,13],"Осия":[11,23,5,19,15,11,16,14,17,15,12,14,15,10],"Иоиль":[20,32,21],"Амос":[15,16,15,13,27,14,17,14,15],"Авдий":[21],"Иона":[16,11,10,11],"Михей":[16,13,12,13,15,16,20],"Наум":[15,13,19],"Аввакум":[17,20,19],"Софония":[18,15,20],"Аггей":[15,23],"Захария":[21,13,10,14,11,15,14,23,17,12,17,14,9,21],"Малахия":[14,17,18,6],"Матфей":[25,23,17,25,48,34,29,34,38,42,30,50,58,36,39,28,27,35,30,34,46,46,39,51,46,75,66,20],"Марк":[45,28,35,41,43,56,37,38,50,52,33,44,37,72,47,20],"Лука":[80,52,38,44,39,49,50,56,62,42,54,59,35,35,32,31,37,43,48,47,38,71,56,53],"Иоанн":[51,25,36,54,47,71,53,59,41,42,57,50,38,31,27,33,26,40,42,31,25],"Деяния":[26,47,26,37,42,15,60,40,43,48,30,25,52,28,41,40,34,28,40,38,40,30,35,27,27,32,44,31],"Римлянам":[32,29,31,25,21,23,25,39,33,21,36,21,14,26,33,24],"1 Коринфянам":[31,16,23,21,13,20,40,13,27,33,34,31,13,40,58,24],"2 Коринфянам":[24,17,18,18,21,18,16,24,15,18,32,21,13],"Галатам":[24,21,29,31,26,18],"Ефесянам":[23,22,21,32,33,24],"Филиппийцам":[30,30,21,23],"Колоссянам":[29,23,25,18],"1 Фессалоникийцам":[10,20,13,18,28],"2 Фессалоникийцам":[12,17,18],"1 Тимофею":[20,15,16,16,25,21],"2 Тимофею":[18,26,17,22],"Титу":[16,15,15],"Филимону":[25],"Евреям":[14,18,19,16,14,20,28,13,28,39,40,29,25],"Иаков":[27,26,18,17,20],"1 Петра":[25,25,22,19,14],"2 Петра":[21,22,18],"1 Иоанна":[10,29,24,21,21],"2 Иоанна":[13],"3 Иоанна":[15],"Иуда":[25],"Откровение":[20,29,22,11,14,17,17,13,21,11,19,17,18,20,8,21,18,24,21,15,27,21]};
 var FS=[0.82,0.92,1.02,1.14,1.28];
@@ -485,7 +489,7 @@ function goPage(id){
   document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
   var el=document.getElementById(id);if(el)el.classList.add('on');
   var nav=document.getElementById('bnav');
-  var show=['pg-read','pg-bm','pg-sel','pg-cfg','pg-seq','pg-con'].indexOf(id)>=0;
+  var show=['pg-read','pg-bm','pg-sel','pg-cfg','pg-seq','pg-con','pg-setup'].indexOf(id)>=0;
   if(nav)nav.style.display=show?'flex':'none';
   ['read','bm','sel','cfg'].forEach(function(k){
     var btn=document.getElementById('nb-'+k);
@@ -567,9 +571,10 @@ function renderSel(){
   }else{
     html+='<div class="card card-custom" style="cursor:pointer" onclick="startNewCustomPlan()"><div class="card-top"><div class="card-ico">✏️</div><div class="card-info"><div class="card-title">Составить свой план</div><div class="card-meta">Выбери книги и срок сам</div></div><div class="badge">Свой</div></div></div>';
   }
-  /* 4) Начатые планы без определения в приложении (bible_180, nt_30,
-     chrono_365 и другие наследники старых версий) — просто карточки в
-     общем списке, без отдельной секции: продолжить или удалить. */
+  /* 4) Начатые планы без определения в приложении (bible_180, nt_30
+     и другие наследники старых версий; chrono_365 снова в PLANS —
+     см. комментарий у массива) — просто карточки в общем списке,
+     без отдельной секции: продолжить или удалить. */
   var known={};
   PLANS.forEach(function(p){known[p.id]=1;});
   /* customPlans целиком (включая скрытые до миграции дубли) — они не
@@ -581,7 +586,6 @@ function renderSel(){
     html+=_planCardHtml(id,plO,_anyPlanTitle(id),plO?(plO.days||_planDaysCount(plO)):0);
   });
   if(plEl)plEl.innerHTML=html;
-  var sa=document.getElementById('start-area');if(sa)sa.remove();
 }
 
 /* ── Слоты планов: карточка, дедуп, миграция дублей ────────── */
@@ -629,8 +633,7 @@ function _findChronoCustomId(){
   return _pickKeeper(ids);
 }
 /* Миграция дублей, созданных старыми версиями (два «Хронологический
-   НЗ · 180», два своих плана с тем же набором книг и сроком, параллельные
-   chrono_365+bible_365 с одинаковым расписанием). Прогресс НЕ теряется:
+   НЗ · 180», два своих плана с тем же набором книг и сроком). Прогресс НЕ теряется:
    дни дубля переносятся в оставшийся план через /plan/set_days, затем дубль
    снимается с регистрации на сервере. Если сеть/сервер недоступны — ничего
    не удаляем и повторяем при следующем запуске. */
@@ -679,40 +682,45 @@ async function migratePlanSlots(){
       for(var j=0;j<grp.length;j++){if(grp[j]!==keep2)await collapse(grp[j],keep2);}
     }
   }
-  /* C. chrono_365 вместе с bible_365 — это одно и то же расписание. */
-  if(app.progress['chrono_365']&&app.progress['bible_365']){
-    var pa=app.progress['chrono_365']||{},pb=app.progress['bible_365']||{};
-    var keepC=((pa.daysDone||[]).length>=(pb.daysDone||[]).length)?'chrono_365':'bible_365';
-    await collapse(keepC==='chrono_365'?'bible_365':'chrono_365',keepC);
-  }
+  /* C. Схлопывание chrono_365+bible_365 УДАЛЕНО: chrono_365 снова в каталоге
+     (см. комментарий у PLANS) — это полноценный план, а автослияние молча
+     удаляло бы один из двух у тех, кто начал оба. */
   if(changed){saveApp();renderSel();}
 }
 
+/* Второй шаг выбора: тап по карточке готового плана открывает отдельную
+   страницу настроек (pg-setup) — время напоминания и кнопки «Выбрать план» /
+   «Вернуться». Раньше панель настроек вставлялась inline в середину списка
+   карточек, и закрыть её можно было только начав план. */
 function selPlan(id){
   haptic('light');
   selPlanId=id;
-  document.querySelectorAll('.card[data-id]').forEach(function(c){c.classList.toggle('sel',c.dataset.id===id);});
-  var sa=document.getElementById('start-area');
-  if(!sa){sa=document.createElement('div');sa.id='start-area';var _ac=document.querySelector('.card[data-id="'+id+'"]');if(_ac)_ac.after(sa);else document.getElementById('plan-list').after(sa);}
+  var p=getPlan(id)||{};
+  var t=document.getElementById('setup-title');
+  if(t)t.textContent=(p.icon?p.icon+' ':'')+(p.title||'План');
+  var m=document.getElementById('setup-meta');
+  if(m)m.textContent=(p.days?p.days+' дней · ':'')+(p.desc||'');
   var s=app.settings||{};
-  sa.innerHTML='<div class="sec">Время напоминания</div>'+
-    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
-    '<span style="font-size:18px">🕐</span>'+
-    '<input type="time" id="sel-time" value="'+(s.notifyTime||'08:00')+'" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px">'+
-    '<span style="font-size:12px;color:var(--txt2)">местное</span></div>'+
-    '<div class="tog-row"><span>Получать напоминания</span>'+
-    '<button class="tog'+(s.notifyOn!==false?' on':'')+'" id="sel-not-tog" onclick="selTogNot()"></button></div>'+
-    '<button class="btn btn-acc" onclick="startPlan()">Начать план</button>';
-  haptic('light');
+  var ti=document.getElementById('setup-time');if(ti)ti.value=s.notifyTime||'08:00';
+  var tb=document.getElementById('setup-not-tog');if(tb)tb.className='tog'+(s.notifyOn!==false?' on':'');
+  goPage('pg-setup');
 }
-function selTogNot(){
+function setupBack(){
+  haptic('light');
+  selPlanId=null;
+  goPage('pg-sel');
+  renderSel();
+}
+function togNotify(btnId){
   if(!app.settings)app.settings={};
   app.settings.notifyOn=!(app.settings.notifyOn!==false);
-  var t=document.getElementById('sel-not-tog');if(t)t.className='tog'+(app.settings.notifyOn?' on':'');
+  var t=document.getElementById(btnId);if(t)t.className='tog'+(app.settings.notifyOn?' on':'');
 }
+function setupTogNot(){togNotify('setup-not-tog');}
+function conTogNot(){togNotify('con-not-tog');}
 async function startPlan(){
   if(!selPlanId)return;
-  var timeEl=document.getElementById('sel-time');
+  var timeEl=document.getElementById('setup-time');
   var time=timeEl?timeEl.value:'08:00';
   var msk=localTimeToMsk(time);
   if(!app.settings)app.settings={};
@@ -774,22 +782,19 @@ async function unregisterOnServer(planId){
 }
 function getPlan(id){
   var p=PLANS.find(function(p){return p.id===id;})||app.customPlans[id]||null;
-  if(p&&!p.schedule&&PLANS_PERI[id])p.schedule=PLANS_PERI[id];
+  if(p&&!p.schedule){
+    if(id==='chrono_365'&&PLANS_PERI.bible_365)p.schedule=PLANS_PERI.bible_365; /* chrono_365 — тот же трек, что bible_365 */
+    else if(PLANS_PERI[id])p.schedule=PLANS_PERI[id];
+  }
   /* Фолбэк для унаследованных планов (bible_180/bible_90/nt_30/chrono_<N>...):
      регистрации живы в app.progress и на сервере, а определения из массива
      PLANS уже удалены. Раньше getPlan() отдавал null - такие планы исчезали
      со вкладки «Планы», из настроек (пустое меню времени) и не открывались.
      Собираем объект по расписанию из PLANS_PERI: длина даёт число дней,
      префикс id - заголовок. */
-  if(!p&&typeof id==='string'){
-    /* chrono_365 больше нет в PLANS (это был дубль bible_365), но у старых
-       пользователей регистрация жива в progress и на сервере. Фолбэк
-       сохраняет карточку, чтение и настройки для таких регистраций. */
-    if(id==='chrono_365'&&PLANS_PERI.bible_365&&PLANS_PERI.bible_365.length){
-      p={id:id,title:'Хронологический план за год',icon:'🕰️',days:365,diff:'challenging',
-         desc:'План предыдущей версии приложения',schedule:PLANS_PERI.bible_365};
-    }
-  }
+  /* Специальный фолбэк для chrono_365 удалён: план снова в PLANS (см.
+     комментарий у массива), getPlan() находит его там и подключает
+     расписание алиасом PLANS_PERI.bible_365. */
   if(!p&&typeof id==='string'){
     var s2=PLANS_PERI[id];
     if(s2&&s2.length){
@@ -1458,6 +1463,9 @@ function initCon(){
   }
   var title=document.getElementById('con-title');
   if(title)title.textContent=conChrono?'🕰️ Хронологический Новый Завет':(editing?'✏️ Изменить план':'✏️ Свой план');
+  var s0=app.settings||{};
+  var cti=document.getElementById('con-time');if(cti)cti.value=s0.notifyTime||'08:00';
+  var ctb=document.getElementById('con-not-tog');if(ctb)ctb.className='tog'+(s0.notifyOn!==false?' on':'');
   if(editing){
     conSel=(editing.books||[]).slice();
     var daysInp=document.getElementById('con-days');if(daysInp)daysInp.value=editing.totalDays||editing.days||(conChrono?180:30);
@@ -1489,14 +1497,14 @@ function updatePrev(){
   if(conChrono){
     if(days<1){if(prev)prev.textContent='Укажи длительность';if(btn)btn.disabled=true;return;}
     if(prev)prev.textContent='Весь Новый Завет в хронологическом порядке · 260 глав · 7955 стихов · ~'+(7955/days).toFixed(0)+' стихов/день · '+days+' дней';
-    if(btn){btn.disabled=false;btn.textContent=conEditId?'Сохранить изменения':'Начать план';}
+    if(btn){btn.disabled=false;btn.textContent=conEditId?'Сохранить изменения':'Выбрать план';}
     return;
   }
   if(!conSel.length||days<1){if(prev)prev.textContent='Выбери книги и укажи длительность';if(btn)btn.disabled=true;return;}
   var totalCh=0;
   conSel.forEach(function(n){var b=ALL_BOOKS.find(function(b){return b.name===n;});if(b)totalCh+=b.chapters;});
   if(prev)prev.textContent=conSel.length+' книг · '+totalCh+' глав · ~'+(totalCh/days).toFixed(1)+' глав/день · '+days+' дней';
-  if(btn){btn.disabled=false;btn.textContent=conEditId?'Сохранить изменения':'Начать план';}
+  if(btn){btn.disabled=false;btn.textContent=conEditId?'Сохранить изменения':'Выбрать план';}
 }
 /* Свой план из выбранных книг: нарезка по перикопам выбранных книг.
    Исправлен баг старой версии (ch:ci+1 - главы были сдвинуты на 1). */
@@ -1609,8 +1617,13 @@ async function startCustom(){
   var planId='c'+Date.now();
   app.customPlans[planId]={id:planId,title:title,icon:conChrono?'🕰️':'✏️',days:schedule.length,diff:'custom',desc:conChrono?'Гармония Евангелий, Деяния, Послания и Откровение по порядку событий':'Ваш план',schedule:schedule,books:conChrono?[]:conSel.slice(),totalDays:days,chrono:conChrono};
   app.activePlanId=planId;
-  var defTime=(app.settings&&app.settings.notifyTime)||'08:00';
+  /* Время напоминания — из поля на этом втором шаге (pg-con); сохраняем его
+     и в общие настройки, как это делает startPlan() для готовых планов. */
+  var timeElC=document.getElementById('con-time');
+  var defTime=(timeElC&&timeElC.value)?timeElC.value:((app.settings&&app.settings.notifyTime)||'08:00');
   var msk=localTimeToMsk(defTime);
+  if(!app.settings)app.settings={};
+  app.settings.notifyTime=defTime;app.settings.notifyHourMsk=msk.hour;app.settings.notifyMinuteMsk=msk.minute;
   app.progress[planId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyTime:defTime,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings?app.settings.notifyOn!==false:true};
   saveApp();haptic('success');viewDay=null;goPage('pg-read');renderRead();
   if(userId){
