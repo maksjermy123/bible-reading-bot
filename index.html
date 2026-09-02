@@ -60,6 +60,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
    одновременного показа "стрик" + "отставание", которые раньше могли
    противоречить друг другу на экране. */
 .streak-btn.mode-catchup .streak-n{color:var(--acc)}
+.streak-btn.mode-ahead .streak-n{color:var(--acc)}
 .streak-btn.mode-broken .streak-n{color:var(--txt2)}
 .ico-btn{width:34px;height:34px;border-radius:9px;background:var(--card);border:1px solid var(--brd);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
 .stats-box{background:var(--card);border:1px solid var(--brd);border-radius:var(--rad);padding:12px;margin-bottom:8px}
@@ -95,6 +96,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 .read-btn:active{opacity:.85}
 .read-btn:disabled{opacity:.6}
 .read-btn.done{background:rgba(46,125,50,.12);color:var(--acc)}
+.read-btn.alt{background:var(--card);color:var(--acc);border:1px solid var(--brd);box-shadow:none}
 .tlink{display:flex;align-items:center;justify-content:center;gap:6px;text-align:center;font-size:14px;font-weight:600;color:var(--acc);margin-bottom:8px;text-decoration:none;background:var(--acc2);border-radius:10px;padding:11px;transition:opacity .15s}.tlink:active{opacity:.75}
 .home-lnk{display:block;text-align:center;font-size:14px;color:var(--txt2);margin-top:12px;cursor:pointer;text-decoration:underline;background:none;border:none;font-family:var(--fui);padding:4px}
 .phrase{font-size:13px;color:var(--acc);text-align:center;padding:6px;min-height:28px}
@@ -149,7 +151,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 <div id="pg-load"><div class="spin">📖</div><div style="font-size:15px;color:var(--acc);font-weight:600">Загружаем Библию...</div><div style="font-size:12px;color:var(--txt2)">Пожалуйста, подождите</div></div>
 <div class="pg" id="pg-ob"><div class="ob-wrap"><div class="ob-em" id="ob-em">📖</div><div class="ob-t" id="ob-t">Читай Библию каждый день</div><div class="ob-tx" id="ob-tx">Выбери план по силам и читай Слово Божье каждый день</div><div class="ob-dots"><div class="od on" id="od0"></div><div class="od" id="od1"></div><div class="od" id="od2"></div></div><button class="btn btn-acc" onclick="obNext()">Далее</button></div></div>
 <div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="plan-list"></div><div class="card" style="cursor:pointer" onclick="goPage('pg-seq');initSeq()"><div class="card-top"><div class="card-ico">📜</div><div class="card-info"><div class="card-title">Свободное чтение</div><div class="card-meta">Свободное чтение, без графика</div></div><div class="badge">Гибкий</div></div></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span class="chan-ico">📻</span><span class="chan-txt">Канал<b>«От чтения к Преображению»</b></span><span class="chan-arrow">→</span></a></div>
-<div class="pg" id="pg-read"><div class="topbar"><button class="streak-btn" id="streak-badge" onclick="toggleStats()"><span style="font-size:20px" id="streak-ico">🔥</span><span class="streak-n" id="r-streak">0</span><span class="streak-l" id="r-streak-l">дней подряд</span></button><div style="display:flex;gap:5px"><button class="ico-btn" onclick="cycleTheme()" id="theme-btn">☀️</button><button class="ico-btn" onclick="goPage('pg-cfg')">⚙️</button></div></div><div id="stats-panel" style="display:none"><div class="stats-box"><div class="sg"><div class="si"><div class="sv" id="s-pct">0%</div><div class="sk">выполнено</div></div><div class="si"><div class="sv" id="s-done">0</div><div class="sk">дней готово</div></div><div class="si"><div class="sv" id="s-left">0</div><div class="sk">осталось</div></div><div class="si"><div class="sv" id="s-streak">0</div><div class="sk">дней подряд</div></div><div class="si"><div class="sv" id="s-max">0</div><div class="sk">рекорд</div></div><div class="si"><div class="sv" id="s-start">—</div><div class="sk">начат</div></div></div><div class="pb"><div class="pf" id="s-bar" style="width:0%"></div></div><div class="pl" id="s-plan-t"></div><button class="sec-tog" onclick="toggleCal()">📅 Календарь <span id="cal-arr">▼</span></button><div id="cal-wrap" style="display:none"><div class="cal-grid" id="cal-grid"></div></div></div></div><div class="cstat" id="r-cstat"></div><div class="pb" style="margin-bottom:10px"><div class="pf" id="r-bar" style="width:0%"></div></div><div class="day-nav"><button class="nav-btn" id="btn-prev" onclick="goDay(-1)">←</button><div class="day-info"><div class="day-n" id="r-day-n">День 1</div><div class="day-d" id="r-day-d"></div></div><button class="nav-btn" id="btn-next" onclick="goDay(1)">→</button></div><div id="to-today" style="margin-bottom:10px;display:none"><button onclick="goToday()" style="width:100%;font-size:15px;font-weight:800;color:#fff;background:var(--acc);border:none;border-radius:10px;padding:13px;cursor:pointer;font-family:var(--fui);box-shadow:0 3px 12px rgba(0,0,0,.18)">📖 К непрочитанному →</button></div><div class="ref-lbl"><span id="r-ref">—</span><button class="ico-btn" onclick="addBm()">⭐</button></div><div class="tabs" id="r-tabs"></div><div class="sc" id="r-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button><a class="tlink" id="r-tlink" target="_blank"><span style="font-size:16px">📚</span> Читать другой перевод</a><div class="phrase" id="r-phrase"></div></div>
+<div class="pg" id="pg-read"><div class="topbar"><button class="streak-btn" id="streak-badge" onclick="toggleStats()"><span style="font-size:20px" id="streak-ico">🔥</span><span class="streak-n" id="r-streak">0</span><span class="streak-l" id="r-streak-l">дней подряд</span></button><div style="display:flex;gap:5px"><button class="ico-btn" onclick="cycleTheme()" id="theme-btn">☀️</button><button class="ico-btn" onclick="goPage('pg-cfg')">⚙️</button></div></div><div id="stats-panel" style="display:none"><div class="stats-box"><div class="sg"><div class="si"><div class="sv" id="s-pct">0%</div><div class="sk">выполнено</div></div><div class="si"><div class="sv" id="s-done">0</div><div class="sk">дней готово</div></div><div class="si"><div class="sv" id="s-left">0</div><div class="sk">осталось</div></div><div class="si"><div class="sv" id="s-streak">0</div><div class="sk">дней подряд</div></div><div class="si"><div class="sv" id="s-max">0</div><div class="sk">рекорд</div></div><div class="si"><div class="sv" id="s-start">—</div><div class="sk">начат</div></div></div><div class="pb"><div class="pf" id="s-bar" style="width:0%"></div></div><div class="pl" id="s-plan-t"></div><button class="sec-tog" onclick="toggleCal()">📅 Календарь <span id="cal-arr">▼</span></button><div id="cal-wrap" style="display:none"><div class="cal-grid" id="cal-grid"></div></div></div></div><div class="cstat" id="r-cstat"></div><div class="pb" style="margin-bottom:10px"><div class="pf" id="r-bar" style="width:0%"></div></div><div class="day-nav"><button class="nav-btn" id="btn-prev" onclick="goDay(-1)">←</button><div class="day-info"><div class="day-n" id="r-day-n">День 1</div><div class="day-d" id="r-day-d"></div></div><button class="nav-btn" id="btn-next" onclick="goDay(1)">→</button></div><div id="to-today" style="margin-bottom:10px;display:none"><button onclick="goToday()" style="width:100%;font-size:15px;font-weight:800;color:#fff;background:var(--acc);border:none;border-radius:10px;padding:13px;cursor:pointer;font-family:var(--fui);box-shadow:0 3px 12px rgba(0,0,0,.18)">📖 К непрочитанному →</button></div><div class="ref-lbl"><span id="r-ref">—</span><button class="ico-btn" onclick="addBm()">⭐</button></div><div class="tabs" id="r-tabs"></div><div class="sc" id="r-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button><button class="read-btn alt" id="r-more-btn" style="display:none" type="button">📚 Хочу прочесть больше</button><a class="tlink" id="r-tlink" target="_blank"><span style="font-size:16px">📚</span> Читать другой перевод</a><div class="phrase" id="r-phrase"></div></div>
 <div class="pg" id="pg-seq"><div class="hdr"><h1>📜 Свободное чтение</h1></div><div class="seq-nav"><select class="seq-sel" id="seq-book" onchange="seqBook()"></select><select class="seq-sel" id="seq-ch" onchange="seqRender()"></select></div><div class="sc" id="seq-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-out" style="margin-top:0;flex:1" onclick="seqPrev()">← Назад</button><button class="btn btn-acc" style="margin-top:0;flex:1" onclick="seqNext()">Далее →</button></div><button class="btn btn-out" style="margin-top:8px" onclick="addSeqBm()">⭐ Закладка</button><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
 <div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div id="con-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="con-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="con-not-tog" onclick="conTogNot()"></button></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Выбрать план</button><button class="btn btn-out" onclick="conEditId=null;conChrono=false;goPage('pg-sel');renderSel()">Вернуться</button></div>
 <div class="pg" id="pg-setup"><div class="hdr"><h1 id="setup-title">📖 План</h1></div><div class="prev-box" id="setup-meta" style="margin-bottom:14px"></div><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="setup-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="setup-not-tog" onclick="setupTogNot()"></button></div><button class="btn btn-acc" onclick="startPlan()">Выбрать план</button><button class="btn btn-out" onclick="setupBack()">Вернуться</button></div>
@@ -949,18 +951,25 @@ function buildTabs(refs){
    иначе, если серия жива — показываем её как обычно; иначе — не пугаем
    голым нулём, а по-доброму показываем личный рекорд как приглашение
    начать заново. */
-function renderStreakBadge(streak,lag,maxStreak){
+function renderStreakBadge(streak,lag,ahead,maxStreak){
   var btn=document.getElementById('streak-badge');
   var ico=document.getElementById('streak-ico');
   var n=document.getElementById('r-streak');
   var l=document.getElementById('r-streak-l');
   if(!btn||!ico||!n||!l)return;
-  btn.classList.remove('mode-active','mode-catchup','mode-broken');
+  btn.classList.remove('mode-active','mode-catchup','mode-broken','mode-ahead');
   if(lag>0){
     btn.classList.add('mode-catchup');
     ico.textContent='🎯';
     n.textContent=lag;
     l.textContent=dayWord(lag)+' позади графика';
+  } else if(ahead>0){
+    /* Чтение «впрок»: долга нет, но уже отмечены дни будущего — показываем
+       опережение вместо стрика (самая свежая и мотивирующая информация). */
+    btn.classList.add('mode-ahead');
+    ico.textContent='⏩';
+    n.textContent=ahead;
+    l.textContent=dayWord(ahead)+' вперёд графика';
   } else if(streak>0){
     btn.classList.add('mode-active');
     ico.textContent='🔥';
@@ -1007,8 +1016,12 @@ function renderRead(){
   var isDayRead=(prog.daysDone||[]).indexOf(vd)>=0;
   var isLanding=vd===landing;
   var lag=Math.max(0,cur-landing);
+  /* Опережение («чтение впрок»): сколько дней подряд, начиная с завтрашнего,
+     уже отмечено прочитанными. Показывается в бейдже, когда долга нет. */
+  var ahead=0;
+  if(lag===0){for(var ad=cur+1;ad<=plan.days;ad++){if((prog.daysDone||[]).indexOf(ad)>=0)ahead++;else break;}}
   var el;
-  renderStreakBadge(streak,lag,prog.maxStreak||0);
+  renderStreakBadge(streak,lag,ahead,prog.maxStreak||0);
   el=document.getElementById('s-pct');if(el)el.textContent=pct+'%';
   el=document.getElementById('s-done');if(el)el.textContent=done;
   el=document.getElementById('s-left');if(el)el.textContent=plan.days-done;
@@ -1025,7 +1038,7 @@ function renderRead(){
   if(el){var _ep=(typeof dd!=='undefined'&&dd&&dd.epoch)?dd.epoch:'';
     el.textContent=(isDayRead?'✓ Прочитано'+(_ep?' · ':''):'')+_ep;}
   el=document.getElementById('btn-prev');if(el)el.disabled=vd<=1;
-  el=document.getElementById('btn-next');if(el)el.disabled=vd>=cur;
+  el=document.getElementById('btn-next');if(el)el.disabled=vd>=plan.days;
   el=document.getElementById('to-today');if(el)el.style.display=!isLanding?'block':'none';
   el=document.getElementById('r-ref');if(el)el.textContent=dd.label||dd.refs.map(_refLabel).join('; ');
   var tabs=buildTabs(dd.refs);
@@ -1100,16 +1113,34 @@ function renderSc(tab){
 
 function updReadBtn(tabs,isFuture,isDayRead,isLanding,vd,isPlanDone){
   var btn=document.getElementById('r-read-btn');if(!btn)return;
+  var more=document.getElementById('r-more-btn');
   var isLast=activeTab>=tabs.length-1;
+  var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];
+  var cur=plan&&prog?curDayNum(plan,prog):0;
+  /* Кнопка «Хочу прочесть больше»: показывается, когда дневной лимит
+     выполнен (догнали график), но в плане остались дни за пределами
+     «сегодня» — открывает следующий день и разрешает читать впрок. */
+  if(more){
+    var moreShow=!!(!isPlanDone&&plan&&prog&&isDayRead&&isLanding&&cur<plan.days);
+    more.style.display=moreShow?'block':'none';
+    if(moreShow)more.onclick=function(){viewDay=cur+1;activeTab=0;haptic('light');renderRead();window.scrollTo(0,0);};
+  }
   if(isPlanDone){
     /* План прочитан целиком: раньше кнопка оставалась disabled
        «✓ День N прочитан» и выглядела зависшей. */
     btn.textContent='🎉 План прочитан полностью';
     btn.disabled=false;btn.className='read-btn';
     btn.onclick=function(){goPage('pg-done');};
-  } else if(isFuture){
-    btn.textContent='Этот день ещё не открыт';
+  } else if(isDayRead&&isFuture){
+    /* Уже прочитанный «наперёд» день: перечитать можно, отметить заново нельзя. */
+    btn.textContent='✓ День '+vd+' прочитан (наперёд)';
     btn.disabled=true;btn.className='read-btn done';btn.onclick=null;
+  } else if(isFuture){
+    /* Чтение «впрок»: будущий день можно открыть и отметить прочитанным.
+       Стрик от этого не растёт: +1 раз за календарный день (и клиент, и сервер). */
+    btn.textContent='✓ Прочитал день '+vd+' (наперёд)';
+    btn.disabled=false;btn.className='read-btn';
+    btn.onclick=markRead;
   } else if(isDayRead&&isLanding){
     /* Догнали график: непрочитанных дней в пределах «сегодня» не осталось.
        Раньше это было мёртвое состояние (disabled, onclick=null) — пользователь
@@ -1151,7 +1182,7 @@ function goDay(d){
   var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];if(!plan||!prog)return;
   var cur=curDayNum(plan,prog);var landing=nextUnreadDay(plan,prog);
   var vd=(viewDay!==null?viewDay:landing)+d;
-  if(vd<1||vd>cur)return;
+  if(vd<1||vd>plan.days)return;
   viewDay=vd===landing?null:vd;activeTab=0;haptic('light');renderRead();window.scrollTo(0,0);
 }
 function goToday(){viewDay=null;activeTab=0;haptic('light');renderRead();}
@@ -1161,7 +1192,7 @@ async function markRead(){
   var cur=curDayNum(plan,prog);
   var landing=nextUnreadDay(plan,prog);
   var vd=viewDay!==null?viewDay:landing;
-  if(vd>cur)return;
+  if(vd>plan.days)return;
   var t=today(),y=yesterday();
   var ns=prog.streak||0;
   if(prog.lastRead===y)ns++;else if(prog.lastRead!==t)ns=1;
@@ -1183,8 +1214,12 @@ async function markRead(){
   if(ph){ph.textContent=PHRASES[Math.floor(Math.random()*PHRASES.length)];setTimeout(function(){ph.textContent='';},3000);}
   /* После отметки — переходим к следующему непрочитанному дню (если пользователь
      наверстывает пропуски, это позволяет отметить несколько дней подряд за один раз,
-     не теряя ни один из них). */
-  viewDay=null;activeTab=0;
+     не теряя ни один из них). При чтении «впрок» (день за пределами «сегодня»)
+     остаёмся в потоке будущих дней — так можно отметить несколько дней вперёд
+     подряд. Стрик от этого не растёт: и клиент, и сервер добавляют +1 раз
+     за календарный день. */
+  if(vd>cur&&vd<plan.days){viewDay=vd+1;activeTab=0;}
+  else{viewDay=null;activeTab=0;}
   renderRead();
   if(prog.daysDone.length>=plan.days){
     setTimeout(function(){
