@@ -1194,7 +1194,21 @@ function goDay(d){
   if(vd<1||vd>plan.days)return;
   viewDay=vd===landing?null:vd;activeTab=0;haptic('light');renderRead();window.scrollTo(0,0);
 }
-function goToday(){viewDay=null;activeTab=0;haptic('light');renderRead();}
+/* «К непрочитанному». Из обычного вида (вчера/сегодня) — к «сегодняшнему»
+   дню по плану: landing = первый непрочитанный в пределах календарного окна,
+   а когда всё догнано — само «сегодня» (дневной лимит выполнен). Из вида
+   БУДУЩЕГО дня (чтение «впрок») — к первому непрочитанному дню после
+   «сегодня» с учётом уже отмеченных наперёд (пропуская их). */
+function goToday(){
+  var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];
+  var cur=plan&&prog?curDayNum(plan,prog):0;
+  var vd=viewDay!==null?viewDay:0;
+  if(vd>cur&&plan&&prog){
+    var done=prog.daysDone||[];var d;
+    for(d=cur+1;d<=plan.days;d++){if(done.indexOf(d)<0){viewDay=d;activeTab=0;haptic('light');renderRead();return;}}
+  }
+  viewDay=null;activeTab=0;haptic('light');renderRead();
+}
 
 async function markRead(){
   var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];if(!plan||!prog)return;
