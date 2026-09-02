@@ -1135,6 +1135,12 @@ function updReadBtn(tabs,isFuture,isDayRead,isLanding,vd,isPlanDone){
     /* Уже прочитанный «наперёд» день: перечитать можно, отметить заново нельзя. */
     btn.textContent='✓ День '+vd+' прочитан (наперёд)';
     btn.disabled=true;btn.className='read-btn done';btn.onclick=null;
+  } else if(!isLast){
+    /* Чреда фрагментов дня — единая для всех дней, включая будущие (чтение
+       «впрок»): кнопка отметки дня появляется только на ПОСЛЕДНЕМ фрагменте. */
+    btn.textContent='Следующий отрывок ('+(activeTab+2)+'/'+tabs.length+')';
+    btn.disabled=false;btn.className='read-btn';
+    btn.onclick=function(){setTab(activeTab+1);window.scrollTo(0,0);};
   } else if(isFuture){
     /* Чтение «впрок»: будущий день можно открыть и отметить прочитанным.
        Стрик от этого не растёт: +1 раз за календарный день (и клиент, и сервер). */
@@ -1154,10 +1160,6 @@ function updReadBtn(tabs,isFuture,isDayRead,isLanding,vd,isPlanDone){
        неактивная кнопка уместна. */
     btn.textContent='✓ День '+vd+' прочитан';
     btn.disabled=true;btn.className='read-btn done';btn.onclick=null;
-  } else if(!isLast){
-    btn.textContent='Следующий отрывок ('+(activeTab+2)+'/'+tabs.length+')';
-    btn.disabled=false;btn.className='read-btn';
-    btn.onclick=function(){setTab(activeTab+1);window.scrollTo(0,0);};
   } else {
     btn.textContent='✓ Прочитал день '+vd;
     btn.disabled=false;btn.className='read-btn';
