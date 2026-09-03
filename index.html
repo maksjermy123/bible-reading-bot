@@ -1117,11 +1117,13 @@ function updReadBtn(tabs,isFuture,isDayRead,isLanding,vd,isPlanDone){
   var isLast=activeTab>=tabs.length-1;
   var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];
   var cur=plan&&prog?curDayNum(plan,prog):0;
-  /* Кнопка «Хочу прочесть больше»: показывается, когда дневной лимит
-     выполнен (догнали график), но в плане остались дни за пределами
-     «сегодня» — открывает следующий день и разрешает читать впрок. */
+  /* Кнопка «Хочу прочесть больше»: показывается ТОЛЬКО на последнем фрагменте
+     закрытого дня (все перикопы дня пройдены) и когда в плане остались дни
+     за пределами «сегодня» — ведёт на первый непрочитанный день вперёд.
+     На первых фрагментах дня её нет, чтобы не провоцировать перескок через
+     непрочитанное. */
   if(more){
-    var moreShow=!!(!isPlanDone&&plan&&prog&&isDayRead&&isLanding&&cur<plan.days);
+    var moreShow=!!(!isPlanDone&&plan&&prog&&isDayRead&&isLast&&(isLanding||isFuture)&&cur<plan.days);
     more.style.display=moreShow?'block':'none';
     if(moreShow){
       /* Цель — первый НЕпрочитанный день за пределами «сегодня»: после
@@ -1240,8 +1242,13 @@ async function markRead(){
      не теряя ни один из них). При чтении «впрок» (день за пределами «сегодня»)
      остаёмся в потоке будущих дней — так можно отметить несколько дней вперёд
      подряд. Стрик от этого не растёт: и клиент, и сервер добавляют +1 раз
-     за календарный день. */
+     за календарный день.
+     Если день закрыт и календарь догнан (postLanding === vd) — остаёмся на
+     ПОСЛЕДНЕМ фрагменте закрытого дня: рядом появится кнопка «Хочу прочесть
+     больше». Если позади ещё есть непрочитанные дни — к следующему из них. */
+  var postLanding=nextUnreadDay(plan,prog);
   if(vd>cur&&vd<plan.days){viewDay=vd+1;activeTab=0;}
+  else if(postLanding===vd){viewDay=vd;}
   else{viewDay=null;activeTab=0;}
   renderRead();
   if(prog.daysDone.length>=plan.days){
@@ -2205,6 +2212,11 @@ async function init(){
     if(_lastPos&&_lastPos.planId===app.activePlanId&&_lastPos.day
        &&_lastPos.day<=getPlan(app.activePlanId).days){
       viewDay=_lastPos.day;activeTab=_lastPos.tab||0;restored=true;
+      /* Уже отмеченный день (прочитан наперёд или ранее) — открываем с
+         первого фрагмента: кнопка «Хочу прочесть больше» появится только
+         после того, как пользователь дойдёт до последней перикопы дня. */
+      var rp=app.progress[app.activePlanId];
+      if(rp&&(rp.daysDone||[]).indexOf(_lastPos.day)>=0)activeTab=0;
     }else{viewDay=null;}
     goPage('pg-read');renderRead();
     if(restored&&_lastPos.scrollY)setTimeout(function(){window.scrollTo(0,_lastPos.scrollY);},50);
