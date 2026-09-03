@@ -106,6 +106,13 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 .cd.r{background:rgba(46,125,50,.2);color:var(--acc)}
 .cd.t{background:var(--acc);color:#fff}
 .cd.e{background:var(--brd);color:var(--txt2)}
+.cd.f{background:rgba(46,125,50,.5);color:#fff}
+.cd.n{background:var(--brd);opacity:.35}
+.cal-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:10px;color:var(--txt2)}
+.cal-legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px}
+.lg-r{background:rgba(46,125,50,.2)}
+.lg-f{background:rgba(46,125,50,.5)}
+.lg-t{background:var(--acc)}
 .bm-card{background:var(--card);border:1px solid var(--brd);border-radius:9px;padding:11px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
 .bm-card:active{opacity:.7}
 .bm-ref{font-size:13px;font-weight:600;color:var(--acc)}
@@ -292,6 +299,13 @@ var bible=null;
 var app=loadApp();
 var viewDay=null;
 var activeTab=0;
+/* Сессионный маркер прохождения дня: номер дня, по которому пользователь
+   ЯВНО двигался в текущей сессии (клик «Следующий отрывок»/по вкладке) или
+   который только что отметил (markRead). Ставится в setTab(i>0)/markRead,
+   сбрасывается в renderRead при смене отображаемого дня. Нужен, чтобы кнопка
+   «Хочу прочесть больше» не выскакивала мгновенно при повторном открытии
+   уже отмеченного дня из одной перикопы (там фрагмент 1 = последний). */
+var moreArmedDay=null;
 /* Память позиции чтения: при возврате в мини-апп человек попадает туда же,
    где остановился (план, день, вкладка, прокрутка), а не в начало дня. */
 var _lastPos=null;
@@ -1001,6 +1015,11 @@ function renderRead(){
   var cur=curDayNum(plan,prog);
   var landing=nextUnreadDay(plan,prog);
   var vd=viewDay!==null?viewDay:landing;
+  /* Смена отображаемого дня сбрасывает сессионный маркер: после перехода к
+     другому дню кнопка «Хочу прочесть больше» появится только после явного
+     движения по новому дню в этой сессии. Если маркер уже стоит на ЭТОМ дне
+     (пользователь кликал по фрагментам / только что отметил) — сохраняем. */
+  if(moreArmedDay!==null&&moreArmedDay!==vd)moreArmedDay=null;
   var dd=plan.schedule[vd-1];
   if(!dd){
     /* План дочитан (vd за пределами расписания): раньше renderRead молча
@@ -1016,10 +1035,13 @@ function renderRead(){
   var isDayRead=(prog.daysDone||[]).indexOf(vd)>=0;
   var isLanding=vd===landing;
   var lag=Math.max(0,cur-landing);
-  /* Опережение («чтение впрок»): сколько дней подряд, начиная с завтрашнего,
-     уже отмечено прочитанными. Показывается в бейдже, когда долга нет. */
+  /* Опережение («чтение впрок»): сколько БУДУЩИХ дней, начиная с завтрашнего,
+     уже отмечено прочитанными — НЕ обязательно подряд: «дырявое» чтение
+     наперёд (отметил через день) теперь тоже считается полностью. Раньше
+     цикл обрывался (else break) на первой «дырке» и бейдж занижал опережение.
+     Показывается в бейдже, когда долга нет. */
   var ahead=0;
-  if(lag===0){for(var ad=cur+1;ad<=plan.days;ad++){if((prog.daysDone||[]).indexOf(ad)>=0)ahead++;else break;}}
+  if(lag===0){for(var ad=cur+1;ad<=plan.days;ad++){if((prog.daysDone||[]).indexOf(ad)>=0)ahead++;}}
   var el;
   renderStreakBadge(streak,lag,ahead,prog.maxStreak||0);
   el=document.getElementById('s-pct');if(el)el.textContent=pct+'%';
@@ -1121,9 +1143,15 @@ function updReadBtn(tabs,isFuture,isDayRead,isLanding,vd,isPlanDone){
      закрытого дня (все перикопы дня пройдены) и когда в плане остались дни
      за пределами «сегодня» — ведёт на первый непрочитанный день вперёд.
      На первых фрагментах дня её нет, чтобы не провоцировать перескок через
-     непрочитанное. */
+     непрочитанное.
+     Дополнительно требуется сессионный маркер прохождения (moreArmedDay===vd):
+     уже отмеченный день из одной перикопы (фрагмент 1 = последний) при
+     повторном открытии больше НЕ показывает кнопку мгновенно — только после
+     явного движения по дню в этой сессии (клик «Следующий отрывок»/по вкладке)
+     или свежей отметки (markRead). Восстановление позиции ставит activeTab=0
+     и маркер не ставит — пользователь должен «дойти» сам. */
   if(more){
-    var moreShow=!!(!isPlanDone&&plan&&prog&&isDayRead&&isLast&&(isLanding||isFuture)&&cur<plan.days);
+    var moreShow=!!(!isPlanDone&&plan&&prog&&isDayRead&&isLast&&(isLanding||isFuture)&&cur<plan.days&&moreArmedDay===vd);
     more.style.display=moreShow?'block':'none';
     if(moreShow){
       /* Цель — первый НЕпрочитанный день за пределами «сегодня»: после
@@ -1182,6 +1210,10 @@ function setTab(i){
   document.querySelectorAll('.tab').forEach(function(t,idx){t.classList.toggle('on',idx===i);});
   var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];if(!plan||!prog)return;
   var cur=curDayNum(plan,prog);var landing=nextUnreadDay(plan,prog);var vd=viewDay!==null?viewDay:landing;
+  /* Явное движение по дню вперёд в текущей сессии (клик «Следующий отрывок»
+     или по вкладке правее) — ставим сессионный маркер этого дня. Клик по
+     вкладке 0 движением вперёд не считается. */
+  if(i>0)moreArmedDay=vd;
   var dd=plan.schedule[vd-1];if(!dd)return;
   var tabs=buildTabs(dd.refs);
   renderSc(tabs[i]);
@@ -1218,6 +1250,10 @@ async function markRead(){
   var landing=nextUnreadDay(plan,prog);
   var vd=viewDay!==null?viewDay:landing;
   if(vd>plan.days)return;
+  /* Свежая отметка дня в этой сессии — тоже явное действие: маркер ставим,
+     чтобы кнопка «Хочу прочесть больше» появилась сразу после закрытия дня
+     (в т.ч. для дня из одной перикопы). */
+  moreArmedDay=vd;
   var t=today(),y=yesterday();
   var ns=prog.streak||0;
   if(prog.lastRead===y)ns++;else if(prog.lastRead!==t)ns=1;
@@ -1310,13 +1346,18 @@ function toggleCal(){
 function renderCal(plan,prog){
   var grid=document.getElementById('cal-grid');if(!grid)return;
   var start=new Date(prog.startDate+'T00:00:00');var t=today();var h='';
+  /* Сетка рисует ВЕСЬ план, а не только до «сегодня»: прочитанное «впрок»
+     должно быть видно. Классы: t — сегодня; r — прочитан (прошедший день);
+     f — отмечен НАПЕРЁД (будущий день уже закрыт); e — не прочитан;
+     n — будущий, пока пустой (бледнее e, чтобы прошлое/будущее различались). */
   for(var i=0;i<plan.days;i++){
     var d=new Date(start);d.setDate(d.getDate()+i);
-    var ds=localDateStr(d);if(ds>t)break;
-    var isR=(prog.daysDone||[]).indexOf(i+1)>=0;var isT=ds===t;
-    h+='<div class="cd '+(isT?'t':isR?'r':'e')+'">'+d.getDate()+'</div>';
+    var ds=localDateStr(d);var dn=i+1;
+    var isR=(prog.daysDone||[]).indexOf(dn)>=0;var isT=ds===t;var isF=ds>t;
+    var cls=isT?'t':isR?(isF?'f':'r'):(isF?'n':'e');
+    h+='<div class="cd '+cls+'" title="День '+dn+'">'+d.getDate()+'</div>';
   }
-  grid.innerHTML=h;
+  grid.innerHTML=h+'<div class="cal-legend"><span><i class="lg-r"></i>прочитан</span><span><i class="lg-f"></i>наперёд</span><span><i class="lg-t"></i>сегодня</span></div>';
 }
 
 function addBm(){
@@ -2214,7 +2255,11 @@ async function init(){
       viewDay=_lastPos.day;activeTab=_lastPos.tab||0;restored=true;
       /* Уже отмеченный день (прочитан наперёд или ранее) — открываем с
          первого фрагмента: кнопка «Хочу прочесть больше» появится только
-         после того, как пользователь дойдёт до последней перикопы дня. */
+         после того, как пользователь дойдёт до последней перикопы дня.
+         Для многоперикопного дня — после явного прохождения фрагментов
+         (сессионный маркер moreArmedDay ставится кликами в setTab); день из
+         одной перикопы при повторном открытии кнопку не показывает вовсе —
+         возобновить чтение вперёд можно через «К непрочитанному». */
       var rp=app.progress[app.activePlanId];
       if(rp&&(rp.daysDone||[]).indexOf(_lastPos.day)>=0)activeTab=0;
     }else{viewDay=null;}
