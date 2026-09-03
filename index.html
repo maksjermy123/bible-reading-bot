@@ -113,6 +113,8 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 .lg-r{background:rgba(46,125,50,.2)}
 .lg-f{background:rgba(46,125,50,.5)}
 .lg-t{background:var(--acc)}
+.lg-e{background:var(--brd)}
+.lg-n{background:var(--brd);opacity:.35}
 .bm-card{background:var(--card);border:1px solid var(--brd);border-radius:9px;padding:11px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
 .bm-card:active{opacity:.7}
 .bm-ref{font-size:13px;font-weight:600;color:var(--acc)}
@@ -1154,10 +1156,16 @@ function updReadBtn(tabs,isFuture,isDayRead,isLanding,vd,isPlanDone){
     var moreShow=!!(!isPlanDone&&plan&&prog&&isDayRead&&isLast&&(isLanding||isFuture)&&cur<plan.days&&moreArmedDay===vd);
     more.style.display=moreShow?'block':'none';
     if(moreShow){
-      /* Цель — первый НЕпрочитанный день за пределами «сегодня»: после
-         предыдущей сессии чтения вперёд день cur+1 может быть уже отмечен. */
+      /* Цель — первый НЕпрочитанный день СТРОГО вперёд от открытого дня vd:
+         при «дырках» в чтении наперёд поиск от cur+1 мог выбрать день МЕНЬШЕ
+         текущего (vd=10, дырка на 6 → пугающий прыжок назад). Сначала ищем
+         после vd; если впереди всё закрыто — самую раннюю дырку после cur
+         (заполнить пропуск полезнее, чем прятать кнопку), в крайнем случае —
+         самый ранний непрочитанный день плана вообще. */
       var nextAhead=0;
-      for(var ad2=cur+1;ad2<=plan.days;ad2++){if((prog.daysDone||[]).indexOf(ad2)<0){nextAhead=ad2;break;}}
+      for(var ad2=vd+1;ad2<=plan.days;ad2++){if((prog.daysDone||[]).indexOf(ad2)<0){nextAhead=ad2;break;}}
+      if(!nextAhead)for(var ad3=cur+1;ad3<vd;ad3++){if((prog.daysDone||[]).indexOf(ad3)<0){nextAhead=ad3;break;}}
+      if(!nextAhead)for(var ad4=1;ad4<=plan.days;ad4++){if((prog.daysDone||[]).indexOf(ad4)<0){nextAhead=ad4;break;}}
       if(!nextAhead){more.style.display='none';}
       else more.onclick=function(){viewDay=nextAhead;activeTab=0;haptic('light');renderRead();window.scrollTo(0,0);};
     }
@@ -1357,7 +1365,7 @@ function renderCal(plan,prog){
     var cls=isT?'t':isR?(isF?'f':'r'):(isF?'n':'e');
     h+='<div class="cd '+cls+'" title="День '+dn+'">'+d.getDate()+'</div>';
   }
-  grid.innerHTML=h+'<div class="cal-legend"><span><i class="lg-r"></i>прочитан</span><span><i class="lg-f"></i>наперёд</span><span><i class="lg-t"></i>сегодня</span></div>';
+  grid.innerHTML=h+'<div class="cal-legend"><span><i class="lg-r"></i>прочитан</span><span><i class="lg-f"></i>наперёд</span><span><i class="lg-t"></i>сегодня</span><span><i class="lg-e"></i>пропущен</span><span><i class="lg-n"></i>впереди</span></div>';
 }
 
 function addBm(){
