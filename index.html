@@ -130,6 +130,12 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 .prev-box{font-size:12px;color:var(--txt2);padding:8px;background:var(--acc2);border-radius:7px;margin-bottom:10px;line-height:1.5}
 .chan-ban{display:flex;align-items:center;gap:12px;background:var(--card);border:2px solid var(--brd);border-radius:var(--rad);padding:16px;margin-top:10px;margin-bottom:10px;text-decoration:none;cursor:pointer;transition:border-color .15s}
 .chan-ban:active{opacity:.7}
+/* Футер приложения: версия и подпись о поддержке канала — мелкий шрифт,
+   приглушённые тона; имя канала — ТА ЖЕ ссылка, что в баннере-кнопке,
+   но оформлена незаметно (скрытая ссылка: цвет текста, пунктир). */
+.app-foot{margin-top:18px;padding:12px 0 2px;text-align:center;font-size:10.5px;line-height:1.7;color:var(--txt2);opacity:.8}
+.app-foot a{color:var(--txt2);text-decoration:none;border-bottom:1px dotted var(--brd)}
+.app-foot a:active{opacity:.6}
 .chan-ico{font-size:28px}
 .chan-txt{flex:1;font-size:13px;color:var(--txt2);line-height:1.4}
 .chan-txt b{color:var(--txt);font-size:15px;font-weight:700;display:block}
@@ -356,6 +362,9 @@ function saveApp(){try{localStorage.setItem('bapp3',JSON.stringify(app));}catch(
    Версия BIBLE_CACHE_VER меняется при обновлении bible_synodal.json - тогда кэш
    инвалидируется. При любой ошибке (квота, битый JSON) - тихий фолбэк на сеть. */
 var BIBLE_CACHE_VER='v1';
+/* Версия приложения для футера: повышать при значимых изменениях
+   (модель чтения, новые экраны). Формат: мажор.минор.патч. */
+var APP_VERSION='1.1.0';
 async function loadBible(){
   if(bible)return;
   var raw=null;
@@ -2267,6 +2276,7 @@ async function init(){
       app.activePlanId=urlPlanId;
     }
   }catch(e){}
+  initFoot();
   var pgLoad=document.getElementById('pg-load');if(pgLoad)pgLoad.style.display='none';
   if(!app.onboarded){renderOb();goPage('pg-ob');}
   else if(app.activePlanId&&getPlan(app.activePlanId)){
@@ -2291,6 +2301,18 @@ async function init(){
   else{renderSel();goPage('pg-sel');}
   initCon();
   if(!bible){loadBible().catch(function(){});}
+}
+/* Футер: одна разметка, инъекция в конец основных страниц. Не ставим на
+   онбординг (pg-ob) и визарды выбора плана (pg-con/pg-setup) — там экран
+   должен оставаться чистым. insertAdjacentHTML идемпотентен (querySelector
+   проверка) — повторные init() не дублируют футер. */
+var FOOT_PAGES=['pg-sel','pg-read','pg-seq','pg-bm','pg-cfg','pg-done'];
+function initFoot(){
+  var h='<div class="app-foot">Версия '+APP_VERSION+' · Создано при поддержке телеграм-канала <a href="https://t.me/Chtenie_Preobrazenie" target="_blank" rel="noopener">«От чтения к Преображению»</a></div>';
+  for(var i=0;i<FOOT_PAGES.length;i++){
+    var pg=document.getElementById(FOOT_PAGES[i]);
+    if(pg&&!pg.querySelector('.app-foot'))pg.insertAdjacentHTML('beforeend',h);
+  }
 }
 init();
 /* Страховка от зависания загрузочного экрана: что бы ни случилось (упавший
