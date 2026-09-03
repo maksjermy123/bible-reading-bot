@@ -160,7 +160,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 <div id="pg-load"><div class="spin">📖</div><div style="font-size:15px;color:var(--acc);font-weight:600">Загружаем Библию...</div><div style="font-size:12px;color:var(--txt2)">Пожалуйста, подождите</div></div>
 <div class="pg" id="pg-ob"><div class="ob-wrap"><div class="ob-em" id="ob-em">📖</div><div class="ob-t" id="ob-t">Читай Библию каждый день</div><div class="ob-tx" id="ob-tx">Выбери план по силам и читай Слово Божье каждый день</div><div class="ob-dots"><div class="od on" id="od0"></div><div class="od" id="od1"></div><div class="od" id="od2"></div></div><button class="btn btn-acc" onclick="obNext()">Далее</button></div></div>
 <div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="plan-list"></div><div class="card" style="cursor:pointer" onclick="goPage('pg-seq');initSeq()"><div class="card-top"><div class="card-ico">📜</div><div class="card-info"><div class="card-title">Свободное чтение</div><div class="card-meta">Свободное чтение, без графика</div></div><div class="badge">Гибкий</div></div></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span class="chan-ico">📻</span><span class="chan-txt">Канал<b>«От чтения к Преображению»</b></span><span class="chan-arrow">→</span></a></div>
-<div class="pg" id="pg-read"><div class="topbar"><button class="streak-btn" id="streak-badge" onclick="toggleStats()"><span style="font-size:20px" id="streak-ico">🔥</span><span class="streak-n" id="r-streak">0</span><span class="streak-l" id="r-streak-l">дней подряд</span></button><div style="display:flex;gap:5px"><button class="ico-btn" onclick="cycleTheme()" id="theme-btn">☀️</button><button class="ico-btn" onclick="goPage('pg-cfg')">⚙️</button></div></div><div id="stats-panel" style="display:none"><div class="stats-box"><div class="sg"><div class="si"><div class="sv" id="s-pct">0%</div><div class="sk">выполнено</div></div><div class="si"><div class="sv" id="s-done">0</div><div class="sk">дней готово</div></div><div class="si"><div class="sv" id="s-left">0</div><div class="sk">осталось</div></div><div class="si"><div class="sv" id="s-streak">0</div><div class="sk">дней подряд</div></div><div class="si"><div class="sv" id="s-max">0</div><div class="sk">рекорд</div></div><div class="si"><div class="sv" id="s-start">—</div><div class="sk">начат</div></div></div><div class="pb"><div class="pf" id="s-bar" style="width:0%"></div></div><div class="pl" id="s-plan-t"></div><button class="sec-tog" onclick="toggleCal()">📅 Календарь <span id="cal-arr">▼</span></button><div id="cal-wrap" style="display:none"><div class="cal-grid" id="cal-grid"></div></div></div></div><div class="cstat" id="r-cstat"></div><div class="pb" style="margin-bottom:10px"><div class="pf" id="r-bar" style="width:0%"></div></div><div class="day-nav"><button class="nav-btn" id="btn-prev" onclick="goDay(-1)">←</button><div class="day-info"><div class="day-n" id="r-day-n">День 1</div><div class="day-d" id="r-day-d"></div></div><button class="nav-btn" id="btn-next" onclick="goDay(1)">→</button></div><div id="to-today" style="margin-bottom:10px;display:none"><button onclick="goToday()" style="width:100%;font-size:15px;font-weight:800;color:#fff;background:var(--acc);border:none;border-radius:10px;padding:13px;cursor:pointer;font-family:var(--fui);box-shadow:0 3px 12px rgba(0,0,0,.18)">📖 К непрочитанному →</button></div><div class="ref-lbl"><span id="r-ref">—</span><button class="ico-btn" onclick="addBm()">⭐</button></div><div class="tabs" id="r-tabs"></div><div class="sc" id="r-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button><button class="read-btn alt" id="r-more-btn" style="display:none" type="button">📚 Хочу прочесть больше</button><a class="tlink" id="r-tlink" target="_blank"><span style="font-size:16px">📚</span> Читать другой перевод</a><div class="phrase" id="r-phrase"></div></div>
+<div class="pg" id="pg-read"><div class="topbar"><button class="streak-btn" id="streak-badge" onclick="toggleStats()"><span style="font-size:20px" id="streak-ico">🔥</span><span class="streak-n" id="r-streak">0</span><span class="streak-l" id="r-streak-l">дней подряд</span></button><div style="display:flex;gap:5px"><button class="ico-btn" onclick="cycleTheme()" id="theme-btn">☀️</button><button class="ico-btn" onclick="goPage('pg-cfg')">⚙️</button></div></div><div id="stats-panel" style="display:none"><div class="stats-box"><div class="sg"><div class="si"><div class="sv" id="s-pct">0%</div><div class="sk">выполнено</div></div><div class="si"><div class="sv" id="s-done">0</div><div class="sk">дней готово</div></div><div class="si"><div class="sv" id="s-left">0</div><div class="sk">осталось</div></div><div class="si"><div class="sv" id="s-streak">0</div><div class="sk">дней подряд</div></div><div class="si"><div class="sv" id="s-max">0</div><div class="sk">рекорд</div></div><div class="si"><div class="sv" id="s-start">—</div><div class="sk">начат</div></div></div><div class="pb"><div class="pf" id="s-bar" style="width:0%"></div></div><div class="pl" id="s-plan-t"></div><button class="sec-tog" onclick="toggleCal()">📅 Календарь <span id="cal-arr">▼</span></button><div id="cal-wrap" style="display:none"><div class="cal-grid" id="cal-grid"></div></div></div></div><div class="cstat" id="r-cstat"></div><div class="pb" style="margin-bottom:10px"><div class="pf" id="r-bar" style="width:0%"></div></div><div class="day-nav"><button class="nav-btn" id="btn-prev" onclick="goDay(-1)">←</button><div class="day-info"><div class="day-n" id="r-day-n">День 1</div><div class="day-d" id="r-day-d"></div></div><button class="nav-btn" id="btn-next" onclick="goDay(1)">→</button></div><div id="to-today" style="margin-bottom:10px;display:none"><button onclick="goToday()" style="width:100%;font-size:15px;font-weight:800;color:#fff;background:var(--acc);border:none;border-radius:10px;padding:13px;cursor:pointer;font-family:var(--fui);box-shadow:0 3px 12px rgba(0,0,0,.18)">📖 К непрочитанному →</button></div><div class="ref-lbl"><span id="r-ref">—</span><button class="ico-btn" onclick="addBm()">⭐</button></div><div class="tabs" id="r-tabs"></div><div class="sc" id="r-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button><button class="read-btn alt" id="r-more-btn" style="display:none" type="button">📚 Хочу прочесть следующий день</button><a class="tlink" id="r-tlink" target="_blank"><span style="font-size:16px">📚</span> Читать другой перевод</a><div class="phrase" id="r-phrase"></div></div>
 <div class="pg" id="pg-seq"><div class="hdr"><h1>📜 Свободное чтение</h1></div><div class="seq-nav"><select class="seq-sel" id="seq-book" onchange="seqBook()"></select><select class="seq-sel" id="seq-ch" onchange="seqRender()"></select></div><div class="sc" id="seq-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-out" style="margin-top:0;flex:1" onclick="seqPrev()">← Назад</button><button class="btn btn-acc" style="margin-top:0;flex:1" onclick="seqNext()">Далее →</button></div><button class="btn btn-out" style="margin-top:8px" onclick="addSeqBm()">⭐ Закладка</button><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
 <div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div id="con-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="con-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="con-not-tog" onclick="conTogNot()"></button></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Выбрать план</button><button class="btn btn-out" onclick="conEditId=null;conChrono=false;goPage('pg-sel');renderSel()">Вернуться</button></div>
 <div class="pg" id="pg-setup"><div class="hdr"><h1 id="setup-title">📖 План</h1></div><div class="prev-box" id="setup-meta" style="margin-bottom:14px"></div><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="setup-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="setup-not-tog" onclick="setupTogNot()"></button></div><button class="btn btn-acc" onclick="startPlan()">Выбрать план</button><button class="btn btn-out" onclick="setupBack()">Вернуться</button></div>
@@ -305,7 +305,7 @@ var activeTab=0;
    ЯВНО двигался в текущей сессии (клик «Следующий отрывок»/по вкладке) или
    который только что отметил (markRead). Ставится в setTab(i>0)/markRead,
    сбрасывается в renderRead при смене отображаемого дня. Нужен, чтобы кнопка
-   «Хочу прочесть больше» не выскакивала мгновенно при повторном открытии
+   «Хочу прочесть следующий день» не выскакивала мгновенно при повторном открытии
    уже отмеченного дня из одной перикопы (там фрагмент 1 = последний). */
 var moreArmedDay=null;
 /* Память позиции чтения: при возврате в мини-апп человек попадает туда же,
@@ -929,17 +929,21 @@ function dayWord(n){
   if(r>=2&&r<=4)return 'дня';
   return 'дней';
 }
-/* Возвращает первый ещё непрочитанный день (а не сегодняшний календарный день).
-   Если пользователь пропустил дни 4-6 и сейчас 7-й календарный день — вернёт 4,
-   чтобы он не терял пропущенные дни, а последовательно наверстал их.
-   Если пробелов нет — вернёт cur (как и раньше). */
+/* Возвращает ПОЗИЦИЮ чтения — первый непрочитанный день ВСЕГО плана.
+   Дырки в прошлом наверстываются первыми: пропустил дни 4-6 при 7-м
+   календарном — вернёт 4. Чтение «впрок» двигает позицию, а не календарь:
+   прочёл дни 1-10 при 2-м дне — вернёт 11 («следующий мой день»).
+   Позиция = единственный день, где активна отметка «Прочитал»; остальные дни
+   открываются для просмотра, но подтверждение на них закрыто (замок) —
+   доступ вперёд выдаётся строго по одному дню через
+   «Хочу прочесть следующий день». Все дни закрыты → plan.days+1 (экран
+   «план прочитан»). */
 function nextUnreadDay(plan,prog){
-  var cur=curDayNum(plan,prog);
   var done=prog.daysDone||[];
-  for(var d=1;d<=cur;d++){
+  for(var d=1;d<=plan.days;d++){
     if(done.indexOf(d)<0)return d;
   }
-  return cur;
+  return plan.days+1;
 }
 /* Перикопная версия: отрезок может пересекать главы ({c1,v1,c2,v2}),
    старый формат {ch,vf,vt} тоже поддерживается. title - заголовок перикопы. */
@@ -1018,7 +1022,7 @@ function renderRead(){
   var landing=nextUnreadDay(plan,prog);
   var vd=viewDay!==null?viewDay:landing;
   /* Смена отображаемого дня сбрасывает сессионный маркер: после перехода к
-     другому дню кнопка «Хочу прочесть больше» появится только после явного
+     другому дню кнопка «Хочу прочесть следующий день» появится только после явного
      движения по новому дню в этой сессии. Если маркер уже стоит на ЭТОМ дне
      (пользователь кликал по фрагментам / только что отметил) — сохраняем. */
   if(moreArmedDay!==null&&moreArmedDay!==vd)moreArmedDay=null;
@@ -1141,32 +1145,28 @@ function updReadBtn(tabs,isFuture,isDayRead,isLanding,vd,isPlanDone){
   var isLast=activeTab>=tabs.length-1;
   var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];
   var cur=plan&&prog?curDayNum(plan,prog):0;
-  /* Кнопка «Хочу прочесть больше»: показывается ТОЛЬКО на последнем фрагменте
-     закрытого дня (все перикопы дня пройдены) и когда в плане остались дни
-     за пределами «сегодня» — ведёт на первый непрочитанный день вперёд.
+  var landing=plan&&prog?nextUnreadDay(plan,prog):0;
+  /* Кнопка «Хочу прочесть следующий день»: показывается ТОЛЬКО на последнем
+     фрагменте закрытого дня (все перикопы пройдены) и ведёт РОВНО на один
+     следующий день (vd+1) — открывает его для чтения и отметки: позиция
+     чтения после закрытия vd и так сдвинулась на vd+1. Цепочка «день за
+     днём»: закрыл → кнопка → следующий день → закрыл → кнопка…
      На первых фрагментах дня её нет, чтобы не провоцировать перескок через
      непрочитанное.
-     Дополнительно требуется сессионный маркер прохождения (moreArmedDay===vd):
-     уже отмеченный день из одной перикопы (фрагмент 1 = последний) при
-     повторном открытии больше НЕ показывает кнопку мгновенно — только после
+     Требуется сессионный маркер прохождения (moreArmedDay===vd): уже
+     отмеченный день из одной перикопы (фрагмент 1 = последний) при
+     повторном открытии НЕ показывает кнопку мгновенно — только после
      явного движения по дню в этой сессии (клик «Следующий отрывок»/по вкладке)
      или свежей отметки (markRead). Восстановление позиции ставит activeTab=0
      и маркер не ставит — пользователь должен «дойти» сам. */
   if(more){
-    var moreShow=!!(!isPlanDone&&plan&&prog&&isDayRead&&isLast&&(isLanding||isFuture)&&cur<plan.days&&moreArmedDay===vd);
+    var moreShow=!!(!isPlanDone&&plan&&prog&&isDayRead&&isLast&&vd<plan.days&&moreArmedDay===vd);
     more.style.display=moreShow?'block':'none';
     if(moreShow){
-      /* Цель — первый НЕпрочитанный день СТРОГО вперёд от открытого дня vd:
-         при «дырках» в чтении наперёд поиск от cur+1 мог выбрать день МЕНЬШЕ
-         текущего (vd=10, дырка на 6 → пугающий прыжок назад). Сначала ищем
-         после vd; если впереди всё закрыто — самую раннюю дырку после cur
-         (заполнить пропуск полезнее, чем прятать кнопку), в крайнем случае —
-         самый ранний непрочитанный день плана вообще. */
-      var nextAhead=0;
-      for(var ad2=vd+1;ad2<=plan.days;ad2++){if((prog.daysDone||[]).indexOf(ad2)<0){nextAhead=ad2;break;}}
-      if(!nextAhead)for(var ad3=cur+1;ad3<vd;ad3++){if((prog.daysDone||[]).indexOf(ad3)<0){nextAhead=ad3;break;}}
-      if(!nextAhead)for(var ad4=1;ad4<=plan.days;ad4++){if((prog.daysDone||[]).indexOf(ad4)<0){nextAhead=ad4;break;}}
-      if(!nextAhead){more.style.display='none';}
+      /* Цель — СТРОГО следующий день (vd+1): доступ вперёд выдаётся по одному
+         дню, а не «до первого свободного места», как раньше. */
+      var nextAhead=vd+1;
+      if(nextAhead>plan.days){more.style.display='none';}
       else more.onclick=function(){viewDay=nextAhead;activeTab=0;haptic('light');renderRead();window.scrollTo(0,0);};
     }
   }
@@ -1186,29 +1186,31 @@ function updReadBtn(tabs,isFuture,isDayRead,isLanding,vd,isPlanDone){
     btn.textContent='Следующий отрывок ('+(activeTab+2)+'/'+tabs.length+')';
     btn.disabled=false;btn.className='read-btn';
     btn.onclick=function(){setTab(activeTab+1);window.scrollTo(0,0);};
-  } else if(isFuture){
-    /* Чтение «впрок»: будущий день можно открыть и отметить прочитанным.
-       Стрик от этого не растёт: +1 раз за календарный день (и клиент, и сервер). */
+  } else if(isFuture&&vd===landing){
+    /* Чтение «впрок»: отметить будущий день можно ТОЛЬКО на позиции чтения
+       (первый непрочитанный день плана). Листание стрелками вперёд остаётся
+       свободным для просмотра, но подтверждение на чужих днях закрыто —
+       доступ выдаётся по одному дню через «Хочу прочесть следующий день».
+       Стрик от чтения впрок не растёт: +1 раз за календарный день. */
     btn.textContent='✓ Прочитал день '+vd+' (наперёд)';
     btn.disabled=false;btn.className='read-btn';
     btn.onclick=markRead;
-  } else if(isDayRead&&isLanding){
-    /* Догнали график: непрочитанных дней в пределах «сегодня» не осталось.
-       Раньше это было мёртвое состояние (disabled, onclick=null) — пользователь
-       воспринимал как зависание, особенно при нескольких планах, созданных
-       одним днём. Теперь кнопка активна и ведёт к выбору плана. */
-    btn.textContent='🌅 На сегодня всё';
-    btn.disabled=false;btn.className='read-btn';
-    btn.onclick=function(){goPage('pg-sel');};
   } else if(isDayRead){
     /* Просмотр уже прочитанного дня через календарь/стрелки: только тут
        неактивная кнопка уместна. */
     btn.textContent='✓ День '+vd+' прочитан';
     btn.disabled=true;btn.className='read-btn done';btn.onclick=null;
-  } else {
+  } else if(vd===landing){
+    /* Позиция чтения (первый непрочитанный день плана) — единственное место,
+       где отметка активна (обычный поток и наверстывание дырок). */
     btn.textContent='✓ Прочитал день '+vd;
     btn.disabled=false;btn.className='read-btn';
     btn.onclick=markRead;
+  } else {
+    /* Непрочитанный день НЕ на позиции (дырка позади позиции или будущий день,
+       открытый листанием): просмотр разрешён, подтверждение закрыто. */
+    btn.textContent='🔒 Сначала закройте день '+landing;
+    btn.disabled=true;btn.className='read-btn';btn.onclick=null;
   }
 }
 
@@ -1236,19 +1238,12 @@ function goDay(d){
   if(vd<1||vd>plan.days)return;
   viewDay=vd===landing?null:vd;activeTab=0;haptic('light');renderRead();window.scrollTo(0,0);
 }
-/* «К непрочитанному». Из обычного вида (вчера/сегодня) — к «сегодняшнему»
-   дню по плану: landing = первый непрочитанный в пределах календарного окна,
-   а когда всё догнано — само «сегодня» (дневной лимит выполнен). Из вида
-   БУДУЩЕГО дня (чтение «впрок») — к первому непрочитанному дню после
-   «сегодня» с учётом уже отмеченных наперёд (пропуская их). */
+/* «К непрочитанному» — из ЛЮБОГО дня ведёт на позицию чтения (первый
+   непрочитанный день ВСЕГО плана): с перечитываемых прошлых дней, с
+   отмеченных наперёд и с будущих дней, открытых простым листанием. Прочёл
+   дни 1-10 при 2-м календарном — кнопка с любого дня вернёт на день 11.
+   На самой позиции кнопка скрыта (renderRead: display=!isLanding). */
 function goToday(){
-  var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];
-  var cur=plan&&prog?curDayNum(plan,prog):0;
-  var vd=viewDay!==null?viewDay:0;
-  if(vd>cur&&plan&&prog){
-    var done=prog.daysDone||[];var d;
-    for(d=cur+1;d<=plan.days;d++){if(done.indexOf(d)<0){viewDay=d;activeTab=0;haptic('light');renderRead();return;}}
-  }
   viewDay=null;activeTab=0;haptic('light');renderRead();
 }
 
@@ -1259,7 +1254,7 @@ async function markRead(){
   var vd=viewDay!==null?viewDay:landing;
   if(vd>plan.days)return;
   /* Свежая отметка дня в этой сессии — тоже явное действие: маркер ставим,
-     чтобы кнопка «Хочу прочесть больше» появилась сразу после закрытия дня
+     чтобы кнопка «Хочу прочесть следующий день» появилась сразу после закрытия дня
      (в т.ч. для дня из одной перикопы). */
   moreArmedDay=vd;
   var t=today(),y=yesterday();
@@ -1281,19 +1276,13 @@ async function markRead(){
   saveApp();haptic('success');
   var ph=document.getElementById('r-phrase');
   if(ph){ph.textContent=PHRASES[Math.floor(Math.random()*PHRASES.length)];setTimeout(function(){ph.textContent='';},3000);}
-  /* После отметки — переходим к следующему непрочитанному дню (если пользователь
-     наверстывает пропуски, это позволяет отметить несколько дней подряд за один раз,
-     не теряя ни один из них). При чтении «впрок» (день за пределами «сегодня»)
-     остаёмся в потоке будущих дней — так можно отметить несколько дней вперёд
-     подряд. Стрик от этого не растёт: и клиент, и сервер добавляют +1 раз
-     за календарный день.
-     Если день закрыт и календарь догнан (postLanding === vd) — остаёмся на
-     ПОСЛЕДНЕМ фрагменте закрытого дня: рядом появится кнопка «Хочу прочесть
-     больше». Если позади ещё есть непрочитанные дни — к следующему из них. */
-  var postLanding=nextUnreadDay(plan,prog);
-  if(vd>cur&&vd<plan.days){viewDay=vd+1;activeTab=0;}
-  else if(postLanding===vd){viewDay=vd;}
-  else{viewDay=null;activeTab=0;}
+  /* После отметки остаёмся на закрытом дне (на последнем фрагменте): рядом
+     появляется «Хочу прочесть следующий день» — тап открывает РОВНО один
+     следующий день, где отметка уже активна (позиция чтения сдвинулась на
+     vd+1). Автопрыжки «к следующему дню/дырке» убраны: продвижение теперь
+     только явными тапами по кнопке, по одному дню. Стрик не меняется:
+     +1 раз за календарный день (и клиент, и сервер). */
+  viewDay=vd;
   renderRead();
   if(prog.daysDone.length>=plan.days){
     setTimeout(function(){
@@ -2262,7 +2251,7 @@ async function init(){
        &&_lastPos.day<=getPlan(app.activePlanId).days){
       viewDay=_lastPos.day;activeTab=_lastPos.tab||0;restored=true;
       /* Уже отмеченный день (прочитан наперёд или ранее) — открываем с
-         первого фрагмента: кнопка «Хочу прочесть больше» появится только
+         первого фрагмента: кнопка «Хочу прочесть следующий день» появится только
          после того, как пользователь дойдёт до последней перикопы дня.
          Для многоперикопного дня — после явного прохождения фрагментов
          (сессионный маркер moreArmedDay ставится кликами в setTab); день из
