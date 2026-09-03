@@ -793,7 +793,7 @@ async function startPlan(){
   if(!app.settings)app.settings={};
   app.settings.notifyTime=time;app.settings.notifyHourMsk=msk.hour;app.settings.notifyMinuteMsk=msk.minute;
   app.activePlanId=selPlanId;
-  app.progress[selPlanId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyTime:time,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings.notifyOn!==false};
+  app.progress[selPlanId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],pericopePos:{},notifyTime:time,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings.notifyOn!==false};
   saveApp();
   if(userId){try{var _r0=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:selPlanId,title:(getPlan(selPlanId)||{}).title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.settings.notifyOn!==false,init_data:tgInitData})});syncBadge(_r0.ok);}catch(e){syncBadge(false);}}
   haptic('success');viewDay=null;goPage('pg-read');renderRead();
@@ -1040,6 +1040,15 @@ function renderRead(){
   var isTod=prog.lastRead===today();
   var isDayRead=(prog.daysDone||[]).indexOf(vd)>=0;
   var isLanding=vd===landing;
+  /* ВНУТРИДНЕВНАЯ ЗАКЛАДКА — единая точка восстановления: на позиции чтения
+     (vd===landing) открываем самую дальнюю достигнутую перикопу, а не первую.
+     Прочёл 3 из 5, ушёл стрелками/закрыл апп — «К непрочитанному» и любое
+     открытие позиции вернёт на перикопу 3, где остановился (недочитанную),
+     а не на начало дня. Закладка не отодвигается перечитыванием назад и
+     удаляется markRead'ом при закрытии дня. clamp ниже (activeTab>=tabs.length
+     →0) страхует от изменившегося расписания. Другие дни (viewDay!==null)
+     не трогаем: там закладку ставят сами переходы (goDay/more-кнопка). */
+  if(isLanding){activeTab=((prog.pericopePos||{})[vd]||0);}
   var lag=Math.max(0,cur-landing);
   /* Опережение («чтение впрок»): сколько БУДУЩИХ дней, начиная с завтрашнего,
      уже отмечено прочитанными — НЕ обязательно подряд: «дырявое» чтение
@@ -1167,7 +1176,9 @@ function updReadBtn(tabs,isFuture,isDayRead,isLanding,vd,isPlanDone){
          дню, а не «до первого свободного места», как раньше. */
       var nextAhead=vd+1;
       if(nextAhead>plan.days){more.style.display='none';}
-      else more.onclick=function(){viewDay=nextAhead;activeTab=0;haptic('light');renderRead();window.scrollTo(0,0);};
+      else more.onclick=function(){/* закладка следующего дня, если там уже
+        листали перикопы стрелками: вернёмся к последней достигнутой */
+        viewDay=nextAhead;activeTab=((prog.pericopePos||{})[nextAhead]||0);haptic('light');renderRead();window.scrollTo(0,0);};
     }
   }
   if(isPlanDone){
@@ -1224,6 +1235,14 @@ function setTab(i){
      или по вкладке правее) — ставим сессионный маркер этого дня. Клик по
      вкладке 0 движением вперёд не считается. */
   if(i>0)moreArmedDay=vd;
+  /* ВНУТРИДНЕВНАЯ ЗАКЛАДКА: запоминаем самую дальнюю достигнутую перикопу
+     дня (вкладки и «Следующий отрывок» идут через setTab). Движение НАЗАД
+     (перечитывание) закладку не отодвигает — терять прогресс нельзя.
+     Хранится в progress плана (localStorage), переживает перезапуск аппа.
+     В СТРИК не идёт: стрик растёт только в markRead при отметке целого дня.
+     Старые сохранения без поля переносятся guard'ом (pericopePos||{}). */
+  if(i>0){var _pp=prog.pericopePos||(prog.pericopePos={});
+    if(i>(_pp[vd]||0)){_pp[vd]=i;saveApp();}}
   var dd=plan.schedule[vd-1];if(!dd)return;
   var tabs=buildTabs(dd.refs);
   renderSc(tabs[i]);
@@ -1236,15 +1255,18 @@ function goDay(d){
   var cur=curDayNum(plan,prog);var landing=nextUnreadDay(plan,prog);
   var vd=(viewDay!==null?viewDay:landing)+d;
   if(vd<1||vd>plan.days)return;
-  viewDay=vd===landing?null:vd;activeTab=0;haptic('light');renderRead();window.scrollTo(0,0);
+  viewDay=vd===landing?null:vd;activeTab=((prog.pericopePos||{})[vd]||0);haptic('light');renderRead();window.scrollTo(0,0);
 }
 /* «К непрочитанному» — из ЛЮБОГО дня ведёт на позицию чтения (первый
    непрочитанный день ВСЕГО плана): с перечитываемых прошлых дней, с
    отмеченных наперёд и с будущих дней, открытых простым листанием. Прочёл
    дни 1-10 при 2-м календарном — кнопка с любого дня вернёт на день 11.
+   Внутридневная позиция НЕ теряется: viewDay=null → renderRead восстановит
+   закладку (самую дальнюю достигнутую перикопу позиции), а не перикопу 1.
    На самой позиции кнопка скрыта (renderRead: display=!isLanding). */
 function goToday(){
-  viewDay=null;activeTab=0;haptic('light');renderRead();
+  viewDay=null;activeTab=0;haptic('light');renderRead(); /* activeTab=0
+    перезапишется восстановлением закладки в renderRead (vd===landing) */
 }
 
 async function markRead(){
@@ -1264,6 +1286,9 @@ async function markRead(){
   prog.streak=ns;prog.lastRead=t;
   if(!prog.daysDone)prog.daysDone=[];
   if(prog.daysDone.indexOf(vd)<0)prog.daysDone.push(vd);
+  /* День закрыт — внутридневная закладка этого дня больше не нужна:
+   повторное чтение закрытого дня начинается с первой перикопы. */
+  if(prog.pericopePos)delete prog.pericopePos[vd];
   /* Раньше здесь был toast «Отменить» с откатом локального состояния и
      POST /plan/unread. Удалён по решению владельца: откат ненадёжен по
      построению — ответ /plan/read мог прийти ПОСЛЕ отката и вернуть
@@ -1778,7 +1803,7 @@ async function startCustom(){
   var msk=localTimeToMsk(defTime);
   if(!app.settings)app.settings={};
   app.settings.notifyTime=defTime;app.settings.notifyHourMsk=msk.hour;app.settings.notifyMinuteMsk=msk.minute;
-  app.progress[planId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],notifyTime:defTime,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings?app.settings.notifyOn!==false:true};
+  app.progress[planId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],pericopePos:{},notifyTime:defTime,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings?app.settings.notifyOn!==false:true};
   saveApp();haptic('success');viewDay=null;goPage('pg-read');renderRead();
   if(userId){
     try{var _r2=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,title:title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.progress[planId].notifyOn,init_data:tgInitData})});syncBadge(_r2.ok);}catch(e){syncBadge(false);}
