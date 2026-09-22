@@ -758,19 +758,21 @@ async function migratePlanSlots(){
     var keep=_pickKeeper(chronoIds);
     for(var i=0;i<chronoIds.length;i++){if(chronoIds[i]!==keep)await collapse(chronoIds[i],keep);}
   }
-  /* D. Пустые хроно-слоты: пересборка расписания из V2-юнитов (обновлённая
-     гармония). Прогресса нет — терять нечего, длительность слота
-     сохраняется; расписание перезапекается с новыми границами дней.
-     Начатые (daysDone не пуст) НЕ трогаются — они дочитывают по старой
-     сетке (PLAN_VNEDRENIYA_FINAL.md §2.3/§3). Отключается флагом. */
+  /* D. Все хроно-слоты: пересборка расписания из V2-юнитов (обновлённая
+     гармония) — РЕШЕНИЕ ВЛАДЕЛЬЦА 21.09: новый порядок перикоп у всех,
+     без предупреждений. Длительность слота и отмеченные дни сохраняются
+     (меняется содержимое дней, номера дней остаются валидными — нарезка
+     возвращает ровно plD.days дней). Прогресс, стрик и напоминания не
+     трогаются (plan_id прежний). Отключается флагом CHRONO_REBAKE_V2. */
   var CHRONO_REBAKE_V2=true;
   if(CHRONO_REBAKE_V2){
     for(var i2=0;i2<chronoIds.length;i2++){
       var plD=app.customPlans[chronoIds[i2]];
-      var ddD=(app.progress[chronoIds[i2]]&&app.progress[chronoIds[i2]].daysDone)||[];
-      if(plD&&plD.chrono&&plD.days&&!ddD.length){
+      if(plD&&plD.chrono&&plD.days){
         var sch2=buildChronoSchedule(plD.days);
-        if(sch2&&sch2.length){plD.schedule=sch2;plD.days=sch2.length;plD.totalDays=sch2.length;changed=true;}
+        if(sch2&&sch2.length===plD.days){
+          plD.schedule=sch2;plD.totalDays=sch2.length;changed=true;
+        }
       }
     }
   }
