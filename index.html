@@ -1313,6 +1313,67 @@ function goToday(){
     перезапишется восстановлением закладки в renderRead (vd===landing) */
 }
 
+/* ── Отложенная очередь отметок дней ──
+   Если POST /plan/read не долетел (Render «просыпается», обрыв сети,
+   Telegram свернул вебвью посреди запроса), день отмечен только локально —
+   а напоминания сервер считает по canonical plan_progress. Раньше отметка
+   терялась навсегда: syncBackend() при следующем открытии перезаписывал
+   локальное состояние серверным, и «прочитанный» день исчезал → «отстаёшь,
+   продолжай с дня N», стрик обнулялся. Теперь каждая неудавшаяся отметка
+   кладётся в персистентную очередь (localStorage 'bpend', вне app — чтобы
+   не уезжала/не затиралась синхронизацией состояния) и дожимается:
+   при следующем открытии аппа, при возврате из свёрнутого состояния и
+   по таймеру каждые 20 секунд, пока очередь не опустеет. Дата отметки —
+   момент ДОСТАВКИ (today()): день реально прочитан, сервер засчитает
+   стрик корректно. Повторный /plan/read идемпотентен (union на сервере). */
+var PEND_KEY='bpend';
+function pendQueue(){try{return JSON.parse(localStorage.getItem('bpend')||'[]');}catch(e){return [];}}
+function pendStore(q){try{localStorage.setItem('bpend',JSON.stringify(q));}catch(e){}}
+function pendRead(planId,day){
+  var q=pendQueue();
+  for(var i=0;i<q.length;i++){if(q[i].plan_id===planId&&q[i].day_number===day)return;}
+  q.push({plan_id:planId,day_number:day,ts:Date.now()});
+  pendStore(q);syncBadge(false);schedPendRetry();
+}
+var _pendTm=null;
+function schedPendRetry(){
+  clearTimeout(_pendTm);
+  if(!(pendQueue().length&&userId))return;
+  _pendTm=setTimeout(flushPending,20000);
+}
+async function flushPending(){
+  if(!userId)return;
+  var q=pendQueue();if(!q.length)return;
+  var rest=[];
+  for(var i=0;i<q.length;i++){
+    var it=q[i];var sent=false;
+    try{
+      var r=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:it.plan_id,day_number:it.day_number,local_date:today(),init_data:tgInitData})});
+      var d=await r.json();
+      if(d&&d.ok){
+        /* Стрик в прогрессе правим ТОЛЬКО серверным ответом: локальное
+           значение могло уйти вперёд при недоставленной отметке. */
+        if(app.progress[it.plan_id]&&d.streak!=null){
+          app.progress[it.plan_id].streak=d.streak;
+          app.progress[it.plan_id].maxStreak=d.max_streak;
+          app.progress[it.plan_id].lastRead=today();
+          saveApp();
+        }
+        syncBadge(true);sent=true;
+      } else if(d&&d.error==='not registered'){
+        try{
+          await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:it.plan_id,title:(getPlan(it.plan_id)||{}).title,notify_hour_msk:(app.progress[it.plan_id]||{}).notifyHourMsk,notify_minute_msk:(app.progress[it.plan_id]||{}).notifyMinuteMsk,notify_on:app.progress[it.plan_id]?app.progress[it.plan_id].notifyOn!==false:true,init_data:tgInitData})});
+          var r2=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:it.plan_id,day_number:it.day_number,local_date:today(),init_data:tgInitData})});
+          var d2=await r2.json();
+          if(d2&&d2.ok){if(app.progress[it.plan_id]&&d2.streak!=null){app.progress[it.plan_id].streak=d2.streak;app.progress[it.plan_id].maxStreak=d2.max_streak;saveApp();}syncBadge(true);sent=true;}
+        }catch(e2){}
+      }
+    }catch(e){}
+    if(!sent)rest.push(it);
+  }
+  pendStore(rest);
+  if(rest.length)schedPendRetry();else{syncBadge(true);renderRead();}
+}
 async function markRead(){
   var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];if(!plan||!prog)return;
   var cur=curDayNum(plan,prog);
@@ -1392,10 +1453,14 @@ async function markRead(){
           var r2=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,day_number:vd,local_date:t,init_data:tgInitData})});
           var data2=await r2.json();
           if(data2.ok){prog.streak=data2.streak;prog.maxStreak=data2.max_streak;saveApp();renderRead();syncBadge(true);}
-          else{syncBadge(false);}
-        }catch(e2){syncBadge(false);}
+          else{pendRead(app.activePlanId,vd);schedPendRetry();}
+        }catch(e2){pendRead(app.activePlanId,vd);schedPendRetry();}
+      } else {
+        /* Сервер ответил ошибкой (rate limit/5xx) — день в очередь на
+           доставку, локально он уже отмечен. */
+        pendRead(app.activePlanId,vd);schedPendRetry();
       }
-    }catch(e){syncBadge(false);}
+    }catch(e){pendRead(app.activePlanId,vd);schedPendRetry();}
   }
 }
 
@@ -2126,6 +2191,11 @@ async function checkAccountReset(){
 async function syncBackend(){
   if(!userId)return;
   await checkAccountReset();
+  /* Сначала доставляем недоставленные отметки (очередь 'bpend'): они
+     пережили закрытие аппа в localStorage. Порядок важен — flush ДО
+     чтения /state, иначе pull перезапишет локальные daysDone и очередь
+     осталась бы единственным носителем прочитанного дня. */
+  await flushPending();
   try{
     var r=await fetchT(BACKEND+'/state?user_id='+userId+'&init_data='+encodeURIComponent(tgInitData),{headers:_authHeaders()});
     var s=await r.json();
@@ -2174,6 +2244,15 @@ async function syncCanonicalDaysDone(){
   }
   saveApp();
 }
+
+/* Дозапись очереди при возврате в апп и при восстановлении сети: типичный
+   сценарий потери дня — отметка при лежащем/просыпающемся бэкенде, апп
+   закрыли, а сервер так и не узнал о дне (напоминание «отстаёшь», стрик 1).
+   Пока очередь непуста — ретраи каждые 20 с + попытка при каждом возврате
+   в мини-апп и по событию online. */
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&userId&&pendQueue().length)flushPending();});
+window.addEventListener('online',function(){if(userId&&pendQueue().length)flushPending();});
+setInterval(function(){if(!document.hidden&&userId&&pendQueue().length)flushPending();},60000);
 
 function showToast(msg){
   var t=document.getElementById('toast');if(!t)return;
