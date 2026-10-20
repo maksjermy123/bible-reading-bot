@@ -1929,7 +1929,12 @@ function conaInit(){
     var cti=document.getElementById('cona-time');if(cti)cti.value=(prog&&prog.notifyTime)||s0.notifyTime||'08:00';
     var ctb=document.getElementById('cona-not-tog');if(ctb)ctb.className='tog'+((prog?prog.notifyOn!==false:(s0.notifyOn!==false))?' on':'');
   }else{
+    /* По умолчанию — ВСЯ Библия на 365 дней (решение владельца 20.10):
+       все 66 книг предвыбраны, пользователь снимет/добавит лишнее сам.
+       Порядок канонический — как в сетке (ВЗ затем НЗ). */
     conaSel=[];
+    OT_BOOKS.forEach(function(b){conaSel.push(b.name);});
+    NT_BOOKS.forEach(function(b){conaSel.push(b.name);});
     var dInp2=document.getElementById('cona-days');if(dInp2)dInp2.value=365;
     var s1=app.settings||{};
     var cti2=document.getElementById('cona-time');if(cti2)cti2.value=s1.notifyTime||'08:00';
@@ -1980,14 +1985,19 @@ async function startCona(){
   app.settings.notifyTime=time;app.settings.notifyHourMsk=msk.hour;app.settings.notifyMinuteMsk=msk.minute;
   var vsel=document.getElementById('cona-ver');
   var slug=(vsel&&vsel.value&&audioVer(vsel.value))?vsel.value:AUDIO_DEFAULT;
-  var schedule=buildAudioSchedule(conaSel,days);
+  /* Книги в каноническом порядке (ВЗ затем НЗ) независимо от порядка тапов —
+     иначе нарезка «Бытие→Откровение» может пойти с той книги, которую
+     выбрали первой. */
+  var _CANON=OT_BOOKS.concat(NT_BOOKS).map(function(b){return b.name;});
+  var booksSorted=conaSel.slice().sort(function(a,b){return _CANON.indexOf(a)-_CANON.indexOf(b);});
+  var schedule=buildAudioSchedule(booksSorted,days);
   if(!schedule||!schedule.length)return;
   var title='🎧 Аудио-план · '+schedule.length+' '+(schedule.length%10===1&&schedule.length%100!==11?'день':'дней');
   var id=AUDIO_PLAN_ID;
   var editing=!!(conaEditId&&app.customPlans[conaEditId]);
   app.customPlans[id]={id:id,title:title,icon:'🎧',days:schedule.length,diff:'custom',
-    desc:'Слушание Библии по целым главам ('+(conaSel.length===1?conaSel[0]:conaSel.length+' книг')+')',
-    schedule:schedule,books:conaSel.slice(),totalDays:days,audio:true};
+    desc:'Слушание Библии по целым главам ('+(booksSorted.length===1?booksSorted[0]:booksSorted.length+' книг')+')',
+    schedule:schedule,books:booksSorted,totalDays:days,audio:true};
   var prog=app.progress[id];
   if(!prog){
     prog={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],pericopePos:{},notifyTime:time,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings.notifyOn!==false};
