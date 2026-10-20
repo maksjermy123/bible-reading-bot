@@ -127,6 +127,9 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 .bc.sel{border-color:var(--acc);background:var(--acc2);color:var(--acc);font-weight:600}
 .dur-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .dur-row input{flex:1;padding:10px;border:1px solid var(--brd);border-radius:8px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px}
+/* быстрая длительность в конструкторе аудио-плана (бывшие пресеты 30/90/180/365) */
+.cona-chip{flex:1;padding:8px 0;border:1px solid var(--brd);border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;background:var(--card);color:var(--txt);font-family:var(--fui);transition:transform .12s}
+.cona-chip:active{transform:scale(.94)}
 .prev-box{font-size:12px;color:var(--txt2);padding:8px;background:var(--acc2);border-radius:7px;margin-bottom:10px;line-height:1.5}
 .chan-ban{display:flex;align-items:center;gap:12px;background:var(--card);border:2px solid var(--brd);border-radius:var(--rad);padding:16px;margin-top:10px;margin-bottom:10px;text-decoration:none;cursor:pointer;transition:border-color .15s}
 .chan-ban:active{opacity:.7}
@@ -205,7 +208,18 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 /* Полоса прогресса трека (клик = перемотка) */
 .ap-seek{position:relative;height:6px;border-radius:3px;background:var(--brd);margin-top:10px;cursor:pointer;overflow:hidden}
 .ap-seek-f{position:absolute;left:0;top:0;bottom:0;width:0%;border-radius:3px;background:var(--acc)}
-.ap-time{font-size:11px;color:var(--txt2);margin-top:5px;text-align:right;font-family:var(--fui)}
+/* время слева, кнопка скорости справа */
+.ap-ctl{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:5px}
+.ap-time{font-size:11px;color:var(--txt2);font-family:var(--fui)}
+.ap-speed{min-width:48px;padding:4px 10px;border-radius:999px;border:1px solid var(--brd);background:var(--card);
+  color:var(--txt);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fui);transition:transform .12s}
+.ap-speed:active{transform:scale(.93)}
+/* смена чтеца внутри дня */
+.ap-narr{display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 10px;
+  border:1px solid var(--brd);border-radius:10px;background:var(--card)}
+.ap-narr-l{font-size:12px;color:var(--txt2);white-space:nowrap;font-weight:600}
+.ap-narr select{flex:1;min-width:0;border:none;background:transparent;color:var(--txt);
+  font-family:var(--fui);font-size:13.5px;font-weight:600;outline:none;padding:2px 0}
 
 /* Блок ошибки недоступной главы (404) */
 .ap-err{margin-top:10px;font-size:13px;line-height:1.5;color:var(--txt2);
@@ -225,6 +239,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 <div class="pg" id="pg-read"><div class="topbar"><button class="streak-btn" id="streak-badge" onclick="toggleStats()"><span style="font-size:20px" id="streak-ico">🔥</span><span class="streak-n" id="r-streak">0</span><span class="streak-l" id="r-streak-l">дней подряд</span></button><div style="display:flex;gap:5px"><button class="ico-btn" onclick="cycleTheme()" id="theme-btn">☀️</button><button class="ico-btn" onclick="goPage('pg-cfg')">⚙️</button></div></div><div id="stats-panel" style="display:none"><div class="stats-box"><div class="sg"><div class="si"><div class="sv" id="s-pct">0%</div><div class="sk">выполнено</div></div><div class="si"><div class="sv" id="s-done">0</div><div class="sk">дней готово</div></div><div class="si"><div class="sv" id="s-left">0</div><div class="sk">осталось</div></div><div class="si"><div class="sv" id="s-streak">0</div><div class="sk">дней подряд</div></div><div class="si"><div class="sv" id="s-max">0</div><div class="sk">рекорд</div></div><div class="si"><div class="sv" id="s-start">—</div><div class="sk">начат</div></div></div><div class="pb"><div class="pf" id="s-bar" style="width:0%"></div></div><div class="pl" id="s-plan-t"></div><button class="sec-tog" onclick="toggleCal()">📅 Календарь <span id="cal-arr">▼</span></button><div id="cal-wrap" style="display:none"><div class="cal-grid" id="cal-grid"></div></div></div></div><div class="cstat" id="r-cstat"></div><div class="pb" style="margin-bottom:10px"><div class="pf" id="r-bar" style="width:0%"></div></div><div class="day-nav"><button class="nav-btn" id="btn-prev" onclick="goDay(-1)">←</button><div class="day-info"><div class="day-n" id="r-day-n">День 1</div><div class="day-d" id="r-day-d"></div></div><button class="nav-btn" id="btn-next" onclick="goDay(1)">→</button></div><div id="r-audio" style="display:none;margin:10px 0"></div><div id="to-today" style="margin-bottom:10px;display:none"><button onclick="goToday()" style="width:100%;font-size:15px;font-weight:800;color:#fff;background:var(--acc);border:none;border-radius:10px;padding:13px;cursor:pointer;font-family:var(--fui);box-shadow:0 3px 12px rgba(0,0,0,.18)">📖 К непрочитанному →</button></div><div class="ref-lbl" id="r-ref-lbl"><span id="r-ref">—</span><button class="ico-btn" onclick="addBm()">⭐</button></div><div class="tabs" id="r-tabs"></div><div class="sc" id="r-sc"></div><div class="font-row" id="r-font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button><button class="read-btn alt" id="r-more-btn" style="display:none" type="button">📚 Хочу прочесть следующий день</button><a class="tlink" id="r-tlink" target="_blank"><span style="font-size:16px">📚</span> Читать другой перевод</a><div class="phrase" id="r-phrase"></div></div>
 <div class="pg" id="pg-seq"><div class="hdr"><h1>📜 Свободное чтение</h1></div><div class="seq-nav"><select class="seq-sel" id="seq-book" onchange="seqBook()"></select><select class="seq-sel" id="seq-ch" onchange="seqRender()"></select></div><div class="sc" id="seq-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-out" style="margin-top:0;flex:1" onclick="seqPrev()">← Назад</button><button class="btn btn-acc" style="margin-top:0;flex:1" onclick="seqNext()">Далее →</button></div><button class="btn btn-out" style="margin-top:8px" onclick="addSeqBm()">⭐ Закладка</button><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
 <div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div id="con-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="con-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="con-not-tog" onclick="conTogNot()"></button></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Выбрать план</button><button class="btn btn-out" onclick="conEditId=null;conChrono=false;goPage('pg-sel');renderSel()">Вернуться</button></div>
+<div class="pg" id="pg-cona"><div class="hdr"><h1 id="cona-title">🎧 Аудио-план</h1></div><div id="cona-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="cona-ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="cona-nt-books"></div></div><div class="sec">Длительность (дней)</div><div style="display:flex;gap:6px;margin-bottom:8px"><button class="cona-chip" onclick="conaSetDays(30)">30</button><button class="cona-chip" onclick="conaSetDays(90)">90</button><button class="cona-chip" onclick="conaSetDays(180)">180</button><button class="cona-chip" onclick="conaSetDays(365)">365</button></div><div class="dur-row"><input type="number" id="cona-days" min="1" max="1000" value="365" oninput="conaUpdatePrev()"></div><div class="sec">Озвучка</div><select id="cona-ver" onchange="conaUpdatePrev()" style="width:100%;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"></select><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="cona-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="cona-not-tog" onclick="conTogNot2()"></button></div><div class="prev-box" id="cona-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-cona" onclick="startCona()" disabled>Начать слушать</button><button class="btn btn-out" onclick="conaEditId=null;goPage('pg-sel');renderSel()">Вернуться</button></div>
 <div class="pg" id="pg-setup"><div class="hdr"><h1 id="setup-title">📖 План</h1></div><div class="prev-box" id="setup-meta" style="margin-bottom:14px"></div><div class="sec" id="setup-audio-wrap" style="display:none">Озвучка
 <select id="setup-audio-ver" onchange="setupAudioPick()" style="width:100%;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"></select></div><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="setup-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="setup-not-tog" onclick="setupTogNot()"></button></div><button class="btn btn-acc" onclick="startPlan()">Выбрать план</button><button class="btn btn-out" onclick="setupBack()">Вернуться</button></div>
 
@@ -360,9 +375,10 @@ function audioVer(slug){
 var AUDIO_OT = Object.keys(AUDIO_CHAPTERS).slice(0, 39);
 var AUDIO_NT = Object.keys(AUDIO_CHAPTERS).slice(39);
 
-/* Фолбэк-генератор расписания: целые главы → дни в формате refs. Используется,
-   только если PLANS_PERI.audio_* ещё не прогрузился (как getChrono365Schedule).
-   Основной источник расписаний — plans.json (ключи audio_365/180/90/30). */
+/* Фолбэк-генератор расписания: целые главы → дни в формате refs. Основной
+   потребитель — конструктор аудио-плана (pg-cona): нарезка выбранных книг
+   на заданное число дней. Также используется getPlan() как источник
+   унаследованных расписаний audio_365/180/90/30 из plans.json. */
 function buildAudioSchedule(bookNames, days){
   var flat = [];
   for(var b = 0; b < bookNames.length; b++){
@@ -383,20 +399,33 @@ function buildAudioSchedule(bookNames, days){
   return out;
 }
 
-/* Готовые аудио-планы. Расписание — из plans.json (PLANS_PERI_VER='v4'),
-   фолбэк — buildAudioSchedule. IDs совпадают с ключами plans.json. */
-var AUDIO_PRESETS = [
-  { id:'audio_365', title:'Аудио: Библия за год',          icon:'🎧', days:365, diff:'challenging',  scope:'full' },
-  { id:'audio_180', title:'Аудио: Библия за полгода',      icon:'🎧', days:180, diff:'challenging',  scope:'full' },
-  { id:'audio_90',  title:'Аудио: Новый Завет за 90 дней', icon:'🎧', days:90,  diff:'recommended', scope:'nt' },
-  { id:'audio_30',  title:'Аудио: Новый Завет за 30 дней', icon:'🎧', days:30,  diff:'recommended', scope:'nt' }
-];
-var AUDIO_PRESET_DESC = 'Слушай Библию по целым главам. Озвучка и перевод — на выбор; дни и стрик считаются как в обычных планах.';
+/* Готовых аудио-пресетов больше НЕТ (решение владельца 20.10: «не нужно много
+   плодить аудиопланов — он должен быть один»). Аудио-план ОДИН, собирается
+   пользователем в конструкторе pg-cona (книги + длительность + озвучка —
+   устройство как у «Составить свой план») и живёт в app.customPlans с флагом
+   audio:true; расписание — целые главы выбранных книг (buildAudioSchedule).
+   У тех, кто успел начать прежние пресеты audio_365/180/90/30, ничего не
+   пропало: расписания остались в plans.json, getPlan() подхватывает их как
+   «унаследованные» планы (блок 4 списка), а isAudioPlanId по-прежнему узнаёт
+   и старый префикс audio_, и новый фиксированный id. */
+var AUDIO_PLAN_ID='audio'; /* фиксированный id единственного аудио-плана */
 
-function audioScopeBooks(scope){ return scope === 'nt' ? AUDIO_NT : AUDIO_OT.concat(AUDIO_NT); }
+function isAudioPlanId(id){
+  if(!id) return false;
+  id = String(id);
+  return id === AUDIO_PLAN_ID || id.indexOf('audio_') === 0;
+}
 
-/* Идентификация аудио-планов (id начинается с audio_) */
-function isAudioPlanId(id){ return !!id && String(id).indexOf('audio_') === 0; }
+/* Живой аудио-план пользователя (id в app.customPlans). Планов с audio:true
+   принципиально один: слот в списке планов не показывает оффер, пока план
+   существует, конструктор перезаписывает тот же id, а _pickKeeper страхует
+   от дублей, если они возникнут в старых данных. */
+function findAudioPlanId(){
+  var ids = Object.keys(app.customPlans || {}).filter(function(id){
+    return app.customPlans[id] && app.customPlans[id].audio;
+  });
+  return _pickKeeper(ids);
+}
 
 /* Выбранная озвучка плана: хранится в прогрессе плана, дефолт — Бондаренко.
    Если сохранённый slug больше не в каталоге — тихо возвращаем дефолт. */
@@ -406,13 +435,7 @@ function audioPlanSlug(planId){
   return audioVer(slug) ? slug : AUDIO_DEFAULT;
 }
 
-/* Пресеты аудио-планов в общий реестр (карточки в pg-sel рендерятся тем же кодом) */
-for(var _ai=0;_ai<AUDIO_PRESETS.length;_ai++){
-  var _P0=AUDIO_PRESETS[_ai];
-  PLANS.push({ id:_P0.id, title:_P0.title, icon:_P0.icon, days:_P0.days, diff:_P0.diff,
-    audio:true, scope:_P0.scope, desc:AUDIO_PRESET_DESC,
-    schedule:PLANS_PERI[_P0.id]||buildAudioSchedule(audioScopeBooks(_P0.scope), _P0.days) });
-}
+
 
 var FS=[0.82,0.92,1.02,1.14,1.28];
 
@@ -542,7 +565,7 @@ function saveApp(){try{localStorage.setItem('bapp3',JSON.stringify(app));}catch(
 var BIBLE_CACHE_VER='v1';
 /* Версия приложения для футера: повышать при значимых изменениях
    (модель чтения, новые экраны). Формат: мажор.минор.патч. */
-var APP_VERSION='1.2.0';
+var APP_VERSION='1.3.0';
 async function loadBible(){
   if(bible)return;
   var raw=null;
@@ -755,7 +778,7 @@ function goPage(id){
   document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
   var el=document.getElementById(id);if(el)el.classList.add('on');
   var nav=document.getElementById('bnav');
-  var show=['pg-read','pg-bm','pg-sel','pg-cfg','pg-seq','pg-con','pg-setup'].indexOf(id)>=0;
+  var show=['pg-read','pg-bm','pg-sel','pg-cfg','pg-seq','pg-con','pg-cona','pg-setup'].indexOf(id)>=0;
   if(nav)nav.style.display=show?'flex':'none';
   ['read','bm','sel','cfg'].forEach(function(k){
     var btn=document.getElementById('nb-'+k);
@@ -824,7 +847,9 @@ function renderSel(){
   /* 3) Слот «Составить свой план»: живые карточки своих планов + мелкая
      ссылка «+ ещё свой план» (второй и дальнейшие — только через неё,
      чтобы оффер не наслаивался). Пока своего плана нет — оффер-карточка. */
-  var customIds=Object.keys(app.customPlans||{}).filter(function(id){return app.customPlans[id]&&!app.customPlans[id].chrono;});
+  /* Аудио-план живёт в customPlans со своим СЛОТОМ (блок 3b) — в текстовый
+     слот «Своих планов» его не включаем, иначе карточка задваивается. */
+  var customIds=Object.keys(app.customPlans||{}).filter(function(id){return app.customPlans[id]&&!app.customPlans[id].chrono&&!app.customPlans[id].audio;});
   var _slotGroups={};
   customIds.forEach(function(id){var k=_booksKeyOf(app.customPlans[id]);(_slotGroups[k]=_slotGroups[k]||[]).push(id);});
   var keeperIds=Object.keys(_slotGroups).map(function(k){return _pickKeeper(_slotGroups[k]);});
@@ -836,6 +861,17 @@ function renderSel(){
     html+='<div style="text-align:center;margin:12px 0 2px"><span onclick="startNewCustomPlan()" style="color:var(--txt2);font-size:12px;cursor:pointer;text-decoration:underline">+ ещё свой план</span></div>';
   }else{
     html+='<div class="card card-custom" style="cursor:pointer" onclick="startNewCustomPlan()"><div class="card-top"><div class="card-ico">✏️</div><div class="card-info"><div class="card-title">Составить свой план</div><div class="card-meta">Выбери книги и срок сам</div></div><div class="badge">Свой</div></div></div>';
+  }
+  /* 3b) Слот «Аудио-план»: ровно ОДИН (решение владельца — «не нужно много
+     плодить аудиопланов»). Пока плана нет — оффер-карточка с конструктором;
+     после старта — живая карточка с прогрессом, «Изменить» пересобирает
+     расписание того же плана (книги/длительность/озвучка), как у своих планов. */
+  var audId=findAudioPlanId();
+  if(audId){
+    var plA=app.customPlans[audId];
+    html+=_planCardHtml(audId,plA,plA.title||'🎧 Аудио-план',_planDaysCount(plA));
+  }else{
+    html+='<div class="card card-custom" style="cursor:pointer" onclick="startNewAudioPlan()"><div class="card-top"><div class="card-ico">🎧</div><div class="card-info"><div class="card-title">Аудио-план</div><div class="card-meta">Слушай Библию по главам</div></div><div class="badge">Свой</div></div><div class="card-desc">Выбери книги и срок — в день предлагается набор дорожек для слушания. Чтец и скорость меняются прямо в плеере.</div></div>';
   }
   /* 4) Начатые планы без определения в приложении (bible_180, nt_30
      и другие наследники старых версий; chrono_365 снова в PLANS —
@@ -870,7 +906,7 @@ function _planCardHtml(id,pl,title,days){
     '<div class="badge" style="background:var(--acc);color:#fff">→</div></div>'+
     '<div style="display:flex;gap:6px;margin-top:8px">'+
     '<button onclick="delPlan(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">🗑 Удалить</button>'+
-    (app.customPlans[id]?'<button onclick="editCustomPlan(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">✏️ Изменить</button>':'')+
+    (app.customPlans[id]?'<button onclick="'+((pl&&pl.audio)?'editAudioPlan':'editCustomPlan')+'(\''+id+'\')" style="flex:1;padding:7px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--fui)">✏️ Изменить</button>':'')+
     (pl?'<button onclick="continuePlan(\''+id+'\')" style="flex:2;padding:7px;border:none;border-radius:7px;background:var(--acc);color:#fff;font-size:12px;cursor:pointer;font-family:var(--fui);font-weight:600">Продолжить →</button>':'')+
     '</div></div>';
 }
@@ -955,7 +991,7 @@ async function migratePlanSlots(){
     }
   }
   /* B. Свои планы с одинаковым набором книг И сроком. */
-  var customs=Object.keys(app.customPlans||{}).filter(function(id){return app.customPlans[id]&&!app.customPlans[id].chrono;});
+  var customs=Object.keys(app.customPlans||{}).filter(function(id){return app.customPlans[id]&&!app.customPlans[id].chrono&&!app.customPlans[id].audio;});
   var groups={};
   customs.forEach(function(id){var k=_booksKeyOf(app.customPlans[id]);(groups[k]=groups[k]||[]).push(id);});
   var gk=Object.keys(groups);
@@ -1580,9 +1616,28 @@ async function flushPending(){
 /* ==================== АУДИО-ПЛАН: ЧАСТЬ 2. ПЛЕЕР ==================== */
 /* ---------- ЧАСТЬ 2. ПЛЕЕР ---------- */
 
-/* Состояние плеера и позиция прослушивания (localStorage, офлайн) */
-var AP = { a:null, planId:null, day:null, idx:0, list:[], ready:false };
+/* Состояние плеера и позиция прослушивания (localStorage, офлайн).
+   speed — скорость воспроизведения, одна на все планы (audio_speed_v1). */
+var AP = { a:null, planId:null, day:null, idx:0, list:[], ready:false, speed:1 };
 function apPosKey(){ return 'audio_pos_v1'; }
+var AP_SPEEDS=[0.8,1,1.25,1.5,2];
+function apSpeedGet(){
+  try{ var v=parseFloat(localStorage.getItem('audio_speed_v1')); if(AP_SPEEDS.indexOf(v)>=0) return v; }catch(e){}
+  return 1;
+}
+function apSpeedLbl(v){ return String(v)+'×'; }
+function apSpeedSet(v){
+  AP.speed=v;
+  try{ localStorage.setItem('audio_speed_v1',String(v)); }catch(e){}
+  if(AP.a)AP.a.playbackRate=v;
+  var b=document.getElementById('ap-speed');
+  if(b)b.textContent=apSpeedLbl(v);
+}
+function apSpeedNext(){
+  var i=AP_SPEEDS.indexOf(AP.speed||1);
+  apSpeedSet(AP_SPEEDS[(i+1)%AP_SPEEDS.length]);
+  haptic('light');
+}
 function apLoadPos(){
   try{ return JSON.parse(localStorage.getItem(apPosKey()) || '{}'); }catch(e){ return {}; }
 }
@@ -1615,6 +1670,8 @@ function apEnsure(){
   if(AP.a) return;
   AP.a = new Audio();
   AP.a.preload = 'metadata';
+  AP.speed = apSpeedGet();
+  AP.a.playbackRate = AP.speed;
   AP.a.addEventListener('ended', apNext);
   AP.a.addEventListener('error', apError);
   AP.a.addEventListener('timeupdate', function(){
@@ -1647,6 +1704,7 @@ function apPlay(idx){
   apEnsure();
   var pos = apLoadPos()[AP.planId];
   AP.a.src = it.url;
+  AP.a.playbackRate = AP.speed || 1; /* скорость сохраняется при смене дорожки */
   AP.a.currentTime = (pos && pos.day === AP.day && pos.idx === idx && pos.sec > 5) ? pos.sec : 0;
   AP.a.play();
   haptic('light');
@@ -1685,9 +1743,10 @@ function apPulseDone(){
   if(b){ b.classList.add('ap-pulse'); setTimeout(function(){ b.classList.remove('ap-pulse'); }, 2400); }
 }
 
-/* Рендер: панель плеера + дорожки дня (плейлист). Контейнер #r-audio (ЧАСТЬ 3).
-   Экран аудио-дня не содержит библейского текста (решение владельца):
-   плеер, полоса перемотки, дорожки на сегодня и кнопка «✓ Прослушал». */
+/* Рендер: панель плеера + чтец + скорость + дорожки дня (плейлист).
+   Контейнер #r-audio (ЧАСТЬ 3). Экран аудио-дня не содержит библейского
+   текста (решение владельца): плеер, перемотка, дорожки на сегодня и кнопка
+   «✓ Прослушал». Скорость и чтец — прямо здесь, без захода в настройки. */
 function apRender(){
   var wrap = document.getElementById('r-audio');
   if(!wrap || !isAudioPlanId(app.activePlanId)) return;
@@ -1702,7 +1761,23 @@ function apRender(){
       (it ? it.book + ' ' + it.ch : '—') + '</div>' +
       '<div class="ap-cnt">Дорожка ' + (AP.idx + 1) + ' из ' + AP.list.length + '</div></div></div>';
   h += '<div class="ap-seek" onclick="apSeek(event)"><div class="ap-seek-f" id="ap-seek-f"></div></div>' +
-    '<div class="ap-time" id="ap-time"></div>';
+    '<div class="ap-ctl"><div class="ap-time" id="ap-time"></div>' +
+    '<button class="ap-speed" id="ap-speed" onclick="apSpeedNext()" aria-label="Скорость">' +
+    apSpeedLbl(AP.speed || 1) + '</button></div>';
+  /* Смена чтеца внутри дня: выбор сохраняется в прогрессе плана, дорожки
+     дня пересобираются под нового чтеца без выхода с экрана. */
+  var curSlug = audioPlanSlug(app.activePlanId);
+  h += '<div class="ap-narr"><span class="ap-narr-l">🎙 Чтец</span>' +
+    '<select id="ap-narr" onchange="apNarrPick(this.value)">';
+  var lastTr = null;
+  for(var vi = 0; vi < AUDIO_VERSIONS.length; vi++){
+    var vv = AUDIO_VERSIONS[vi];
+    if(vv.tr !== lastTr){ h += '<optgroup label="' + vv.tr + '">'; lastTr = vv.tr; }
+    h += '<option value="' + vv.slug + '"' + (vv.slug === curSlug ? ' selected' : '') + '>' +
+      vv.narrator + (vv.music ? ' (с музыкой)' : '') + '</option>';
+    if(vi === AUDIO_VERSIONS.length - 1 || AUDIO_VERSIONS[vi + 1].tr !== vv.tr) h += '</optgroup>';
+  }
+  h += '</select></div>';
   h += '<div class="ap-tracks">';
   for(var i = 0; i < AP.list.length; i++){
     var t = AP.list[i];
@@ -1720,6 +1795,25 @@ function apRender(){
   h += '</div><div id="r-audio-err" class="ap-err" style="display:none"></div>';
   wrap.innerHTML = h;
   apSeekUi();
+}
+/* Смена чтеца на экране дня: сохранить slug, остановить текущий файл,
+   пересобрать дорожки дня под новую озвучку. Позиция дня (day/idx/sec)
+   не зависит от чтеца — вернёмся на ту же дорожку. */
+function apNarrPick(slug){
+  var prog = app.progress[app.activePlanId];
+  if(!prog || !audioVer(slug)) return;
+  var cur = audioPlanSlug(app.activePlanId);
+  if(slug === cur) return;
+  prog.audioSlug = slug;
+  saveApp(); haptic('light');
+  if(AP.a && !AP.a.paused){ AP.a.pause(); apSavePos(AP.a.currentTime || 0); }
+  if(AP.a && AP.a.src){ AP.a.removeAttribute('src'); try{ AP.a.load(); }catch(e){} }
+  AP.list = apDayChapters(app.activePlanId, AP.day);
+  AP.ready = AP.list.length > 0;
+  var box = document.getElementById('r-audio-err');
+  if(box){ box.style.display = 'none'; box.innerHTML = ''; }
+  AP.list.forEach(function(t){ delete t.failed; });
+  apRender();
 }
 /* Перемотка: клик по полосе прогресса */
 function apSeek(e){
@@ -1747,7 +1841,9 @@ function apFmtT(s){
   s = Math.max(0, Math.floor(s || 0));
   return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
 }
-/* Селектор озвучки на экране старта плана (pg-setup): показывать только для аудио-пресетов */
+/* Селектор озвучки на экране старта плана (pg-setup). После отказа от пресетов
+   не используется каталогом (аудио-план начинается из своего конструктора pg-cona),
+   но остаётся рабочим для любых будущих аудио-предложений в каталоге. */
 function setupAudioFill(p){
   var wrap=document.getElementById('setup-audio-wrap'), sel=document.getElementById('setup-audio-ver');
   if(!wrap||!sel)return;
@@ -1787,6 +1883,139 @@ function cfgAudioPick(slug){
   prog.audioSlug=slug;saveApp();haptic('light');
   if(cfgPlanId===app.activePlanId)renderRead();
 }
+
+/* ---------- КОНСТРУКТОР АУДИО-ПЛАНА (pg-cona) ----------
+   Устройство как у «Составить свой план» (pg-con): сетка книг ВЗ/НЗ,
+   длительность в днях, время напоминания. Разница: нарезка по ЦЕЛЫМ главам
+   (buildAudioSchedule, не по перикопам) и выбор озвучки прямо здесь.
+   План всегда один: старт создаёт customPlans[AUDIO_PLAN_ID], «Изменить»
+   на карточке пересобирает ТОТ ЖЕ план с сохранением прогресса. */
+var conaSel=[],conaEditId=null;
+function startNewAudioPlan(){
+  conaEditId=null;
+  goPage('pg-cona');conaInit();
+}
+function editAudioPlan(id){
+  if(!app.customPlans[id])return;
+  conaEditId=id;
+  goPage('pg-cona');conaInit();
+}
+function conaInit(){
+  var ot=document.getElementById('cona-ot-books'),nt=document.getElementById('cona-nt-books');
+  if(ot)ot.innerHTML=OT_BOOKS.map(function(b){return '<button class="bc" data-n="'+b.name+'" onclick="conaToggleBook(this)">'+b.name+'</button>';}).join('');
+  if(nt)nt.innerHTML=NT_BOOKS.map(function(b){return '<button class="bc" data-n="'+b.name+'" onclick="conaToggleBook(this)">'+b.name+'</button>';}).join('');
+  var title=document.getElementById('cona-title');
+  if(title)title.textContent=conaEditId?'🎧 Изменить аудио-план':'🎧 Аудио-план';
+  /* Озвучка: те же три версии, что и в настройках */
+  var vsel=document.getElementById('cona-ver');
+  if(vsel){
+    var h='',lastTr=null,cur=AUDIO_DEFAULT;
+    var prog=conaEditId?app.progress[conaEditId]:null;
+    if(prog&&prog.audioSlug&&audioVer(prog.audioSlug))cur=prog.audioSlug;
+    for(var i=0;i<AUDIO_VERSIONS.length;i++){
+      var v=AUDIO_VERSIONS[i];
+      if(v.tr!==lastTr){h+='<optgroup label="'+v.tr+'">';lastTr=v.tr;}
+      h+='<option value="'+v.slug+'"'+(v.slug===cur?' selected':'')+'>'
+        +v.narrator+(v.music?' (с музыкой)':'')+'</option>';
+      if(i===AUDIO_VERSIONS.length-1||AUDIO_VERSIONS[i+1].tr!==v.tr)h+='</optgroup>';
+    }
+    vsel.innerHTML=h;
+  }
+  if(conaEditId){
+    var pl=app.customPlans[conaEditId]||{};
+    conaSel=(pl.books||[]).slice();
+    var dInp=document.getElementById('cona-days');if(dInp)dInp.value=pl.totalDays||pl.days||365;
+    var s0=app.settings||{};
+    var cti=document.getElementById('cona-time');if(cti)cti.value=(prog&&prog.notifyTime)||s0.notifyTime||'08:00';
+    var ctb=document.getElementById('cona-not-tog');if(ctb)ctb.className='tog'+((prog?prog.notifyOn!==false:(s0.notifyOn!==false))?' on':'');
+  }else{
+    conaSel=[];
+    var dInp2=document.getElementById('cona-days');if(dInp2)dInp2.value=365;
+    var s1=app.settings||{};
+    var cti2=document.getElementById('cona-time');if(cti2)cti2.value=s1.notifyTime||'08:00';
+    var ctb2=document.getElementById('cona-not-tog');if(ctb2)ctb2.className='tog'+(s1.notifyOn!==false?' on':'');
+  }
+  /* Подсветка выбранных книг: только внутри сетки конструктора (у «Своего
+     плана» на pg-con свои .bc — их не задеваем). */
+  document.querySelectorAll('#cona-books-wrap .bc').forEach(function(b){
+    b.classList.toggle('sel',conaSel.indexOf(b.dataset.n)>=0);
+  });
+  conaUpdatePrev();
+}
+function conaToggleBook(btn){
+  var n=btn.dataset.n;var i=conaSel.indexOf(n);
+  if(i>=0){conaSel.splice(i,1);btn.classList.remove('sel');}else{conaSel.push(n);btn.classList.add('sel');}
+  conaUpdatePrev();haptic('light');
+}
+/* Быстрая длительность: бывшие пресеты 30/90/180/365 — просто чипы */
+function conaSetDays(n){
+  var el=document.getElementById('cona-days');if(el)el.value=n;
+  conaUpdatePrev();haptic('light');
+}
+function conaUpdatePrev(){
+  var dEl=document.getElementById('cona-days');
+  var days=dEl?parseInt(dEl.value)||0:0;
+  var prev=document.getElementById('cona-prev');var btn=document.getElementById('btn-cona');
+  if(!conaSel.length||days<1){
+    if(prev)prev.textContent='Выбери книги и укажи длительность';
+    if(btn)btn.disabled=true;
+    return;
+  }
+  var totalCh=0;
+  conaSel.forEach(function(n){var b=AUDIO_CHAPTERS[n];if(b)totalCh+=b;});
+  /* buildAudioSchedule не даст больше дней, чем глав: показываем честное число */
+  var realDays=Math.min(days,Math.max(1,totalCh));
+  var per=(realDays>0)?(totalCh/realDays).toFixed(1):'0';
+  if(prev)prev.textContent=conaSel.length+' '+(conaSel.length===1?'книга':'книг')+' · '+totalCh+' глав · ~'+per+' главы/день · '+realDays+' '+(realDays%10===1&&realDays%100!==11?'день':'дней');
+  if(btn){btn.disabled=false;btn.textContent=conaEditId?'Сохранить изменения':'Начать слушать';}
+}
+async function startCona(){
+  var dEl=document.getElementById('cona-days');
+  var days=dEl?(parseInt(dEl.value)||365):365;
+  if(!conaSel.length)return;
+  var timeEl=document.getElementById('cona-time');
+  var time=timeEl?timeEl.value:'08:00';
+  var msk=localTimeToMsk(time);
+  if(!app.settings)app.settings={};
+  app.settings.notifyTime=time;app.settings.notifyHourMsk=msk.hour;app.settings.notifyMinuteMsk=msk.minute;
+  var vsel=document.getElementById('cona-ver');
+  var slug=(vsel&&vsel.value&&audioVer(vsel.value))?vsel.value:AUDIO_DEFAULT;
+  var schedule=buildAudioSchedule(conaSel,days);
+  if(!schedule||!schedule.length)return;
+  var title='🎧 Аудио-план · '+schedule.length+' '+(schedule.length%10===1&&schedule.length%100!==11?'день':'дней');
+  var id=AUDIO_PLAN_ID;
+  var editing=!!(conaEditId&&app.customPlans[conaEditId]);
+  app.customPlans[id]={id:id,title:title,icon:'🎧',days:schedule.length,diff:'custom',
+    desc:'Слушание Библии по целым главам ('+(conaSel.length===1?conaSel[0]:conaSel.length+' книг')+')',
+    schedule:schedule,books:conaSel.slice(),totalDays:days,audio:true};
+  var prog=app.progress[id];
+  if(!prog){
+    prog={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],pericopePos:{},notifyTime:time,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings.notifyOn!==false};
+    app.progress[id]=prog;
+  }
+  prog.audioSlug=slug;
+  /* Дни за пределами новой длительности обрезаются — план и прогресс
+     адаптируются под новые параметры (как у «Своего плана» при правке). */
+  prog.daysDone=(prog.daysDone||[]).filter(function(d){return d<=schedule.length;});
+  saveApp();
+  if(userId){
+    try{
+      if(editing){
+        var _r1=await fetch(BACKEND+'/plan/set_days',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:id,days_done:prog.daysDone,init_data:tgInitData})});
+        syncBadge(_r1.ok);
+      }else{
+        var _r0=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:id,title:title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.settings.notifyOn!==false,init_data:tgInitData})});
+        syncBadge(_r0.ok);
+      }
+    }catch(e){syncBadge(false);}
+  }
+  conaEditId=null;
+  haptic('success');
+  app.activePlanId=id;saveApp();
+  viewDay=null;goPage('pg-read');renderRead();
+}
+/* Тумблер напоминаний конструктора аудио-плана (тот же app.settings) */
+function conTogNot2(){togNotify('cona-not-tog');}
 
 
 async function markRead(){
