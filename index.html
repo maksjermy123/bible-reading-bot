@@ -159,20 +159,52 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 .done-wrap{text-align:center;padding:36px 16px}
 .done-em{font-size:60px;margin-bottom:14px}
 #toast{position:fixed;bottom:78px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:7px 16px;border-radius:18px;font-size:12px;z-index:999;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap}
+/* ==== АУДИО-ПЛЕЕР (audio-module v3) ==== */
+/* Контейнер плеера на экране дня */
+#r-audio{background:var(--card);border:1px solid var(--brd);border-radius:14px;padding:12px}
+
+/* Панель управления: prev / play / next + мета */
+.ap-bar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ap-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--brd);background:var(--card);
+  color:var(--txt);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:transform .12s}
+.ap-btn:active{transform:scale(.93)}
+.ap-main{width:54px;height:54px;background:var(--acc);border-color:var(--acc);color:#fff;font-size:22px;
+  box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.ap-meta{margin-left:6px;min-width:0}
+.ap-now{font-size:15px;font-weight:800;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ap-cnt{font-size:11.5px;color:var(--txt2)}
+
+/* Чипы глав дня */
+.ap-chips{display:flex;flex-wrap:wrap;gap:6px}
+.ap-chip{padding:7px 11px;border-radius:999px;border:1px solid var(--brd);background:var(--card);
+  color:var(--txt);font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s}
+.ap-chip.cur{background:var(--acc);border-color:var(--acc);color:#fff}
+.ap-chip.na{opacity:.42;text-decoration:line-through;cursor:not-allowed}
+
+/* Блок ошибки недоступной главы (404) */
+.ap-err{margin-top:10px;font-size:13px;line-height:1.5;color:var(--txt2);
+  background:var(--card);border:1px dashed var(--brd);border-radius:10px;padding:10px 12px}
+
+/* Подсветка кнопки закрытия дня после последней главы */
+.ap-pulse{animation:apPulse 1.2s ease-in-out 2}
+@keyframes apPulse{0%,100%{transform:scale(1);box-shadow:none}
+  50%{transform:scale(1.04);box-shadow:0 0 0 8px rgba(0,0,0,.06)}}
 </style>
 </head>
 <body>
 <div id="sync-warn" onclick="dismissSyncWarn()" title="Последние изменения не сохранились на сервере. Локально ничего не потеряно — попробуем ещё раз, как только появится связь. Нажми, чтобы скрыть." style="display:none;position:fixed;top:10px;right:10px;z-index:9999;background:#fff3cd;color:#856404;border:1px solid #ffe08a;border-radius:20px;padding:5px 11px;font-size:12px;font-weight:700;font-family:var(--fui);box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;display:flex;align-items:center;gap:4px">⚠️ не синхронизировано</div>
 <div id="pg-load"><div class="spin">📖</div><div style="font-size:15px;color:var(--acc);font-weight:600">Загружаем Библию...</div><div style="font-size:12px;color:var(--txt2)">Пожалуйста, подождите</div></div>
 <div class="pg" id="pg-ob"><div class="ob-wrap"><div class="ob-em" id="ob-em">📖</div><div class="ob-t" id="ob-t">Читай Библию каждый день</div><div class="ob-tx" id="ob-tx">Выбери план по силам и читай Слово Божье каждый день</div><div class="ob-dots"><div class="od on" id="od0"></div><div class="od" id="od1"></div><div class="od" id="od2"></div></div><button class="btn btn-acc" onclick="obNext()">Далее</button></div></div>
-<div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="plan-list"></div><div class="card" style="cursor:pointer" onclick="goPage('pg-seq');initSeq()"><div class="card-top"><div class="card-ico">📜</div><div class="card-info"><div class="card-title">Свободное чтение</div><div class="card-meta">Свободное чтение, без графика</div></div><div class="badge">Гибкий</div></div></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span class="chan-ico">📻</span><span class="chan-txt">Канал<b>«От чтения к Преображению»</b></span><span class="chan-arrow">→</span></a></div>
-<div class="pg" id="pg-read"><div class="topbar"><button class="streak-btn" id="streak-badge" onclick="toggleStats()"><span style="font-size:20px" id="streak-ico">🔥</span><span class="streak-n" id="r-streak">0</span><span class="streak-l" id="r-streak-l">дней подряд</span></button><div style="display:flex;gap:5px"><button class="ico-btn" onclick="cycleTheme()" id="theme-btn">☀️</button><button class="ico-btn" onclick="goPage('pg-cfg')">⚙️</button></div></div><div id="stats-panel" style="display:none"><div class="stats-box"><div class="sg"><div class="si"><div class="sv" id="s-pct">0%</div><div class="sk">выполнено</div></div><div class="si"><div class="sv" id="s-done">0</div><div class="sk">дней готово</div></div><div class="si"><div class="sv" id="s-left">0</div><div class="sk">осталось</div></div><div class="si"><div class="sv" id="s-streak">0</div><div class="sk">дней подряд</div></div><div class="si"><div class="sv" id="s-max">0</div><div class="sk">рекорд</div></div><div class="si"><div class="sv" id="s-start">—</div><div class="sk">начат</div></div></div><div class="pb"><div class="pf" id="s-bar" style="width:0%"></div></div><div class="pl" id="s-plan-t"></div><button class="sec-tog" onclick="toggleCal()">📅 Календарь <span id="cal-arr">▼</span></button><div id="cal-wrap" style="display:none"><div class="cal-grid" id="cal-grid"></div></div></div></div><div class="cstat" id="r-cstat"></div><div class="pb" style="margin-bottom:10px"><div class="pf" id="r-bar" style="width:0%"></div></div><div class="day-nav"><button class="nav-btn" id="btn-prev" onclick="goDay(-1)">←</button><div class="day-info"><div class="day-n" id="r-day-n">День 1</div><div class="day-d" id="r-day-d"></div></div><button class="nav-btn" id="btn-next" onclick="goDay(1)">→</button></div><div id="to-today" style="margin-bottom:10px;display:none"><button onclick="goToday()" style="width:100%;font-size:15px;font-weight:800;color:#fff;background:var(--acc);border:none;border-radius:10px;padding:13px;cursor:pointer;font-family:var(--fui);box-shadow:0 3px 12px rgba(0,0,0,.18)">📖 К непрочитанному →</button></div><div class="ref-lbl"><span id="r-ref">—</span><button class="ico-btn" onclick="addBm()">⭐</button></div><div class="tabs" id="r-tabs"></div><div class="sc" id="r-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button><button class="read-btn alt" id="r-more-btn" style="display:none" type="button">📚 Хочу прочесть следующий день</button><a class="tlink" id="r-tlink" target="_blank"><span style="font-size:16px">📚</span> Читать другой перевод</a><div class="phrase" id="r-phrase"></div></div>
+<div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="plan-list"></div><div class="card" style="cursor:pointer" onclick="goPage('pg-seq');initSeq()"><div class="card-top"><div class="card-ico">📜</div><div class="card-info"><div class="card-title">Свободное чтение</div><div class="card-meta">Свободное чтение, без графика</div></div><div class="badge">Гибкий</div></div></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span class="chan-ico">📻</span><span class="chan-txt">Канал<b>«От чтения к Преображению»</b></span><span class="chan-arrow">→</span></a><div style="text-align:center;margin:10px 0 2px"><a href="https://bible.by/audio/" target="_blank" style="font-size:12px;color:var(--txt2)">🎧 Аудио: bible.by</a></div></div>
+<div class="pg" id="pg-read"><div class="topbar"><button class="streak-btn" id="streak-badge" onclick="toggleStats()"><span style="font-size:20px" id="streak-ico">🔥</span><span class="streak-n" id="r-streak">0</span><span class="streak-l" id="r-streak-l">дней подряд</span></button><div style="display:flex;gap:5px"><button class="ico-btn" onclick="cycleTheme()" id="theme-btn">☀️</button><button class="ico-btn" onclick="goPage('pg-cfg')">⚙️</button></div></div><div id="stats-panel" style="display:none"><div class="stats-box"><div class="sg"><div class="si"><div class="sv" id="s-pct">0%</div><div class="sk">выполнено</div></div><div class="si"><div class="sv" id="s-done">0</div><div class="sk">дней готово</div></div><div class="si"><div class="sv" id="s-left">0</div><div class="sk">осталось</div></div><div class="si"><div class="sv" id="s-streak">0</div><div class="sk">дней подряд</div></div><div class="si"><div class="sv" id="s-max">0</div><div class="sk">рекорд</div></div><div class="si"><div class="sv" id="s-start">—</div><div class="sk">начат</div></div></div><div class="pb"><div class="pf" id="s-bar" style="width:0%"></div></div><div class="pl" id="s-plan-t"></div><button class="sec-tog" onclick="toggleCal()">📅 Календарь <span id="cal-arr">▼</span></button><div id="cal-wrap" style="display:none"><div class="cal-grid" id="cal-grid"></div></div></div></div><div class="cstat" id="r-cstat"></div><div class="pb" style="margin-bottom:10px"><div class="pf" id="r-bar" style="width:0%"></div></div><div class="day-nav"><button class="nav-btn" id="btn-prev" onclick="goDay(-1)">←</button><div class="day-info"><div class="day-n" id="r-day-n">День 1</div><div class="day-d" id="r-day-d"></div></div><button class="nav-btn" id="btn-next" onclick="goDay(1)">→</button></div><div id="r-audio" style="display:none;margin:10px 0"></div><div id="to-today" style="margin-bottom:10px;display:none"><button onclick="goToday()" style="width:100%;font-size:15px;font-weight:800;color:#fff;background:var(--acc);border:none;border-radius:10px;padding:13px;cursor:pointer;font-family:var(--fui);box-shadow:0 3px 12px rgba(0,0,0,.18)">📖 К непрочитанному →</button></div><div class="ref-lbl"><span id="r-ref">—</span><button class="ico-btn" onclick="addBm()">⭐</button></div><div class="tabs" id="r-tabs"></div><div class="sc" id="r-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button><button class="read-btn alt" id="r-more-btn" style="display:none" type="button">📚 Хочу прочесть следующий день</button><a class="tlink" id="r-tlink" target="_blank"><span style="font-size:16px">📚</span> Читать другой перевод</a><div class="phrase" id="r-phrase"></div></div>
 <div class="pg" id="pg-seq"><div class="hdr"><h1>📜 Свободное чтение</h1></div><div class="seq-nav"><select class="seq-sel" id="seq-book" onchange="seqBook()"></select><select class="seq-sel" id="seq-ch" onchange="seqRender()"></select></div><div class="sc" id="seq-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-out" style="margin-top:0;flex:1" onclick="seqPrev()">← Назад</button><button class="btn btn-acc" style="margin-top:0;flex:1" onclick="seqNext()">Далее →</button></div><button class="btn btn-out" style="margin-top:8px" onclick="addSeqBm()">⭐ Закладка</button><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
 <div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div id="con-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="con-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="con-not-tog" onclick="conTogNot()"></button></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Выбрать план</button><button class="btn btn-out" onclick="conEditId=null;conChrono=false;goPage('pg-sel');renderSel()">Вернуться</button></div>
-<div class="pg" id="pg-setup"><div class="hdr"><h1 id="setup-title">📖 План</h1></div><div class="prev-box" id="setup-meta" style="margin-bottom:14px"></div><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="setup-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="setup-not-tog" onclick="setupTogNot()"></button></div><button class="btn btn-acc" onclick="startPlan()">Выбрать план</button><button class="btn btn-out" onclick="setupBack()">Вернуться</button></div>
+<div class="pg" id="pg-setup"><div class="hdr"><h1 id="setup-title">📖 План</h1></div><div class="prev-box" id="setup-meta" style="margin-bottom:14px"></div><div class="sec" id="setup-audio-wrap" style="display:none">Озвучка
+<select id="setup-audio-ver" onchange="setupAudioPick()" style="width:100%;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"></select></div><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="setup-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="setup-not-tog" onclick="setupTogNot()"></button></div><button class="btn btn-acc" onclick="startPlan()">Выбрать план</button><button class="btn btn-out" onclick="setupBack()">Вернуться</button></div>
 
 <div class="pg" id="pg-bm"><div class="hdr"><h1>⭐ Закладки</h1></div><div id="bm-list"></div><div id="bm-empty" style="display:none;text-align:center;padding:36px;color:var(--txt2);font-size:14px">Нет закладок.<br>Нажми ⭐ во время чтения.</div></div>
-<div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-empty" style="font-size:12px;color:var(--txt2);margin-bottom:10px;display:none">Сначала выбери план на вкладке «Планы»</div><select id="cfg-plan-sel" onchange="cfgSelectPlan(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px;margin-bottom:12px"></select><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid" style="grid-template-columns:repeat(3,1fr)"><button onclick="setTheme('auto')" id="th-auto" class="th-btn"><div>🌗</div>Авто</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button></div><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span>Номера стихов</span><button class="tog on" id="cfg-vn-tog" onclick="cfgTogVn()"></button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div id="font-track" style="flex:1;height:28px;display:flex;align-items:center;position:relative;touch-action:none;cursor:pointer"><div style="width:100%;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div></div>
+<div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-empty" style="font-size:12px;color:var(--txt2);margin-bottom:10px;display:none">Сначала выбери план на вкладке «Планы»</div><select id="cfg-plan-sel" onchange="cfgSelectPlan(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px;margin-bottom:12px"></select><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div></div><div class="cfg-box" id="cfg-audio-wrap" style="display:none"><h3>🎧 Озвучка</h3><select id="cfg-audio-ver" onchange="cfgAudioPick(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px"></select><div style="font-size:11px;color:var(--txt2);margin-top:6px">Прогресс дней не зависит от озвучки</div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid" style="grid-template-columns:repeat(3,1fr)"><button onclick="setTheme('auto')" id="th-auto" class="th-btn"><div>🌗</div>Авто</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button></div><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span>Номера стихов</span><button class="tog on" id="cfg-vn-tog" onclick="cfgTogVn()"></button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div id="font-track" style="flex:1;height:28px;display:flex;align-items:center;position:relative;touch-action:none;cursor:pointer"><div style="width:100%;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div><div style="text-align:center;margin:14px 0 4px"><a href="https://bible.by/audio/" target="_blank" style="font-size:12px;color:var(--txt2)">🎧 Аудио: bible.by</a></div></div>
 
 <div class="pg" id="pg-done"><div class="done-wrap"><div class="done-em">🎉</div><h2 style="font-size:24px;font-weight:800;margin-bottom:8px">План завершён!</h2><p style="font-size:14px;color:var(--txt2);line-height:1.6;margin-bottom:20px" id="done-txt"></p><button class="btn btn-acc" onclick="goPage('pg-sel')">Выбрать новый план</button><a class="chan-ban" style="margin-top:20px" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span class="chan-ico">📻</span><span class="chan-txt">Хочешь двигаться дальше?<b>Канал «От чтения к Преображению»</b></span><span class="chan-arrow">→</span></a></div></div>
 <div class="bnav" id="bnav" style="display:none"><button class="nb on" id="nb-read" onclick="switchTab('read')"><span class="nb-em">📖</span>Чтение</button><button class="nb" id="nb-bm" onclick="switchTab('bm')"><span class="nb-em">⭐</span>Закладки</button><button class="nb" id="nb-sel" onclick="switchTab('sel')"><span class="nb-em">🏠</span>Планы</button><button class="nb" id="nb-cfg" onclick="switchTab('cfg')"><span class="nb-em">⚙️</span>Настройки</button></div>
@@ -204,7 +236,7 @@ var NT_CHRONO_TITLES=["Пролог. Слово стало плотию", "Св�
    зависал на "Загружаем Библию"). Загружается асинхронно с кэшем в
    localStorage; init() ждёт его так же, как loadBible(). */
 var PLANS_PERI={};
-var PLANS_PERI_VER='v3';
+var PLANS_PERI_VER='v4';
 function loadPlansPeri(){
   try{
     if(localStorage.getItem('pp_ver')===PLANS_PERI_VER){
@@ -236,6 +268,127 @@ var PLANS=[
  {id:"chrono_365",title:"Хронологический план за год",icon:"🕰️",days:365,diff:"challenging",desc:"Вся Библия в хронологическом порядке событий за 365 дней — 10 эпох, от сотворения мира до Откровения. Псалмы и пророки — на своих исторических местах.",schedule:PLANS_PERI.chrono_365}
 ];
 var VC={"Бытие":[31,25,24,26,32,22,24,22,29,32,32,20,18,24,21,16,27,33,38,18,34,24,20,67,34,35,46,22,35,43,55,32,20,31,29,43,36,30,23,23,57,38,34,34,28,34,31,22,33,26],"Исход":[22,25,22,31,23,30,25,32,35,29,10,51,22,31,27,36,16,27,25,26,36,31,33,18,40,37,21,43,46,38,18,35,23,35,35,38,29,31,43,38],"Левит":[17,16,17,35,19,30,38,36,24,20,47,8,59,56,33,34,16,30,37,27,24,33,44,23,55,46,34],"Числа":[54,34,51,49,31,27,89,26,23,36,35,15,34,45,41,50,13,32,22,29,35,41,30,25,18,65,23,31,39,17,54,42,55,29,34,13],"Второзаконие":[46,37,29,49,33,25,26,20,29,22,32,32,18,29,23,22,20,22,21,20,23,30,25,22,19,19,26,68,29,20,30,52,29,12],"Иисус Навин":[18,24,17,24,16,26,26,35,27,43,23,24,33,15,63,10,18,28,51,9,45,34,16,33],"Судьи":[36,23,31,24,31,40,25,35,57,18,40,15,25,20,20,31,13,31,30,48,25],"Руфь":[22,23,18,22],"1 Царств":[28,36,21,22,12,21,17,22,27,27,15,25,23,52,35,23,58,30,24,43,15,23,28,23,44,25,12,25,11,31,13],"2 Царств":[27,32,39,12,25,23,29,18,13,19,27,31,39,33,37,23,29,33,43,26,22,51,39,25],"3 Царств":[53,46,28,34,18,38,51,66,28,29,43,33,34,31,34,34,24,46,21,43,29,53],"4 Царств":[18,25,27,44,27,33,20,29,37,36,21,21,25,29,38,20,41,37,37,21,26,20,37,20,30],"1 Паралипоменон":[54,55,24,43,26,81,40,40,44,14,47,40,14,17,29,43,27,17,19,8,30,19,32,31,31,32,34,21,30],"2 Паралипоменон":[17,18,17,22,14,42,22,18,31,19,23,16,22,15,19,14,19,34,11,37,20,12,21,27,28,23,9,27,36,27,21,33,25,33,27,23],"Ездра":[11,70,13,24,17,22,28,36,15,44],"Неемия":[11,20,32,23,19,19,73,18,38,39,36,47,31],"Есфирь":[22,23,15,17,14,14,10,17,32,3],"Иов":[22,13,26,21,27,30,21,22,35,22,20,25,28,22,35,22,16,21,29,29,34,30,17,25,6,14,23,28,25,31,40,22,33,37,16,33,24,41,35,27,26,17],"Псалтирь":[6,12,9,9,13,11,18,10,39,7,9,6,7,5,11,15,51,15,10,14,32,6,10,22,12,14,9,11,13,25,11,22,23,28,13,40,23,14,18,14,12,5,27,18,12,10,15,21,23,21,11,7,9,24,14,12,12,18,14,9,13,12,11,14,20,8,36,37,6,24,20,28,23,11,13,21,72,13,20,17,8,19,13,14,17,7,19,53,17,16,16,5,23,11,13,12,9,9,5,8,29,22,35,45,48,43,14,31,7,10,10,9,26,9,10,2,29,176,7,8,9,4,8,5,6,5,6,8,8,3,18,3,3,21,26,9,8,24,14,10,7,12,15,21,10,11,9,14,9,6],"Притчи":[33,22,35,27,23,35,27,36,18,32,31,28,25,35,33,33,28,24,29,30,31,29,35,34,28,28,27,28,27,33,31],"Екклесиаст":[18,26,22,17,19,12,29,17,18,20,10,14],"Песнь Песней":[16,17,11,16,16,12,14,14],"Исаия":[31,22,25,6,30,13,25,22,21,34,16,6,22,32,9,14,14,7,25,6,17,25,18,23,12,21,13,29,24,33,9,20,24,17,10,22,38,22,8,31,29,25,28,28,25,13,15,22,26,11,23,15,12,17,13,12,21,14,21,22,11,12,19,12,25,24],"Иеремия":[19,37,25,31,31,30,34,22,26,25,23,17,27,22,21,21,27,23,15,18,14,30,40,10,38,24,22,17,32,24,40,44,26,22,19,32,21,28,18,16,18,22,13,30,5,28,7,47,39,46,64,34],"Плач Иеремии":[22,22,66,22,22],"Иезекииль":[28,10,27,17,17,14,27,18,11,22,25,28,23,23,8,63,24,32,14,49,32,31,49,27,17,21,36,26,21,26,18,32,33,31,15,38,28,23,29,49,26,20,27,31,25,24,23,35],"Даниил":[21,49,33,34,31,28,28,27,27,21,45,13],"Осия":[11,23,5,19,15,11,16,14,17,15,12,14,15,10],"Иоиль":[20,32,21],"Амос":[15,16,15,13,27,14,17,14,15],"Авдий":[21],"Иона":[16,11,10,11],"Михей":[16,13,12,13,15,16,20],"Наум":[15,13,19],"Аввакум":[17,20,19],"Софония":[18,15,20],"Аггей":[15,23],"Захария":[21,13,10,14,11,15,14,23,17,12,17,14,9,21],"Малахия":[14,17,18,6],"Матфей":[25,23,17,25,48,34,29,34,38,42,30,50,58,36,39,28,27,35,30,34,46,46,39,51,46,75,66,20],"Марк":[45,28,35,41,43,56,37,38,50,52,33,44,37,72,47,20],"Лука":[80,52,38,44,39,49,50,56,62,42,54,59,35,35,32,31,37,43,48,47,38,71,56,53],"Иоанн":[51,25,36,54,47,71,53,59,41,42,57,50,38,31,27,33,26,40,42,31,25],"Деяния":[26,47,26,37,42,15,60,40,43,48,30,25,52,28,41,40,34,28,40,38,40,30,35,27,27,32,44,31],"Римлянам":[32,29,31,25,21,23,25,39,33,21,36,21,14,26,33,24],"1 Коринфянам":[31,16,23,21,13,20,40,13,27,33,34,31,13,40,58,24],"2 Коринфянам":[24,17,18,18,21,18,16,24,15,18,32,21,13],"Галатам":[24,21,29,31,26,18],"Ефесянам":[23,22,21,32,33,24],"Филиппийцам":[30,30,21,23],"Колоссянам":[29,23,25,18],"1 Фессалоникийцам":[10,20,13,18,28],"2 Фессалоникийцам":[12,17,18],"1 Тимофею":[20,15,16,16,25,21],"2 Тимофею":[18,26,17,22],"Титу":[16,15,15],"Филимону":[25],"Евреям":[14,18,19,16,14,20,28,13,28,39,40,29,25],"Иаков":[27,26,18,17,20],"1 Петра":[25,25,22,19,14],"2 Петра":[21,22,18],"1 Иоанна":[10,29,24,21,21],"2 Иоанна":[13],"3 Иоанна":[15],"Иуда":[25],"Откровение":[20,29,22,11,14,17,17,13,21,11,19,17,18,20,8,21,18,24,21,15,27,21]};
+
+/* ==================== АУДИО-ПЛАН: ЧАСТЬ 1. ДАННЫЕ И ГЕНЕРАТОРЫ ==================== */
+/* ---------- ЧАСТЬ 1. ДАННЫЕ И ГЕНЕРАТОРЫ ---------- */
+
+var AUDIO_VER = 'v3';
+var AUDIO_BASE = 'https://4bbl.ru/data/';           /* CDN с mp3-файлами */
+var AUDIO_SITE = 'https://bible.by/audio/';         /* сайт-источник (человекочитаемый фолбэк) */
+var AUDIO_DEFAULT = 'syn-bondarenko';               /* озвучка по умолчанию */
+
+/* Каталог аудио-версий. Поля:
+   slug     — код версии в URL bible.by и папки на 4bbl.ru (совпадают);
+   tr       — перевод; narrator — чтец; music — музыкальное сопровождение;
+   note     — необязательная подпись для тултипа/атрибуции в UI.
+   Все три версии проверены почapterно: 1189/1189 файлов, дыр нет. */
+var AUDIO_VERSIONS = [
+  { slug:'syn-bondarenko',  tr:'Синодальный',      narrator:'Александр Бондаренко', music:true,
+    note:'1–2 Паралипоменон и Песнь Песней читает Игорь Козлов' },
+  { slug:'syn-jbl',         tr:'Синодальный',      narrator:'«Свет на Востоке»',    music:false },
+  { slug:'bti-prozorovsky', tr:'ИПБ (Кулаковых)',  narrator:'Виктор Прозоровский',  music:false }
+];
+
+/* Индивидуальные дыры версий (slug → {книга: [главы]}). На 19.10.2026 пусто:
+   у всех трёх выбранных озвучек файлы полного канона на месте.
+   Если источник пополнится/поломается — править только этот блок. */
+var AUDIO_GAPS = {};
+
+/* Число глав в аудио-хранилище по книгам (Псалтирь в аудио 150 — Пс 151 = 404;
+   Даниил 12 — неканонические 13-14 отсутствуют). Совпадает с VC, кроме Псалтири. */
+var AUDIO_CHAPTERS = {'Бытие':50,'Исход':40,'Левит':27,'Числа':36,'Второзаконие':34,'Иисус Навин':24,'Судьи':21,
+  'Руфь':4,'1 Царств':31,'2 Царств':24,'3 Царств':22,'4 Царств':25,'1 Паралипоменон':29,'2 Паралипоменон':36,
+  'Ездра':10,'Неемия':13,'Есфирь':10,'Иов':42,'Псалтирь':150,'Притчи':31,'Екклесиаст':12,'Песнь Песней':8,
+  'Исаия':66,'Иеремия':52,'Плач Иеремии':5,'Иезекииль':48,'Даниил':12,'Осия':14,'Иоиль':3,'Амос':9,'Авдий':1,
+  'Иона':4,'Михей':7,'Наум':3,'Аввакум':3,'Софония':3,'Аггей':2,'Захария':14,'Малахия':4,
+  'Матфей':28,'Марк':16,'Лука':24,'Иоанн':21,'Деяния':28,'Римлянам':16,'1 Коринфянам':16,'2 Коринфянам':13,
+  'Галатам':6,'Ефесянам':6,'Филиппийцам':4,'Колоссянам':4,'1 Фессалоникийцам':5,'2 Фессалоникийцам':3,
+  '1 Тимофею':6,'2 Тимофею':4,'Титу':3,'Филимону':1,'Евреям':13,'Иаков':5,'1 Петра':5,'2 Петра':3,
+  '1 Иоанна':5,'2 Иоанна':1,'3 Иоанна':1,'Иуда':1,'Откровение':22};
+
+/* Прямая ссылка на mp3-файл главы. Паттерн подтверждён на всех версиях каталога:
+   https://4bbl.ru/data/{slug}/{книга 2-значная}/{глава 2-значная}.mp3 */
+function audioUrl(book, ch, slug){
+  var n = BOOK_NUM[book]; if(!n || !AUDIO_CHAPTERS[book] || ch < 1 || ch > AUDIO_CHAPTERS[book]) return null;
+  var p = function(x){ return (x < 10 ? '0' : '') + x; };
+  return AUDIO_BASE + slug + '/' + p(n) + '/' + p(ch) + '.mp3';
+}
+
+/* Страница главы на bible.by — человекочитаемый фолбэк при ошибке файла */
+function audioPageUrl(book, ch, slug){
+  var n = BOOK_NUM[book]; if(!n) return null;
+  return AUDIO_SITE + slug + '/' + n + '/' + ch + '/';
+}
+
+/* Доступна ли глава в версии (сейчас — всегда да; запасной крюк на будущее) */
+function audioChapterAvailable(slug, book, ch){
+  var g = AUDIO_GAPS[slug];
+  return !(g && g[book] && g[book].indexOf(ch) >= 0);
+}
+
+/* Найти версию по slug */
+function audioVer(slug){
+  for(var i = 0; i < AUDIO_VERSIONS.length; i++){ if(AUDIO_VERSIONS[i].slug === slug) return AUDIO_VERSIONS[i]; }
+  return null;
+}
+
+var AUDIO_OT = Object.keys(AUDIO_CHAPTERS).slice(0, 39);
+var AUDIO_NT = Object.keys(AUDIO_CHAPTERS).slice(39);
+
+/* Фолбэк-генератор расписания: целые главы → дни в формате refs. Используется,
+   только если PLANS_PERI.audio_* ещё не прогрузился (как getChrono365Schedule).
+   Основной источник расписаний — plans.json (ключи audio_365/180/90/30). */
+function buildAudioSchedule(bookNames, days){
+  var flat = [];
+  for(var b = 0; b < bookNames.length; b++){
+    var book = bookNames[b], n = AUDIO_CHAPTERS[book];
+    if(!n) continue;
+    for(var c = 1; c <= n; c++){
+      var last = (VC[book] && VC[book][c-1]) ? VC[book][c-1] : 1;
+      flat.push({ book:book, c1:c, v1:1, c2:c, v2:last });
+    }
+  }
+  days = Math.max(1, Math.min(days || 365, flat.length));
+  var per = Math.floor(flat.length / days), rem = flat.length % days, out = [], idx = 0;
+  for(var d = 0; d < days; d++){
+    var take = per + (d < rem ? 1 : 0);
+    out.push({ day:d + 1, refs:flat.slice(idx, idx + take) });
+    idx += take;
+  }
+  return out;
+}
+
+/* Готовые аудио-планы. Расписание — из plans.json (PLANS_PERI_VER='v4'),
+   фолбэк — buildAudioSchedule. IDs совпадают с ключами plans.json. */
+var AUDIO_PRESETS = [
+  { id:'audio_365', title:'Аудио: Библия за год',          icon:'🎧', days:365, diff:'challenging',  scope:'full' },
+  { id:'audio_180', title:'Аудио: Библия за полгода',      icon:'🎧', days:180, diff:'challenging',  scope:'full' },
+  { id:'audio_90',  title:'Аудио: Новый Завет за 90 дней', icon:'🎧', days:90,  diff:'recommended', scope:'nt' },
+  { id:'audio_30',  title:'Аудио: Новый Завет за 30 дней', icon:'🎧', days:30,  diff:'recommended', scope:'nt' }
+];
+var AUDIO_PRESET_DESC = 'Слушай Библию по целым главам. Озвучка и перевод — на выбор; дни и стрик считаются как в обычных планах.';
+
+function audioScopeBooks(scope){ return scope === 'nt' ? AUDIO_NT : AUDIO_OT.concat(AUDIO_NT); }
+
+/* Идентификация аудио-планов (id начинается с audio_) */
+function isAudioPlanId(id){ return !!id && String(id).indexOf('audio_') === 0; }
+
+/* Выбранная озвучка плана: хранится в прогрессе плана, дефолт — Бондаренко.
+   Если сохранённый slug больше не в каталоге — тихо возвращаем дефолт. */
+function audioPlanSlug(planId){
+  var pr = app.progress[planId];
+  var slug = pr && pr.audioSlug ? pr.audioSlug : AUDIO_DEFAULT;
+  return audioVer(slug) ? slug : AUDIO_DEFAULT;
+}
+
+/* Пресеты аудио-планов в общий реестр (карточки в pg-sel рендерятся тем же кодом) */
+for(var _ai=0;_ai<AUDIO_PRESETS.length;_ai++){
+  var _P0=AUDIO_PRESETS[_ai];
+  PLANS.push({ id:_P0.id, title:_P0.title, icon:_P0.icon, days:_P0.days, diff:_P0.diff,
+    audio:true, scope:_P0.scope, desc:AUDIO_PRESET_DESC,
+    schedule:PLANS_PERI[_P0.id]||buildAudioSchedule(audioScopeBooks(_P0.scope), _P0.days) });
+}
+
 var FS=[0.82,0.92,1.02,1.14,1.28];
 
 var PHRASES=['Твоя верность день за днём — это сила','Каждый шаг приближает к цели','Слово Божье преображает изнутри','Продолжай — ты на верном пути!','Читая Писание, ты слышишь Бога','Настойчивость — твой лучший друг'];
@@ -364,7 +517,7 @@ function saveApp(){try{localStorage.setItem('bapp3',JSON.stringify(app));}catch(
 var BIBLE_CACHE_VER='v1';
 /* Версия приложения для футера: повышать при значимых изменениях
    (модель чтения, новые экраны). Формат: мажор.минор.патч. */
-var APP_VERSION='1.1.0';
+var APP_VERSION='1.2.0';
 async function loadBible(){
   if(bible)return;
   var raw=null;
@@ -809,6 +962,7 @@ function selPlan(id){
   var s=app.settings||{};
   var ti=document.getElementById('setup-time');if(ti)ti.value=s.notifyTime||'08:00';
   var tb=document.getElementById('setup-not-tog');if(tb)tb.className='tog'+(s.notifyOn!==false?' on':'');
+  setupAudioFill(p);
   goPage('pg-setup');
 }
 function setupBack(){
@@ -833,6 +987,10 @@ async function startPlan(){
   app.settings.notifyTime=time;app.settings.notifyHourMsk=msk.hour;app.settings.notifyMinuteMsk=msk.minute;
   app.activePlanId=selPlanId;
   app.progress[selPlanId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],pericopePos:{},notifyTime:time,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings.notifyOn!==false};
+  if(isAudioPlanId(selPlanId)){
+    var _asel=document.getElementById('setup-audio-ver');
+    app.progress[selPlanId].audioSlug=(_asel&&_asel.value)?_asel.value:AUDIO_DEFAULT;
+  }
   saveApp();
   if(userId){try{var _r0=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:selPlanId,title:(getPlan(selPlanId)||{}).title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.settings.notifyOn!==false,init_data:tgInitData})});syncBadge(_r0.ok);}catch(e){syncBadge(false);}}
   haptic('success');viewDay=null;goPage('pg-read');renderRead();
@@ -1119,6 +1277,12 @@ function renderRead(){
   el=document.getElementById('btn-next');if(el)el.disabled=vd>=plan.days;
   el=document.getElementById('to-today');if(el)el.style.display=!isLanding?'block':'none';
   el=document.getElementById('r-ref');if(el)el.textContent=dd.label||dd.refs.map(_refLabel).join('; ');
+  /* АУДИО-ПЛАН: плеер вместо шрифтового блока не прячем — текст дня остаётся
+     доступным; плеер открывается на отображаемом дне (vd). */
+  var isAud=isAudioPlanId(app.activePlanId);
+  var aw=document.getElementById('r-audio');
+  if(aw)aw.style.display=isAud?'block':'none';
+  if(isAud)apOpen(app.activePlanId,vd);
   var tabs=buildTabs(dd.refs);
   if(activeTab>=tabs.length)activeTab=0;
   var tabsEl=document.getElementById('r-tabs');
@@ -1191,6 +1355,7 @@ function renderSc(tab){
 
 function updReadBtn(tabs,isFuture,isDayRead,isLanding,vd,isPlanDone){
   var btn=document.getElementById('r-read-btn');if(!btn)return;
+  var isAud=isAudioPlanId(app.activePlanId);
   var more=document.getElementById('r-more-btn');
   var isLast=activeTab>=tabs.length-1;
   var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];
@@ -1225,12 +1390,12 @@ function updReadBtn(tabs,isFuture,isDayRead,isLanding,vd,isPlanDone){
   if(isPlanDone){
     /* План прочитан целиком: раньше кнопка оставалась disabled
        «✓ День N прочитан» и выглядела зависшей. */
-    btn.textContent='🎉 План прочитан полностью';
+    btn.textContent=isAud?'🎉 План прослушан полностью':'🎉 План прочитан полностью';
     btn.disabled=false;btn.className='read-btn';
     btn.onclick=function(){goPage('pg-done');};
   } else if(isDayRead&&isFuture){
     /* Уже прочитанный «наперёд» день: перечитать можно, отметить заново нельзя. */
-    btn.textContent='✓ День '+vd+' прочитан (наперёд)';
+    btn.textContent=isAud?('✓ День '+vd+' прослушан (наперёд)'):('✓ День '+vd+' прочитан (наперёд)');
     btn.disabled=true;btn.className='read-btn done';btn.onclick=null;
   } else if(isDayRead){
     /* ПРОЧИТАННЫЙ ДЕНЬ НА ГРАФИКЕ ИЛИ В ДОЛГЕ (позади календаря): та же
@@ -1242,9 +1407,9 @@ function updReadBtn(tabs,isFuture,isDayRead,isLanding,vd,isPlanDone){
        дни 3+ нет). Теперь прочитанный день ведёт себя одинаково на всех
        перикопах: прохождение завершено; перечитывание доступно через
        вкладки фрагментов, отметка заново не требуется. */
-    btn.textContent='✓ День '+vd+' прочитан';
+    btn.textContent=isAud?('✓ День '+vd+' прослушан'):('✓ День '+vd+' прочитан');
     btn.disabled=true;btn.className='read-btn done';btn.onclick=null;
-  } else if(!isLast&&isLanding){
+  } else if(!isLast&&isLanding&&!isAud){
     /* Чреда фрагментов дня — только на ПОЗИЦИИ ЧТЕНИЯ (первый непрочитанный
        день). На чужих днях (впереди позиции или дырки позади) навигационная
        кнопка НЕ активна — активная кнопка подтверждения может быть только
@@ -1258,7 +1423,7 @@ function updReadBtn(tabs,isFuture,isDayRead,isLanding,vd,isPlanDone){
     /* Позиция чтения (первый непрочитанный день плана) — единственное место,
        где отметка активна. Если позиция впереди календаря (чтение впрок) —
        подпись «(наперёд)», стрик от этого не растёт: +1 раз за день. */
-    btn.textContent='✓ Прочитал день '+vd+(isFuture?' (наперёд)':'');
+    btn.textContent=(isAud?'✓ Прослушал день ':'✓ Прочитал день ')+vd+(isFuture?' (наперёд)':'');
     btn.disabled=false;btn.className='read-btn';
     btn.onclick=markRead;
   } else {
@@ -1374,6 +1539,180 @@ async function flushPending(){
   pendStore(rest);
   if(rest.length)schedPendRetry();else{syncBadge(true);renderRead();}
 }
+
+
+/* ==================== АУДИО-ПЛАН: ЧАСТЬ 2. ПЛЕЕР ==================== */
+/* ---------- ЧАСТЬ 2. ПЛЕЕР ---------- */
+
+/* Состояние плеера и позиция прослушивания (localStorage, офлайн) */
+var AP = { a:null, planId:null, day:null, idx:0, list:[], ready:false };
+function apPosKey(){ return 'audio_pos_v1'; }
+function apLoadPos(){
+  try{ return JSON.parse(localStorage.getItem(apPosKey()) || '{}'); }catch(e){ return {}; }
+}
+function apSavePos(sec){
+  try{
+    var all = apLoadPos(), me = all[AP.planId] || {};
+    me.day = AP.day; me.idx = AP.idx; me.sec = sec || 0; me.ts = Date.now();
+    all[AP.planId] = me;
+    localStorage.setItem(apPosKey(), JSON.stringify(all));
+  }catch(e){}
+}
+
+/* Главы дня аудио-плана: [{book, ch, url, page, ok}] */
+function apDayChapters(planId, day){
+  var plan = getPlan(planId), out = [];
+  if(!plan || !plan.schedule || !plan.schedule[day - 1]) return out;
+  var refs = plan.schedule[day - 1].refs, slug0 = audioPlanSlug(planId);
+  for(var i = 0; i < refs.length; i++){
+    var r = refs[i];
+    for(var c = r.c1; c <= r.c2; c++){
+      out.push({ book:r.book, ch:c,
+        url:audioUrl(r.book, c, slug0), page:audioPageUrl(r.book, c, slug0),
+        ok:audioChapterAvailable(slug0, r.book, c) });
+    }
+  }
+  return out;
+}
+
+function apEnsure(){
+  if(AP.a) return;
+  AP.a = new Audio();
+  AP.a.preload = 'metadata';
+  AP.a.addEventListener('ended', apNext);
+  AP.a.addEventListener('error', apError);
+  AP.a.addEventListener('timeupdate', function(){
+    if(AP.a && !AP.a.paused) apTick();
+  });
+}
+var _apLastSave = 0;
+function apTick(){
+  var now = Date.now();
+  if(now - _apLastSave > 5000){ _apLastSave = now; apSavePos(AP.a.currentTime || 0); }
+}
+
+function apOpen(planId, day){
+  apEnsure(); apPause();
+  AP.planId = planId; AP.day = day;
+  AP.list = apDayChapters(planId, day);
+  /* восстановление позиции дня */
+  var pos = apLoadPos()[planId];
+  AP.idx = (pos && pos.day === day && pos.idx < AP.list.length) ? pos.idx : 0;
+  AP.ready = AP.list.length > 0;
+  apRender();
+}
+
+function apPlay(idx){
+  if(!AP.list[idx]) return;
+  AP.idx = idx;
+  var it = AP.list[idx];
+  if(!it.ok || !it.url){ apError(); return; }
+  apEnsure();
+  var pos = apLoadPos()[AP.planId];
+  AP.a.src = it.url;
+  AP.a.currentTime = (pos && pos.day === AP.day && pos.idx === idx && pos.sec > 5) ? pos.sec : 0;
+  AP.a.play();
+  haptic('light');
+  apRender();
+}
+function apPause(){
+  if(AP.a && !AP.a.paused){ AP.a.pause(); apSavePos(AP.a.currentTime || 0); apRender(); }
+}
+function apToggle(){ if(!AP.ready) return; (AP.a && !AP.a.paused && AP.a.src) ? apPause() : apPlay(AP.idx); }
+function apNext(){
+  apSavePos(0);
+  if(AP.idx < AP.list.length - 1){ apPlay(AP.idx + 1); }
+  else { apRender(); apPulseDone(); }
+}
+function apPrev(){ if(AP.idx > 0){ apSavePos(0); apPlay(AP.idx - 1); } else if(AP.a){ AP.a.currentTime = 0; } }
+
+/* Ошибка загрузки файла (404/сеть): пометить главу, дать фолбэк на bible.by
+   и кнопку следующей главы. Для выбранных 3 озвучек штатных дыр нет —
+   сработает только при сбое сети или удалении файла источником. */
+function apError(){
+  var it = AP.list[AP.idx];
+  if(it) it.failed = true;
+  apRender();
+  var box = document.getElementById('r-audio-err');
+  if(box && it){
+    box.style.display = 'block';
+    box.innerHTML = '⚠️ Глава «' + it.book + ' ' + it.ch + '» недоступна в этой озвучке. ' +
+      '<a href="' + it.page + '" target="_blank" style="color:var(--acc)">Открыть на bible.by</a>' +
+      ' или <a href="#" onclick="apNext();return false" style="color:var(--acc)">следующая глава</a>.';
+  }
+  if(AP.a && !AP.a.paused) AP.a.pause();
+}
+
+function apPulseDone(){
+  var b = document.getElementById('r-read-btn');
+  if(b){ b.classList.add('ap-pulse'); setTimeout(function(){ b.classList.remove('ap-pulse'); }, 2400); }
+}
+
+/* Рендер: чипы глав + панель плеера. Контейнер #r-audio добавляется в pg-read (ЧАСТЬ 3) */
+function apRender(){
+  var wrap = document.getElementById('r-audio');
+  if(!wrap || !isAudioPlanId(app.activePlanId)) return;
+  var now = (AP.a && !AP.a.paused && AP.a.src) ? '⏸' : '▶';
+  var h = '<div class="ap-bar">' +
+    '<button class="ap-btn" onclick="apPrev()" aria-label="Назад">⏮</button>' +
+    '<button class="ap-btn ap-main" onclick="apToggle()" aria-label="Пуск/пауза">' + now + '</button>' +
+    '<button class="ap-btn" onclick="apNext()" aria-label="Вперёд">⏭</button>' +
+    '<div class="ap-meta"><div class="ap-now">' +
+      (AP.list[AP.idx] ? AP.list[AP.idx].book + ' ' + AP.list[AP.idx].ch : '—') + '</div>' +
+      '<div class="ap-cnt">Глава ' + (AP.idx + 1) + ' из ' + AP.list.length + '</div></div></div>';
+  h += '<div class="ap-chips">';
+  for(var i = 0; i < AP.list.length; i++){
+    var it = AP.list[i];
+    var cls = 'ap-chip' + (i === AP.idx ? ' cur' : '') + (it.ok ? '' : ' na');
+    h += '<button class="' + cls + '" onclick="apPlay(' + i + ')" ' + (it.ok ? '' : 'title="Нет файла в озвучке"') + '>' +
+      it.book.replace(' Паралипоменон', ' Пар.').replace(' Фессалоникийцам', ' Фес.').replace(' Коринфянам', ' Кор.') +
+      ' ' + it.ch + '</button>';
+  }
+  h += '</div><div id="r-audio-err" class="ap-err" style="display:none"></div>';
+  wrap.innerHTML = h;
+}
+/* Селектор озвучки на экране старта плана (pg-setup): показывать только для аудио-пресетов */
+function setupAudioFill(p){
+  var wrap=document.getElementById('setup-audio-wrap'), sel=document.getElementById('setup-audio-ver');
+  if(!wrap||!sel)return;
+  if(!p||!isAudioPlanId(p.id)){wrap.style.display='none';return;}
+  var h='',lastTr=null,cur=audioPlanSlug(p.id);
+  if(!app.progress[p.id])cur=AUDIO_DEFAULT;
+  for(var i=0;i<AUDIO_VERSIONS.length;i++){
+    var v=AUDIO_VERSIONS[i];
+    if(v.tr!==lastTr){h+='<optgroup label="'+v.tr+'">';lastTr=v.tr;}
+    h+='<option value="'+v.slug+'"'+(v.slug===cur?' selected':'')+'>'
+      +v.narrator+(v.music?' (с музыкой)':'')+'</option>';
+    if(i===AUDIO_VERSIONS.length-1||AUDIO_VERSIONS[i+1].tr!==v.tr)h+='</optgroup>';
+  }
+  sel.innerHTML=h;
+  wrap.style.display='block';
+}
+function setupAudioPick(){/* выбор остаётся в селекте до старта плана */}
+
+/* Селектор озвучки в настройках (pg-cfg): смена на лету для активного аудио-плана */
+function cfgAudioFill(prog){
+  var wrap=document.getElementById('cfg-audio-wrap'), sel=document.getElementById('cfg-audio-ver');
+  if(!wrap||!sel)return;
+  if(!prog||!isAudioPlanId(cfgPlanId)||!app.progress[cfgPlanId]){wrap.style.display='none';return;}
+  var h='',lastTr=null,cur=audioPlanSlug(cfgPlanId);
+  for(var i=0;i<AUDIO_VERSIONS.length;i++){
+    var v=AUDIO_VERSIONS[i];
+    if(v.tr!==lastTr){h+='<optgroup label="'+v.tr+'">';lastTr=v.tr;}
+    h+='<option value="'+v.slug+'"'+(v.slug===cur?' selected':'')+'>'
+      +v.narrator+(v.music?' (с музыкой)':'')+'</option>';
+    if(i===AUDIO_VERSIONS.length-1||AUDIO_VERSIONS[i+1].tr!==v.tr)h+='</optgroup>';
+  }
+  sel.innerHTML=h;
+  wrap.style.display='block';
+}
+function cfgAudioPick(slug){
+  var prog=app.progress[cfgPlanId];if(!prog)return;
+  prog.audioSlug=slug;saveApp();haptic('light');
+  if(cfgPlanId===app.activePlanId)renderRead();
+}
+
+
 async function markRead(){
   var plan=getPlan(app.activePlanId);var prog=app.progress[app.activePlanId];if(!plan||!prog)return;
   var cur=curDayNum(plan,prog);
@@ -2044,6 +2383,7 @@ function renderCfg(){
   ['auto','sepia','dark'].forEach(function(t){var b=document.getElementById('th-'+t);if(b)b.classList.toggle('sel',(t==='auto')?(themeMode==='auto'):(themeMode==='manual'&&theme===t));});
 var vnb=document.getElementById('cfg-vn-tog');if(vnb)vnb.className='tog'+(showVerseNums?' on':'');
   var fi=document.getElementById('font-ind');if(fi)fi.style.left=(fontIdx/(FS.length-1)*100-4)+'%';
+  cfgAudioFill(prog);
   var tz=document.getElementById('cfg-tz-note');
   if(tz){var off=-new Date().getTimezoneOffset()/60;tz.textContent='Время указано по твоему часовому поясу (UTC'+(off>=0?'+':'')+off+')';}
 }
