@@ -214,6 +214,14 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 .ap-speed{min-width:48px;padding:4px 10px;border-radius:999px;border:1px solid var(--brd);background:var(--card);
   color:var(--txt);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--fui);transition:transform .12s}
 .ap-speed:active{transform:scale(.93)}
+/* ползунок громкости: иконка-мьют + range между временем и скоростью.
+   oninput меняет только громкость/память/иконку (без apRender) — иначе
+   пересборка innerHTML посреди перетаскивания рвала drag. */
+.ap-vol{display:flex;align-items:center;gap:7px;flex:1;min-width:0;margin:0 6px}
+.ap-vol-i{font-size:14px;line-height:1;cursor:pointer;user-select:none;-webkit-user-select:none;flex:none}
+.ap-vol input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:var(--brd);outline:none;cursor:pointer;padding:0;margin:0}
+.ap-vol input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;background:var(--acc);border:none;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.ap-vol input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--acc);border:none}
 /* смена чтеца внутри дня */
 .ap-narr{display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 10px;
   border:1px solid var(--brd);border-radius:10px;background:var(--card)}
@@ -565,7 +573,7 @@ function saveApp(){try{localStorage.setItem('bapp3',JSON.stringify(app));}catch(
 var BIBLE_CACHE_VER='v1';
 /* Версия приложения для футера: повышать при значимых изменениях
    (модель чтения, новые экраны). Формат: мажор.минор.патч. */
-var APP_VERSION='1.3.0';
+var APP_VERSION='1.3.1';
 async function loadBible(){
   if(bible)return;
   var raw=null;
@@ -1446,8 +1454,15 @@ function updReadBtn(tabs,isFuture,isDayRead,isLanding,vd,isPlanDone){
      или свежей отметки (markRead). Восстановление позиции ставит activeTab=0
      и маркер не ставит — пользователь должен «дойти» сам. */
   if(more){
-    /* АУДИО: цепочки «следующий отрывок» нет — день целиком покрывается дорожками плеера */
-    var moreShow=!!(!isAud&&!isPlanDone&&plan&&prog&&isDayRead&&isLast&&vd<plan.days&&moreArmedDay===vd);
+    /* ЕДИНАЯ логика чтения/прослушивания наперёд (и текст, и аудио):
+       закрыл день → кнопка «Хочу следующий день» → РОВНО один следующий день.
+       Разница модальностей только в двух вещах: у ТЕКСТА нужен isLast
+       (цепочка перикоп внутри дня; аудио-день атомарен — дорожки покрывают
+       его целиком), и подпись кнопки своя. Маркер сессии (moreArmedDay===vd)
+       один и тот же: повторное открытие закрытого дня кнопку не показывает,
+       пока пользователь не сделает явное движение в этом дне. */
+    more.textContent=isAud?'🎧 Хочу прослушать следующий день':'📚 Хочу прочесть следующий день';
+    var moreShow=!!(!isPlanDone&&plan&&prog&&isDayRead&&vd<plan.days&&moreArmedDay===vd&&(isAud||isLast));
     more.style.display=moreShow?'block':'none';
     if(moreShow){
       /* Цель — СТРОГО следующий день (vd+1): доступ вперёд выдаётся по одному
@@ -1638,6 +1653,20 @@ function apSpeedNext(){
   apSpeedSet(AP_SPEEDS[(i+1)%AP_SPEEDS.length]);
   haptic('light');
 }
+/* Громкость: одна на все планы (audio_vol_v1, 0..100). apVolSet намеренно
+   НЕ перерисовывает панель — вызывается на каждом oninput ползунка. */
+function apVolGet(){
+  try{ var v=parseFloat(localStorage.getItem('audio_vol_v1')); if(isFinite(v)&&v>=0&&v<=100) return v; }catch(e){}
+  return 100;
+}
+function apVolIcon(v){ return v<=0?'🔇':(v<45?'🔉':'🔊'); }
+function apVolSet(v){
+  v=Math.max(0,Math.min(100,Number(v)||0));
+  try{ localStorage.setItem('audio_vol_v1',String(v)); }catch(e){}
+  if(AP.a)AP.a.volume=v/100;
+  var i=document.getElementById('ap-vol-i'); if(i)i.textContent=apVolIcon(v);
+}
+function apVolMute(){ apVolSet(apVolGet()>0?0:100); haptic('light'); }
 function apLoadPos(){
   try{ return JSON.parse(localStorage.getItem(apPosKey()) || '{}'); }catch(e){ return {}; }
 }
@@ -1672,6 +1701,7 @@ function apEnsure(){
   AP.a.preload = 'metadata';
   AP.speed = apSpeedGet();
   AP.a.playbackRate = AP.speed;
+  AP.a.volume = apVolGet() / 100;
   AP.a.addEventListener('ended', apNext);
   AP.a.addEventListener('error', apError);
   AP.a.addEventListener('timeupdate', function(){
@@ -1686,12 +1716,18 @@ function apTick(){
 }
 
 function apOpen(planId, day){
-  apEnsure(); apPause();
+  apEnsure();
+  /* Тот же план и тот же день (возврат из Планов/Настроек, re-render после
+     отметки) — НЕ паузим: воспроизведение продолжается бесшовно. Пауза только
+     при переходе к другому дню/плану: там другой список дорожек. */
+  var same = (AP.planId === planId && AP.day === day);
+  if(!same) apPause();
   AP.planId = planId; AP.day = day;
   AP.list = apDayChapters(planId, day);
-  /* восстановление позиции дня */
+  /* восстановление позиции дня (только при смене дня — иначе сбили бы
+     играющую дорожку) */
   var pos = apLoadPos()[planId];
-  AP.idx = (pos && pos.day === day && pos.idx < AP.list.length) ? pos.idx : 0;
+  if(!same) AP.idx = (pos && pos.day === day && pos.idx < AP.list.length) ? pos.idx : 0;
   AP.ready = AP.list.length > 0;
   apRender();
 }
@@ -1762,6 +1798,10 @@ function apRender(){
       '<div class="ap-cnt">Дорожка ' + (AP.idx + 1) + ' из ' + AP.list.length + '</div></div></div>';
   h += '<div class="ap-seek" onclick="apSeek(event)"><div class="ap-seek-f" id="ap-seek-f"></div></div>' +
     '<div class="ap-ctl"><div class="ap-time" id="ap-time"></div>' +
+    '<div class="ap-vol"><span class="ap-vol-i" id="ap-vol-i" onclick="apVolMute()" aria-label="Звук вкл/выкл">' +
+    apVolIcon(apVolGet()) + '</span>' +
+    '<input type="range" id="ap-vol" min="0" max="100" step="5" value="' + apVolGet() +
+    '" oninput="apVolSet(this.value)" aria-label="Громкость"></div>' +
     '<button class="ap-speed" id="ap-speed" onclick="apSpeedNext()" aria-label="Скорость">' +
     apSpeedLbl(AP.speed || 1) + '</button></div>';
   /* Смена чтеца внутри дня: выбор сохраняется в прогрессе плана, дорожки
