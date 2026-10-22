@@ -600,7 +600,7 @@ function saveApp(){try{localStorage.setItem('bapp3',JSON.stringify(app));}catch(
 var BIBLE_CACHE_VER='v1';
 /* Версия приложения для футера: повышать при значимых изменениях
    (модель чтения, новые экраны). Формат: мажор.минор.патч. */
-var APP_VERSION='1.5.1';
+var APP_VERSION='1.5.2';
 async function loadBible(){
   if(bible)return;
   var raw=null;
@@ -1379,9 +1379,10 @@ function renderRead(){
      Плеер открывается на отображаемом дне (vd). */
   var isAud=isAudioPlanId(app.activePlanId);
   var aw=document.getElementById('r-audio');
-  /* v1.5.0: панель плеера живёт в парящем доке внизу экрана — #r-audio больше
-     не показывается в потоке страницы (просьба владельца: «отвяжи плеер»). */
-  if(aw){aw.style.display='none';if(aw.innerHTML)aw.innerHTML='';}
+  /* v1.5.2 (просьба владельца): дорожки дня вернулись В СТРАНИЦУ (#r-audio,
+     где они были до v1.5.0) — клик по дорожке запускает плеер; парящим внизу
+     остаётся только плеер-бар с управлением. */
+  if(aw){aw.style.display=isAud?'block':'none';if(!isAud&&aw.innerHTML)aw.innerHTML='';}
   /* Текстовый каркас дня (перикопы/стихи/шрифт/закладка/перевод) показываем
      только текстовым планам; при возврате на текстовый план возвращается. */
   var _ahide=['r-ref-lbl','r-tabs','r-sc','r-font-row','r-tlink','r-phrase'];
@@ -1663,7 +1664,7 @@ async function flushPending(){
 
 /* Состояние плеера и позиция прослушивания (localStorage, офлайн).
    speed — скорость воспроизведения, одна на все планы (audio_speed_v1). */
-var AP = { a:null, planId:null, day:null, idx:0, list:[], ready:false, speed:1, ex:true }; /* ex: док развёрнут (v1.5.0) */
+var AP = { a:null, planId:null, day:null, idx:0, list:[], ready:false, speed:1, ex:false }; /* ex: док развёрнут; по умолчанию МИНИ-бар (v1.5.2) — дорожки не перекрывает */
 function apPosKey(){ return 'audio_pos_v1'; }
 var AP_SPEEDS=[0.8,1,1.25,1.5,2];
 function apSpeedGet(){
@@ -1698,16 +1699,13 @@ function apVolSet(v){
 }
 function apVolMute(){ apVolSet(apVolGet()>0?0:100); haptic('light'); }
 
-/* ── Парящий плеер v1.5.1 (как в MyRadio): ЕДИНСТВЕННАЯ панель плеера —
-   полностью отвязана от страницы. Виден: играет/на паузе — на ВСЕХ экранах;
-   воспроизведения ещё нет (свежий вход в план, после «■») — на экране
-   аудио-дня, где док заменяет прежнюю встроенную панель с дорожками.
-   Мини-режим ↔ развёрнутый док переключается тапом по шапке/шеврону. ── */
+/* ── Парящий плеер v1.5.2 (как в MyRadio): парит внизу ТОЛЬКО плеер-бар с
+   управлением (mini по умолчанию; тап по шапке разворачивает перемотку,
+   громкость, скорость, чтеца). Список дорожек живёт НА СТРАНИЦЕ аудио-дня
+   (#r-audio, как до v1.5.0) — клик по дорожке запускает воспроизведение и
+   показывает мини-бар. Док скрыт, пока воспроизведения нет. ── */
 function apFloatVisible(){
-  if(!(AP.a&&AP.planId&&AP.list.length))return false;
-  if(AP.a.src)return true;
-  var cur=document.querySelector('.pg.on');var pid=cur?cur.id:'';
-  return pid==='pg-read'&&isAudioPlanId(app.activePlanId);
+  return !!(AP.a&&AP.a.src);
 }
 function apFloatUpdate(){
   var bar=document.getElementById('ap-float');if(!bar)return;
@@ -1860,17 +1858,18 @@ function apPulseDone(){
   if(b){ b.classList.add('ap-pulse'); setTimeout(function(){ b.classList.remove('ap-pulse'); }, 2400); }
 }
 
-/* Рендер: панель плеера + чтец + скорость + дорожки дня (плейлист).
-   v1.5.0: панель рендерится в ТЕЛО ПАРЯЩЕГО ДОКА #ap-dock-body (position:fixed
-   внизу, как в радио-миниаппах) и больше не встраивается в страницу (#r-audio
-   пуст и скрыт). Экран аудио-дня содержит только кнопку «✓ Прослушал». */
+/* Рендер v1.5.2 (разделение по просьбе владельца):
+   — ПАРЯЩИЙ ДОК (#ap-dock-body): только управление — prev/play/next,
+     перемотка, громкость, скорость, чтец (дорожек в доке больше нет);
+   — СТРАНИЦА (#r-audio): дорожки дня (плейлист), клик по дорожке запускает
+     плеер — как было до v1.5.0. */
 function apRender(){
   apFloatUpdate(); /* состояние сессии меняется в apPlay/apPause/apOpen/... — все они вызывают apRender */
-  var wrap = document.getElementById('ap-dock-body');
-  if(!wrap) return;
   var playing = !!(AP.a && !AP.a.paused && AP.a.src);
   var now = playing ? '⏸' : '▶';
   var it = AP.list[AP.idx];
+  var wrap = document.getElementById('ap-dock-body');
+  if(wrap){
   var h = '<div class="ap-bar">' +
     '<button class="ap-btn" onclick="apPrev()" aria-label="Назад">⏮</button>' +
     '<button class="ap-btn ap-main" onclick="apToggle()" aria-label="Пуск/пауза">' + now + '</button>' +
@@ -1900,24 +1899,28 @@ function apRender(){
     if(vi === AUDIO_VERSIONS.length - 1 || AUDIO_VERSIONS[vi + 1].tr !== vv.tr) h += '</optgroup>';
   }
   h += '</select></div>';
-  h += '<div class="ap-tracks">';
-  for(var i = 0; i < AP.list.length; i++){
-    var t = AP.list[i];
-    var isCur = (i === AP.idx);
-    var isPlay = isCur && playing;
-    var left;
-    if(isPlay) left = '<span class="ap-eq"><i></i><i></i><i></i></span>';
-    else if(isCur) left = '▶';
-    else left = (i + 1);
-    var cls = 'ap-track' + (isPlay ? ' playing' : (isCur ? ' cur' : '')) + (t.ok ? '' : ' na');
-    h += '<button class="' + cls + '" onclick="apPlay(' + i + ')" ' + (t.ok ? '' : 'title="Нет файла в озвучке"') + '>' +
-      '<span class="ap-n">' + left + '</span>' +
-      '<span class="ap-nm">' + t.book + ' ' + t.ch + '</span></button>';
-  }
-  h += '</div><div id="r-audio-err" class="ap-err" style="display:none"></div>';
   wrap.innerHTML = h;
-  var _ra=document.getElementById('r-audio');
-  if(_ra&&_ra.innerHTML)_ra.innerHTML=''; /* панель больше не живёт в странице */
+  }
+  /* Дорожки дня — НА СТРАНИЦЕ (#r-audio), как до v1.5.0: клик запускает плеер */
+  var ra = document.getElementById('r-audio');
+  if(ra){
+    var ht = '<div class="ap-tracks">';
+    for(var i = 0; i < AP.list.length; i++){
+      var t = AP.list[i];
+      var isCur = (i === AP.idx);
+      var isPlay = isCur && playing;
+      var left;
+      if(isPlay) left = '<span class="ap-eq"><i></i><i></i><i></i></span>';
+      else if(isCur) left = '▶';
+      else left = (i + 1);
+      var cls = 'ap-track' + (isPlay ? ' playing' : (isCur ? ' cur' : '')) + (t.ok ? '' : ' na');
+      ht += '<button class="' + cls + '" onclick="apPlay(' + i + ')" ' + (t.ok ? '' : 'title="Нет файла в озвучке"') + '>' +
+        '<span class="ap-n">' + left + '</span>' +
+        '<span class="ap-nm">' + t.book + ' ' + t.ch + '</span></button>';
+    }
+    ht += '</div><div id="r-audio-err" class="ap-err" style="display:none"></div>';
+    ra.innerHTML = ht;
+  }
   apfSyncH();
   apSeekUi();
 }
