@@ -206,7 +206,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 @keyframes apEq{0%,100%{height:5px}50%{height:14px}}
 
 /* Полоса прогресса трека (клик = перемотка) */
-.ap-seek{position:relative;height:6px;border-radius:3px;background:var(--brd);margin-top:10px;cursor:pointer;overflow:hidden}
+.ap-seek{position:relative;height:6px;border-radius:3px;background:var(--brd);margin-top:10px;cursor:pointer;overflow:hidden;touch-action:none}
 .ap-seek-f{position:absolute;left:0;top:0;bottom:0;width:0%;border-radius:3px;background:var(--acc)}
 /* время слева, кнопка скорости справа */
 .ap-ctl{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:5px}
@@ -219,12 +219,21 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
    пересборка innerHTML посреди перетаскивания рвала drag. */
 .ap-vol{display:flex;align-items:center;gap:7px;flex:1;min-width:0;margin:0 6px}
 .ap-vol-i{font-size:14px;line-height:1;cursor:pointer;user-select:none;-webkit-user-select:none;flex:none}
-.ap-vol input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:var(--brd);outline:none;cursor:pointer;padding:0;margin:0}
+.ap-vol input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:var(--brd);outline:none;cursor:pointer;padding:0;margin:0;touch-action:none}
 .ap-vol input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;background:var(--acc);border:none;box-shadow:0 1px 4px rgba(0,0,0,.25)}
 .ap-vol input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--acc);border:none}
-/* ── Парящий плеер (как в радио): фиксированная панель над нижней навигацией, видна на любом экране, кроме экрана аудио-дня ── */
-#ap-float{position:fixed;left:10px;right:10px;bottom:calc(62px + env(safe-area-inset-bottom,0px));z-index:45;background:var(--card);border:1px solid var(--brd);border-radius:14px;box-shadow:0 6px 22px rgba(0,0,0,.22);overflow:hidden;display:none}
+/* ── Парящий плеер v1.5.0 (как в MyRadio): ЕДИНСТВЕННАЯ панель плеера, полностью
+   отвязана от страницы: position:fixed над нижней навигацией, видна на всех
+   экранах, пока есть аудио-сессия. Мини-режим — компактная строка (EQ, трек,
+   play/stop); развёрнутый — тело дока с перемоткой, громкостью, чтецом и
+   дорожками дня (скроллится внутри, не вместе со страницей). ── */
+#ap-float{position:fixed;left:10px;right:10px;bottom:calc(62px + env(safe-area-inset-bottom,0px));z-index:46;background:var(--card);border:1px solid var(--brd);border-radius:14px;box-shadow:0 6px 22px rgba(0,0,0,.22);overflow:hidden;display:none}
 #ap-float.vis{display:block}
+.apf-body{display:none;border-top:1px solid var(--brd);padding:10px 12px 12px;max-height:min(46vh,380px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#ap-float.ex .apf-body{display:block}
+/* в развёрнутом виде кнопки шапки (play/stop) скрыты — транспорт есть в теле дока */
+#ap-float.ex .apf-main .apf-btn:not(.apf-chev){display:none}
+.apf-btn.apf-chev{background:none;border:1.5px solid var(--brd);color:var(--txt2);font-size:12px}
 .apf-line{height:3px;background:var(--brd)}
 .apf-line-f{height:100%;width:0%;background:var(--acc);opacity:.85;transition:width .3s linear}
 .apf-main{display:flex;align-items:center;gap:9px;padding:8px 12px 9px}
@@ -239,7 +248,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 .apf-btn{width:36px;height:36px;border-radius:50%;border:none;background:var(--acc);color:#fff;font-size:14px;cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center;padding:0;font-family:var(--fui)}
 .apf-btn:active{transform:scale(.92)}
 .apf-btn.apf-x{background:none;border:1.5px solid var(--brd);color:var(--txt2);font-size:10px}
-body.apf-on .pg.on{padding-bottom:92px}
+body.apf-on .pg.on{padding-bottom:calc(var(--apf-h,92px) + 8px)}
 /* смена чтеца внутри дня */
 .ap-narr{display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 10px;
   border:1px solid var(--brd);border-radius:10px;background:var(--card)}
@@ -273,7 +282,7 @@ body.apf-on .pg.on{padding-bottom:92px}
 <div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-empty" style="font-size:12px;color:var(--txt2);margin-bottom:10px;display:none">Сначала выбери план на вкладке «Планы»</div><select id="cfg-plan-sel" onchange="cfgSelectPlan(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px;margin-bottom:12px"></select><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div><div id="cfg-sync-st" style="font-size:11px;margin-top:6px;display:none;font-weight:600"></div></div><div class="cfg-box" id="cfg-audio-wrap" style="display:none"><h3>🎧 Озвучка</h3><select id="cfg-audio-ver" onchange="cfgAudioPick(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px"></select><div style="font-size:11px;color:var(--txt2);margin-top:6px">Прогресс дней не зависит от озвучки</div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid" style="grid-template-columns:repeat(3,1fr)"><button onclick="setTheme('auto')" id="th-auto" class="th-btn"><div>🌗</div>Авто</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button></div><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span>Номера стихов</span><button class="tog on" id="cfg-vn-tog" onclick="cfgTogVn()"></button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div id="font-track" style="flex:1;height:28px;display:flex;align-items:center;position:relative;touch-action:none;cursor:pointer"><div style="width:100%;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div><div style="text-align:center;margin:14px 0 4px"><a href="https://bible.by/audio/" target="_blank" style="font-size:12px;color:var(--txt2)">🎧 Аудио: bible.by</a></div></div>
 
 <div class="pg" id="pg-done"><div class="done-wrap"><div class="done-em">🎉</div><h2 style="font-size:24px;font-weight:800;margin-bottom:8px">План завершён!</h2><p style="font-size:14px;color:var(--txt2);line-height:1.6;margin-bottom:20px" id="done-txt"></p><button class="btn btn-acc" onclick="goPage('pg-sel')">Выбрать новый план</button><a class="chan-ban" style="margin-top:20px" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span class="chan-ico">📻</span><span class="chan-txt">Хочешь двигаться дальше?<b>Канал «От чтения к Преображению»</b></span><span class="chan-arrow">→</span></a></div></div>
-<div id="ap-float"><div class="apf-line"><div class="apf-line-f" id="apf-line-f"></div></div><div class="apf-main"><div class="apf-vis" id="apf-vis" onclick="apFloatOpen()"><i></i><i></i><i></i><i></i><i></i></div><div class="apf-info" onclick="apFloatOpen()"><div class="apf-name" id="apf-name">—</div><div class="apf-sub" id="apf-sub"></div></div><button class="apf-btn" id="apf-play" onclick="apFloatToggle()" aria-label="Пуск/пауза">▶</button><button class="apf-btn apf-x" onclick="apFloatStop()" aria-label="Остановить">■</button></div></div><div class="bnav" id="bnav" style="display:none"><button class="nb on" id="nb-read" onclick="switchTab('read')"><span class="nb-em">📖</span>Чтение</button><button class="nb" id="nb-bm" onclick="switchTab('bm')"><span class="nb-em">⭐</span>Закладки</button><button class="nb" id="nb-sel" onclick="switchTab('sel')"><span class="nb-em">🏠</span>Планы</button><button class="nb" id="nb-cfg" onclick="switchTab('cfg')"><span class="nb-em">⚙️</span>Настройки</button></div>
+<div id="ap-float"><div class="apf-line"><div class="apf-line-f" id="apf-line-f"></div></div><div class="apf-main"><div class="apf-vis" id="apf-vis" onclick="apFloatEx()" role="button" aria-label="Развернуть/свернуть плеер"><i></i><i></i><i></i><i></i><i></i></div><div class="apf-info" onclick="apFloatEx()"><div class="apf-name" id="apf-name">—</div><div class="apf-sub" id="apf-sub"></div></div><button class="apf-btn" id="apf-play" onclick="apFloatToggle()" aria-label="Пуск/пауза">▶</button><button class="apf-btn apf-x" onclick="apFloatStop()" aria-label="Остановить">■</button><button class="apf-btn apf-chev" id="apf-chev" onclick="apFloatEx()" aria-label="Развернуть/свернуть плеер">▴</button></div><div class="apf-body" id="ap-dock-body"></div></div><div class="bnav" id="bnav" style="display:none"><button class="nb on" id="nb-read" onclick="switchTab('read')"><span class="nb-em">📖</span>Чтение</button><button class="nb" id="nb-bm" onclick="switchTab('bm')"><span class="nb-em">⭐</span>Закладки</button><button class="nb" id="nb-sel" onclick="switchTab('sel')"><span class="nb-em">🏠</span>Планы</button><button class="nb" id="nb-cfg" onclick="switchTab('cfg')"><span class="nb-em">⚙️</span>Настройки</button></div>
 <div id="toast"></div>
 <div id="milestone-modal" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeMilestone()">
   <div style="background:var(--bg);border-radius:16px;padding:30px 22px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.35)">
@@ -591,7 +600,7 @@ function saveApp(){try{localStorage.setItem('bapp3',JSON.stringify(app));}catch(
 var BIBLE_CACHE_VER='v1';
 /* Версия приложения для футера: повышать при значимых изменениях
    (модель чтения, новые экраны). Формат: мажор.минор.патч. */
-var APP_VERSION='1.4.0';
+var APP_VERSION='1.5.0';
 async function loadBible(){
   if(bible)return;
   var raw=null;
@@ -1370,7 +1379,9 @@ function renderRead(){
      Плеер открывается на отображаемом дне (vd). */
   var isAud=isAudioPlanId(app.activePlanId);
   var aw=document.getElementById('r-audio');
-  if(aw)aw.style.display=isAud?'block':'none';
+  /* v1.5.0: панель плеера живёт в парящем доке внизу экрана — #r-audio больше
+     не показывается в потоке страницы (просьба владельца: «отвяжи плеер»). */
+  if(aw){aw.style.display='none';if(aw.innerHTML)aw.innerHTML='';}
   /* Текстовый каркас дня (перикопы/стихи/шрифт/закладка/перевод) показываем
      только текстовым планам; при возврате на текстовый план возвращается. */
   var _ahide=['r-ref-lbl','r-tabs','r-sc','r-font-row','r-tlink','r-phrase'];
@@ -1652,7 +1663,7 @@ async function flushPending(){
 
 /* Состояние плеера и позиция прослушивания (localStorage, офлайн).
    speed — скорость воспроизведения, одна на все планы (audio_speed_v1). */
-var AP = { a:null, planId:null, day:null, idx:0, list:[], ready:false, speed:1 };
+var AP = { a:null, planId:null, day:null, idx:0, list:[], ready:false, speed:1, ex:true }; /* ex: док развёрнут (v1.5.0) */
 function apPosKey(){ return 'audio_pos_v1'; }
 var AP_SPEEDS=[0.8,1,1.25,1.5,2];
 function apSpeedGet(){
@@ -1687,14 +1698,12 @@ function apVolSet(v){
 }
 function apVolMute(){ apVolSet(apVolGet()>0?0:100); haptic('light'); }
 
-/* ── Парящий плеер (как в радио-миниаппе): виден, пока загружена аудио-сессия,
-   на любом экране КРОМЕ экрана аудио-дня (там полноценная панель).
-   Обновляется точечно; тап по инфо/визуализатору — вернуться к экрану дня. ── */
+/* ── Парящий плеер v1.5.0 (как в MyRadio): ЕДИНСТВЕННАЯ панель плеера —
+   полностью отвязана от страницы и видна на ВСЕХ экранах (включая экран
+   аудио-дня), пока загружена аудио-сессия. Мини-режим ↔ развёрнутый док
+   (перемотка/громкость/чтец/дорожки) переключается тапом по шапке/шеврону. ── */
 function apFloatVisible(){
-  if(!(AP.a&&AP.a.src))return false;
-  var cur=document.querySelector('.pg.on');var pid=cur?cur.id:'';
-  if(pid==='pg-read'&&isAudioPlanId(app.activePlanId))return false;
-  return true;
+  return !!(AP.a&&AP.a.src);
 }
 function apFloatUpdate(){
   var bar=document.getElementById('ap-float');if(!bar)return;
@@ -1704,6 +1713,9 @@ function apFloatUpdate(){
   if(document.body)document.body.classList.toggle('apf-on',vis);
   var nav=document.getElementById('bnav');
   bar.style.bottom=(nav&&nav.style.display!=='none')?'calc(62px + env(safe-area-inset-bottom,0px))':'calc(12px + env(safe-area-inset-bottom,0px))';
+  var ex=AP.ex!==false;
+  bar.classList.toggle('ex',vis&&ex);
+  var chv=document.getElementById('apf-chev');if(chv)chv.textContent=ex?'▾':'▴';
   if(!sess)return;
   var p=getPlan(AP.planId);
   var it=AP.list[AP.idx];
@@ -1713,12 +1725,20 @@ function apFloatUpdate(){
   var playing=!!(AP.a&&!AP.a.paused);
   var pb=document.getElementById('apf-play');if(pb)pb.textContent=playing?'⏸':'▶';
   var vs=document.getElementById('apf-vis');if(vs)vs.className='apf-vis'+(playing?' play':'');
+  apfSyncH();
+}
+/* Высота дока -> CSS-переменная --apf-h: страницы получают нижний отступ,
+   чтобы кнопки («✓ Прослушал» и пр.) не уходили под парящую панель. */
+function apfSyncH(){
+  var bar=document.getElementById('ap-float');if(!bar)return;
+  if(bar.style.display==='none'||!bar.classList.contains('vis'))return;
+  document.body.style.setProperty('--apf-h',(bar.offsetHeight+12)+'px');
 }
 function apFloatToggle(){ apToggle(); apFloatUpdate(); }
-function apFloatOpen(){
-  if(AP.planId&&app.activePlanId!==AP.planId){app.activePlanId=AP.planId;saveApp();viewDay=null;}
-  goPage('pg-read');renderRead();
-}
+/* Тап по инфо/визуализатору/шеврону: мини-режим ↔ развёрнутый док (как в радио).
+   На экран дня возвращает вкладка «Чтение» нижней навигации. */
+function apFloatEx(){ AP.ex=!AP.ex; apFloatUpdate(); haptic('light'); }
+function apFloatOpen(){ apFloatEx(); }
 function apFloatStop(){
   if(!AP.a)return;
   if(AP.a.src&&isFinite(AP.a.currentTime))apSavePos(AP.a.currentTime||0);
@@ -1838,13 +1858,13 @@ function apPulseDone(){
 }
 
 /* Рендер: панель плеера + чтец + скорость + дорожки дня (плейлист).
-   Контейнер #r-audio (ЧАСТЬ 3). Экран аудио-дня не содержит библейского
-   текста (решение владельца): плеер, перемотка, дорожки на сегодня и кнопка
-   «✓ Прослушал». Скорость и чтец — прямо здесь, без захода в настройки. */
+   v1.5.0: панель рендерится в ТЕЛО ПАРЯЩЕГО ДОКА #ap-dock-body (position:fixed
+   внизу, как в радио-миниаппах) и больше не встраивается в страницу (#r-audio
+   пуст и скрыт). Экран аудио-дня содержит только кнопку «✓ Прослушал». */
 function apRender(){
   apFloatUpdate(); /* состояние сессии меняется в apPlay/apPause/apOpen/... — все они вызывают apRender */
-  var wrap = document.getElementById('r-audio');
-  if(!wrap || !isAudioPlanId(app.activePlanId)) return;
+  var wrap = document.getElementById('ap-dock-body');
+  if(!wrap) return;
   var playing = !!(AP.a && !AP.a.paused && AP.a.src);
   var now = playing ? '⏸' : '▶';
   var it = AP.list[AP.idx];
@@ -1865,7 +1885,7 @@ function apRender(){
     apSpeedLbl(AP.speed || 1) + '</button></div>';
   /* Смена чтеца внутри дня: выбор сохраняется в прогрессе плана, дорожки
      дня пересобираются под нового чтеца без выхода с экрана. */
-  var curSlug = audioPlanSlug(app.activePlanId);
+  var curSlug = audioPlanSlug(AP.planId||app.activePlanId); /* док виден и когда активен другой план */
   h += '<div class="ap-narr"><span class="ap-narr-l">🎙 Чтец</span>' +
     '<select id="ap-narr" onchange="apNarrPick(this.value)">';
   var lastTr = null;
@@ -1893,6 +1913,9 @@ function apRender(){
   }
   h += '</div><div id="r-audio-err" class="ap-err" style="display:none"></div>';
   wrap.innerHTML = h;
+  var _ra=document.getElementById('r-audio');
+  if(_ra&&_ra.innerHTML)_ra.innerHTML=''; /* панель больше не живёт в странице */
+  apfSyncH();
   apSeekUi();
 }
 /* Смена чтеца на экране дня: сохранить slug, остановить текущий файл,
@@ -3063,10 +3086,30 @@ function haptic(type){
   try{if(type==='success')tg&&tg.HapticFeedback&&tg.HapticFeedback.notificationOccurred('success');else tg&&tg.HapticFeedback&&tg.HapticFeedback.impactOccurred(type);}catch(e){}
 }
 
-var swX=0;
+/* ── v1.5.0: изоляция жестов плеера от страницы ──
+   Любой жест на доке (drag громкости/перемотки, скролл дорожек, кнопки) не
+   должен видеть документные обработчики: на части WebView touchend при drag
+   ползунка приходит с другой целью, и горизонтальный drag распознавался как
+   свайп -> смена дня -> пауза (баг «ползунок громкости останавливает звук»).
+   stopPropagation на корне дока НЕ мешает собственным onclick/oninput его
+   элементов: inline-обработчики срабатывают раньше, в target-фазе. */
+(function(){
+  var d=document.getElementById('ap-float');
+  if(d&&!d._nsw){d._nsw=1;
+    var evs=['touchstart','touchmove','touchend','touchcancel','mousedown','pointerdown'];
+    for(var i=0;i<evs.length;i++){d.addEventListener(evs[i],function(e){e.stopPropagation();},{passive:true});}
+  }
+})();
+var swX=0,swY=0,swCtl=false;
 window.addEventListener('scroll',saveReadPos,{passive:true});
-document.addEventListener('touchstart',function(e){swX=e.touches[0].clientX;swY=e.touches[0].clientY;},{passive:true});
-var swY=0;
+document.addEventListener('touchstart',function(e){
+  swX=e.touches[0].clientX;swY=e.touches[0].clientY;
+  /* решение «жест начался на контроле» принимается в НАЧАЛЕ жеста: touchend
+     на некоторых WebView ретаргетится, и проверка только по цели touchend
+     пропускала drag ползунка громкости */
+  try{var _t=e.target;swCtl=!!(_t&&_t.closest&&_t.closest('#ap-float,input,select,textarea,button,a,.ap-seek'));}catch(e5){swCtl=false;}
+},{passive:true});
+document.addEventListener('touchcancel',function(){swCtl=false;},{passive:true});
 document.addEventListener('touchend',function(e){
   /* Раньше этот обработчик был глобальным и безусловным — любое движение
      пальца на 60px и больше запускало навигацию по дням/главам, даже
@@ -3078,6 +3121,7 @@ document.addEventListener('touchend',function(e){
      мешает свайп-навигации нигде, кроме как ровно в момент активного
      выделения. */
   try{if(window.getSelection&&window.getSelection().toString())return;}catch(e2){}
+  if(swCtl){swCtl=false;return;} /* жест начался на контроле (ползунок/кнопка/док) */
   /* Свайп-навигация не должна срабатывать, когда жест начался на интерактивном
      элементе: горизонтальный drag ползунка громкости/перемотки — это настройка
      звука, а не перелистывание дня (именно из-за этого drag громкости на
