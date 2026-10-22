@@ -600,7 +600,7 @@ function saveApp(){try{localStorage.setItem('bapp3',JSON.stringify(app));}catch(
 var BIBLE_CACHE_VER='v1';
 /* Версия приложения для футера: повышать при значимых изменениях
    (модель чтения, новые экраны). Формат: мажор.минор.патч. */
-var APP_VERSION='1.5.0';
+var APP_VERSION='1.5.1';
 async function loadBible(){
   if(bible)return;
   var raw=null;
@@ -1698,17 +1698,20 @@ function apVolSet(v){
 }
 function apVolMute(){ apVolSet(apVolGet()>0?0:100); haptic('light'); }
 
-/* ── Парящий плеер v1.5.0 (как в MyRadio): ЕДИНСТВЕННАЯ панель плеера —
-   полностью отвязана от страницы и видна на ВСЕХ экранах (включая экран
-   аудио-дня), пока загружена аудио-сессия. Мини-режим ↔ развёрнутый док
-   (перемотка/громкость/чтец/дорожки) переключается тапом по шапке/шеврону. ── */
+/* ── Парящий плеер v1.5.1 (как в MyRadio): ЕДИНСТВЕННАЯ панель плеера —
+   полностью отвязана от страницы. Виден: играет/на паузе — на ВСЕХ экранах;
+   воспроизведения ещё нет (свежий вход в план, после «■») — на экране
+   аудио-дня, где док заменяет прежнюю встроенную панель с дорожками.
+   Мини-режим ↔ развёрнутый док переключается тапом по шапке/шеврону. ── */
 function apFloatVisible(){
-  return !!(AP.a&&AP.a.src);
+  if(!(AP.a&&AP.planId&&AP.list.length))return false;
+  if(AP.a.src)return true;
+  var cur=document.querySelector('.pg.on');var pid=cur?cur.id:'';
+  return pid==='pg-read'&&isAudioPlanId(app.activePlanId);
 }
 function apFloatUpdate(){
   var bar=document.getElementById('ap-float');if(!bar)return;
-  var sess=!!(AP.a&&AP.a.src);
-  var vis=sess&&apFloatVisible();
+  var vis=apFloatVisible();
   if(vis){bar.classList.add('vis');bar.style.display='block';}else{bar.classList.remove('vis');bar.style.display='none';}
   if(document.body)document.body.classList.toggle('apf-on',vis);
   var nav=document.getElementById('bnav');
@@ -1716,7 +1719,7 @@ function apFloatUpdate(){
   var ex=AP.ex!==false;
   bar.classList.toggle('ex',vis&&ex);
   var chv=document.getElementById('apf-chev');if(chv)chv.textContent=ex?'▾':'▴';
-  if(!sess)return;
+  if(!vis)return;
   var p=getPlan(AP.planId);
   var it=AP.list[AP.idx];
   var nm=document.getElementById('apf-name');if(nm)nm.textContent=it?(it.book+' '+it.ch):'—';
