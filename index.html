@@ -222,6 +222,24 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 .ap-vol input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:var(--brd);outline:none;cursor:pointer;padding:0;margin:0}
 .ap-vol input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;background:var(--acc);border:none;box-shadow:0 1px 4px rgba(0,0,0,.25)}
 .ap-vol input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--acc);border:none}
+/* ── Парящий плеер (как в радио): фиксированная панель над нижней навигацией, видна на любом экране, кроме экрана аудио-дня ── */
+#ap-float{position:fixed;left:10px;right:10px;bottom:calc(62px + env(safe-area-inset-bottom,0px));z-index:45;background:var(--card);border:1px solid var(--brd);border-radius:14px;box-shadow:0 6px 22px rgba(0,0,0,.22);overflow:hidden;display:none}
+#ap-float.vis{display:block}
+.apf-line{height:3px;background:var(--brd)}
+.apf-line-f{height:100%;width:0%;background:var(--acc);opacity:.85;transition:width .3s linear}
+.apf-main{display:flex;align-items:center;gap:9px;padding:8px 12px 9px}
+.apf-vis{display:flex;align-items:flex-end;gap:2px;height:20px;flex:none;cursor:pointer}
+.apf-vis i{display:block;width:3px;border-radius:2px;background:var(--acc);height:30%;opacity:.45}
+.apf-vis.play i{animation:apfdance .9s ease-in-out infinite}
+.apf-vis.play i:nth-child(1){animation-delay:0s}.apf-vis.play i:nth-child(2){animation-delay:.18s}.apf-vis.play i:nth-child(3){animation-delay:.35s}.apf-vis.play i:nth-child(4){animation-delay:.12s}.apf-vis.play i:nth-child(5){animation-delay:.28s}
+@keyframes apfdance{0%,100%{transform:scaleY(.3);opacity:.4}50%{transform:scaleY(1.6);opacity:1}}
+.apf-info{flex:1;min-width:0;cursor:pointer}
+.apf-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)}
+.apf-sub{font-size:11px;color:var(--txt2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.apf-btn{width:36px;height:36px;border-radius:50%;border:none;background:var(--acc);color:#fff;font-size:14px;cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center;padding:0;font-family:var(--fui)}
+.apf-btn:active{transform:scale(.92)}
+.apf-btn.apf-x{background:none;border:1.5px solid var(--brd);color:var(--txt2);font-size:10px}
+body.apf-on .pg.on{padding-bottom:92px}
 /* смена чтеца внутри дня */
 .ap-narr{display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 10px;
   border:1px solid var(--brd);border-radius:10px;background:var(--card)}
@@ -252,10 +270,10 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 <select id="setup-audio-ver" onchange="setupAudioPick()" style="width:100%;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"></select></div><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="setup-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="setup-not-tog" onclick="setupTogNot()"></button></div><button class="btn btn-acc" onclick="startPlan()">Выбрать план</button><button class="btn btn-out" onclick="setupBack()">Вернуться</button></div>
 
 <div class="pg" id="pg-bm"><div class="hdr"><h1>⭐ Закладки</h1></div><div id="bm-list"></div><div id="bm-empty" style="display:none;text-align:center;padding:36px;color:var(--txt2);font-size:14px">Нет закладок.<br>Нажми ⭐ во время чтения.</div></div>
-<div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-empty" style="font-size:12px;color:var(--txt2);margin-bottom:10px;display:none">Сначала выбери план на вкладке «Планы»</div><select id="cfg-plan-sel" onchange="cfgSelectPlan(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px;margin-bottom:12px"></select><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div></div><div class="cfg-box" id="cfg-audio-wrap" style="display:none"><h3>🎧 Озвучка</h3><select id="cfg-audio-ver" onchange="cfgAudioPick(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px"></select><div style="font-size:11px;color:var(--txt2);margin-top:6px">Прогресс дней не зависит от озвучки</div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid" style="grid-template-columns:repeat(3,1fr)"><button onclick="setTheme('auto')" id="th-auto" class="th-btn"><div>🌗</div>Авто</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button></div><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span>Номера стихов</span><button class="tog on" id="cfg-vn-tog" onclick="cfgTogVn()"></button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div id="font-track" style="flex:1;height:28px;display:flex;align-items:center;position:relative;touch-action:none;cursor:pointer"><div style="width:100%;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div><div style="text-align:center;margin:14px 0 4px"><a href="https://bible.by/audio/" target="_blank" style="font-size:12px;color:var(--txt2)">🎧 Аудио: bible.by</a></div></div>
+<div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-empty" style="font-size:12px;color:var(--txt2);margin-bottom:10px;display:none">Сначала выбери план на вкладке «Планы»</div><select id="cfg-plan-sel" onchange="cfgSelectPlan(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px;margin-bottom:12px"></select><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div><div id="cfg-sync-st" style="font-size:11px;margin-top:6px;display:none;font-weight:600"></div></div><div class="cfg-box" id="cfg-audio-wrap" style="display:none"><h3>🎧 Озвучка</h3><select id="cfg-audio-ver" onchange="cfgAudioPick(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px"></select><div style="font-size:11px;color:var(--txt2);margin-top:6px">Прогресс дней не зависит от озвучки</div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid" style="grid-template-columns:repeat(3,1fr)"><button onclick="setTheme('auto')" id="th-auto" class="th-btn"><div>🌗</div>Авто</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button></div><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span>Номера стихов</span><button class="tog on" id="cfg-vn-tog" onclick="cfgTogVn()"></button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div id="font-track" style="flex:1;height:28px;display:flex;align-items:center;position:relative;touch-action:none;cursor:pointer"><div style="width:100%;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div><div style="text-align:center;margin:14px 0 4px"><a href="https://bible.by/audio/" target="_blank" style="font-size:12px;color:var(--txt2)">🎧 Аудио: bible.by</a></div></div>
 
 <div class="pg" id="pg-done"><div class="done-wrap"><div class="done-em">🎉</div><h2 style="font-size:24px;font-weight:800;margin-bottom:8px">План завершён!</h2><p style="font-size:14px;color:var(--txt2);line-height:1.6;margin-bottom:20px" id="done-txt"></p><button class="btn btn-acc" onclick="goPage('pg-sel')">Выбрать новый план</button><a class="chan-ban" style="margin-top:20px" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span class="chan-ico">📻</span><span class="chan-txt">Хочешь двигаться дальше?<b>Канал «От чтения к Преображению»</b></span><span class="chan-arrow">→</span></a></div></div>
-<div class="bnav" id="bnav" style="display:none"><button class="nb on" id="nb-read" onclick="switchTab('read')"><span class="nb-em">📖</span>Чтение</button><button class="nb" id="nb-bm" onclick="switchTab('bm')"><span class="nb-em">⭐</span>Закладки</button><button class="nb" id="nb-sel" onclick="switchTab('sel')"><span class="nb-em">🏠</span>Планы</button><button class="nb" id="nb-cfg" onclick="switchTab('cfg')"><span class="nb-em">⚙️</span>Настройки</button></div>
+<div id="ap-float"><div class="apf-line"><div class="apf-line-f" id="apf-line-f"></div></div><div class="apf-main"><div class="apf-vis" id="apf-vis" onclick="apFloatOpen()"><i></i><i></i><i></i><i></i><i></i></div><div class="apf-info" onclick="apFloatOpen()"><div class="apf-name" id="apf-name">—</div><div class="apf-sub" id="apf-sub"></div></div><button class="apf-btn" id="apf-play" onclick="apFloatToggle()" aria-label="Пуск/пауза">▶</button><button class="apf-btn apf-x" onclick="apFloatStop()" aria-label="Остановить">■</button></div></div><div class="bnav" id="bnav" style="display:none"><button class="nb on" id="nb-read" onclick="switchTab('read')"><span class="nb-em">📖</span>Чтение</button><button class="nb" id="nb-bm" onclick="switchTab('bm')"><span class="nb-em">⭐</span>Закладки</button><button class="nb" id="nb-sel" onclick="switchTab('sel')"><span class="nb-em">🏠</span>Планы</button><button class="nb" id="nb-cfg" onclick="switchTab('cfg')"><span class="nb-em">⚙️</span>Настройки</button></div>
 <div id="toast"></div>
 <div id="milestone-modal" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeMilestone()">
   <div style="background:var(--bg);border-radius:16px;padding:30px 22px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.35)">
@@ -573,7 +591,7 @@ function saveApp(){try{localStorage.setItem('bapp3',JSON.stringify(app));}catch(
 var BIBLE_CACHE_VER='v1';
 /* Версия приложения для футера: повышать при значимых изменениях
    (модель чтения, новые экраны). Формат: мажор.минор.патч. */
-var APP_VERSION='1.3.1';
+var APP_VERSION='1.4.0';
 async function loadBible(){
   if(bible)return;
   var raw=null;
@@ -793,6 +811,7 @@ function goPage(id){
     if(btn)btn.classList.toggle('on',(k==='read'&&id==='pg-read')||(k==='bm'&&id==='pg-bm')||(k==='sel'&&id==='pg-sel')||(k==='cfg'&&id==='pg-cfg'));
   });
   if(id==='pg-seq') initSeq();
+  apFloatUpdate();
   window.scrollTo(0,0);
 }
 function switchTab(tab){
@@ -1667,6 +1686,45 @@ function apVolSet(v){
   var i=document.getElementById('ap-vol-i'); if(i)i.textContent=apVolIcon(v);
 }
 function apVolMute(){ apVolSet(apVolGet()>0?0:100); haptic('light'); }
+
+/* ── Парящий плеер (как в радио-миниаппе): виден, пока загружена аудио-сессия,
+   на любом экране КРОМЕ экрана аудио-дня (там полноценная панель).
+   Обновляется точечно; тап по инфо/визуализатору — вернуться к экрану дня. ── */
+function apFloatVisible(){
+  if(!(AP.a&&AP.a.src))return false;
+  var cur=document.querySelector('.pg.on');var pid=cur?cur.id:'';
+  if(pid==='pg-read'&&isAudioPlanId(app.activePlanId))return false;
+  return true;
+}
+function apFloatUpdate(){
+  var bar=document.getElementById('ap-float');if(!bar)return;
+  var sess=!!(AP.a&&AP.a.src);
+  var vis=sess&&apFloatVisible();
+  if(vis){bar.classList.add('vis');bar.style.display='block';}else{bar.classList.remove('vis');bar.style.display='none';}
+  if(document.body)document.body.classList.toggle('apf-on',vis);
+  var nav=document.getElementById('bnav');
+  bar.style.bottom=(nav&&nav.style.display!=='none')?'calc(62px + env(safe-area-inset-bottom,0px))':'calc(12px + env(safe-area-inset-bottom,0px))';
+  if(!sess)return;
+  var p=getPlan(AP.planId);
+  var it=AP.list[AP.idx];
+  var nm=document.getElementById('apf-name');if(nm)nm.textContent=it?(it.book+' '+it.ch):'—';
+  var sb=document.getElementById('apf-sub');
+  if(sb)sb.textContent=((p&&p.title)?p.title:'Аудиоплан')+' · День '+AP.day+' · Дорожка '+(AP.idx+1)+' из '+AP.list.length;
+  var playing=!!(AP.a&&!AP.a.paused);
+  var pb=document.getElementById('apf-play');if(pb)pb.textContent=playing?'⏸':'▶';
+  var vs=document.getElementById('apf-vis');if(vs)vs.className='apf-vis'+(playing?' play':'');
+}
+function apFloatToggle(){ apToggle(); apFloatUpdate(); }
+function apFloatOpen(){
+  if(AP.planId&&app.activePlanId!==AP.planId){app.activePlanId=AP.planId;saveApp();viewDay=null;}
+  goPage('pg-read');renderRead();
+}
+function apFloatStop(){
+  if(!AP.a)return;
+  if(AP.a.src&&isFinite(AP.a.currentTime))apSavePos(AP.a.currentTime||0);
+  try{AP.a.pause();AP.a.removeAttribute('src');AP.a.load();}catch(e2){}
+  apRender();apFloatUpdate();haptic('light');
+}
 function apLoadPos(){
   try{ return JSON.parse(localStorage.getItem(apPosKey()) || '{}'); }catch(e){ return {}; }
 }
@@ -1784,6 +1842,7 @@ function apPulseDone(){
    текста (решение владельца): плеер, перемотка, дорожки на сегодня и кнопка
    «✓ Прослушал». Скорость и чтец — прямо здесь, без захода в настройки. */
 function apRender(){
+  apFloatUpdate(); /* состояние сессии меняется в apPlay/apPause/apOpen/... — все они вызывают apRender */
   var wrap = document.getElementById('r-audio');
   if(!wrap || !isAudioPlanId(app.activePlanId)) return;
   var playing = !!(AP.a && !AP.a.paused && AP.a.src);
@@ -1869,12 +1928,16 @@ function apSeekUi(){
   var a = AP.a;
   var f = document.getElementById('ap-seek-f');
   var t = document.getElementById('ap-time');
+  var ff = document.getElementById('apf-line-f');
   if(!a || !a.src || !isFinite(a.duration) || !a.duration){
     if(f) f.style.width = '0%';
     if(t) t.textContent = '';
+    if(ff) ff.style.width = '0%';
     return;
   }
-  if(f) f.style.width = Math.min(100, (a.currentTime / a.duration) * 100) + '%';
+  var pct=Math.min(100,(a.currentTime/a.duration)*100);
+  if(f) f.style.width = pct + '%';
+  if(ff) ff.style.width = pct + '%';
   if(t) t.textContent = apFmtT(a.currentTime) + ' / ' + apFmtT(a.duration);
 }
 function apFmtT(s){
@@ -2741,6 +2804,7 @@ var vnb=document.getElementById('cfg-vn-tog');if(vnb)vnb.className='tog'+(showVe
   cfgAudioFill(prog);
   var tz=document.getElementById('cfg-tz-note');
   if(tz){var off=-new Date().getTimezoneOffset()/60;tz.textContent='Время указано по твоему часовому поясу (UTC'+(off>=0?'+':'')+off+')';}
+  var st0=document.getElementById('cfg-sync-st');if(st0)st0.style.display='none'; /* статус от прошлого плана не висит над новым */
 }
 function cfgSelectPlan(id){
   cfgPlanId=id;
@@ -2790,8 +2854,30 @@ function syncNotify(){
   if(!userId) return;
   clearTimeout(_notifySyncTimers[planId]);
   _notifySyncTimers[planId]=setTimeout(function(){
-    fetch(BACKEND+'/plan/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,notify_hour_msk:mskHour,notify_minute_msk:mskMinute,notify_on:notifyOn,init_data:tgInitData})}).then(function(r){syncBadge(r.ok);}).catch(function(){syncBadge(false);});
+    /* /plan/register, а не /plan/settings: register — upsert. Если строка плана
+       ещё не существует на сервере (настраивали до нажатия «Выбрать план»,
+       план с другого устройства и т.п.), settings сделал бы PATCH по пустоте —
+       Supabase молча не меняет ни одной строки, сервер отвечает ok:true —
+       и напоминание физически не сохраняется (случай с аудиопланом и 9:00).
+       register создаёт недостающую строку, а для существующей обновляет
+       ТОЛЬКО notify-поля (гарантия бэкенда) — прогресс не трогается. */
+    fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,title:(_anyPlanTitle(planId)||''),notify_hour_msk:mskHour,notify_minute_msk:mskMinute,notify_on:notifyOn,init_data:tgInitData})}).then(function(r){_notifySyncDone(planId,r.ok);}).catch(function(){_notifySyncDone(planId,false);});
   },700);
+}
+/* Видимый итог сохранения времени напоминания (экран Настроек):
+   успех — зелёная строка на 4с; сбой — красная с подсказкой.
+   Раньше единственным сигналом сбоя был глобальный баннер синхронизации,
+   и пользователь не мог понять, придёт ли напоминание вообще. */
+var _cfgStTimer=null;
+function _notifySyncDone(planId,ok){
+  syncBadge(ok);
+  if(planId!==cfgPlanId)return;
+  var st=document.getElementById('cfg-sync-st');if(!st)return;
+  clearTimeout(_cfgStTimer);
+  st.style.display='block';
+  st.style.color=ok?'var(--acc)':'#c0392b';
+  st.textContent=ok?'✓ Напоминание сохранено на сервере':'⚠ Не сохранено — открой апп в Telegram и повтори';
+  _cfgStTimer=setTimeout(function(){st.style.display='none';},4000);
 }
 
 // ── Единый аккаунт: полная синхронизация состояния между устройствами ──
@@ -2992,6 +3078,11 @@ document.addEventListener('touchend',function(e){
      мешает свайп-навигации нигде, кроме как ровно в момент активного
      выделения. */
   try{if(window.getSelection&&window.getSelection().toString())return;}catch(e2){}
+  /* Свайп-навигация не должна срабатывать, когда жест начался на интерактивном
+     элементе: горизонтальный drag ползунка громкости/перемотки — это настройка
+     звука, а не перелистывание дня (именно из-за этого drag громкости на
+     аудио-экране «перелистывал» день и ставил воспроизведение на паузу). */
+  try{var _swt=e.target;if(_swt&&_swt.closest&&_swt.closest('input,select,textarea,button,a,.ap-seek'))return;}catch(e6){}
   var dx=e.changedTouches[0].clientX-swX,dy=e.changedTouches[0].clientY-swY;
   if(Math.abs(dx)<60||Math.abs(dy)>Math.abs(dx)*0.7)return; /* вертикальный скролл - не свайп */
   var cur=document.querySelector('.pg.on');var id=cur?cur.id:'';
