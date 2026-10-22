@@ -222,6 +222,8 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 .ap-vol input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:var(--brd);outline:none;cursor:pointer;padding:0;margin:0;touch-action:none}
 .ap-vol input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;background:var(--acc);border:none;box-shadow:0 1px 4px rgba(0,0,0,.25)}
 .ap-vol input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--acc);border:none}
+/* iOS: ползунок невозможен (audio.volume read-only) — компактная подсказка */
+.ap-vol-hint{flex:1;min-width:0;margin:0 6px;font-size:11.5px;color:var(--txt2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* ── Парящий плеер v1.5.0 (как в MyRadio): ЕДИНСТВЕННАЯ панель плеера, полностью
    отвязана от страницы: position:fixed над нижней навигацией, видна на всех
    экранах, пока есть аудио-сессия. Мини-режим — компактная строка (EQ, трек,
@@ -600,7 +602,7 @@ function saveApp(){try{localStorage.setItem('bapp3',JSON.stringify(app));}catch(
 var BIBLE_CACHE_VER='v1';
 /* Версия приложения для футера: повышать при значимых изменениях
    (модель чтения, новые экраны). Формат: мажор.минор.патч. */
-var APP_VERSION='1.5.2';
+var APP_VERSION='1.5.3';
 async function loadBible(){
   if(bible)return;
   var raw=null;
@@ -1665,6 +1667,12 @@ async function flushPending(){
 /* Состояние плеера и позиция прослушивания (localStorage, офлайн).
    speed — скорость воспроизведения, одна на все планы (audio_speed_v1). */
 var AP = { a:null, planId:null, day:null, idx:0, list:[], ready:false, speed:1, ex:false }; /* ex: док развёрнут; по умолчанию МИНИ-бар (v1.5.2) — дорожки не перекрывает */
+/* iOS/HTMLMediaElement: audio.volume ТОЛЬКО ДЛЯ ЧТЕНИЯ — Apple не позволяет JS
+   менять громкость воспроизведения (ползунок на iPhone физически не работает,
+   кроме того у CDN 4bbl.ru нет CORS-заголовков, значит WebAudio-Gain тоже
+   невозможен). На iOS вместо ползунка показываем подсказку про кнопки
+   громкости; на Android/десктопе ползунок остаётся рабочим. */
+var AP_IOS = /iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
 function apPosKey(){ return 'audio_pos_v1'; }
 var AP_SPEEDS=[0.8,1,1.25,1.5,2];
 function apSpeedGet(){
@@ -1879,10 +1887,12 @@ function apRender(){
       '<div class="ap-cnt">Дорожка ' + (AP.idx + 1) + ' из ' + AP.list.length + '</div></div></div>';
   h += '<div class="ap-seek" onclick="apSeek(event)"><div class="ap-seek-f" id="ap-seek-f"></div></div>' +
     '<div class="ap-ctl"><div class="ap-time" id="ap-time"></div>' +
-    '<div class="ap-vol"><span class="ap-vol-i" id="ap-vol-i" onclick="apVolMute()" aria-label="Звук вкл/выкл">' +
+    (AP_IOS
+      ? '<div class="ap-vol-hint">🔊 Громкость — кнопками телефона</div>'
+      : '<div class="ap-vol"><span class="ap-vol-i" id="ap-vol-i" onclick="apVolMute()" aria-label="Звук вкл/выкл">' +
     apVolIcon(apVolGet()) + '</span>' +
     '<input type="range" id="ap-vol" min="0" max="100" step="5" value="' + apVolGet() +
-    '" oninput="apVolSet(this.value)" aria-label="Громкость"></div>' +
+    '" oninput="apVolSet(this.value)" aria-label="Громкость"></div>') +
     '<button class="ap-speed" id="ap-speed" onclick="apSpeedNext()" aria-label="Скорость">' +
     apSpeedLbl(AP.speed || 1) + '</button></div>';
   /* Смена чтеца внутри дня: выбор сохраняется в прогрессе плана, дорожки
@@ -1924,9 +1934,12 @@ function apRender(){
   apfSyncH();
   apSeekUi();
 }
-/* Смена чтеца на экране дня: сохранить slug, остановить текущий файл,
-   пересобрать дорожки дня под новую озвучку. Позиция дня (day/idx/sec)
-   не зависит от чтеца — вернёмся на ту же дорожку. */
+/* Смена чтеца на экране дня: сохранить slug, пересобрать дорожки дня под
+   новую озвучку. Позиция дня (day/idx/sec) не зависит от чтеца — вернёмся
+   на ту же дорожку. v1.5.3: src НЕ чистим (раньше removeAttribute закрывал
+   парящий плеер — apFloatVisible требует сессию): пауза + сохранение позиции,
+   док остаётся на экране; старый файл не сыграет — play всегда идёт через
+   apPlay, который перезаписывает src на озвучку из нового списка. */
 function apNarrPick(slug){
   var prog = app.progress[app.activePlanId];
   if(!prog || !audioVer(slug)) return;
@@ -1935,7 +1948,6 @@ function apNarrPick(slug){
   prog.audioSlug = slug;
   saveApp(); haptic('light');
   if(AP.a && !AP.a.paused){ AP.a.pause(); apSavePos(AP.a.currentTime || 0); }
-  if(AP.a && AP.a.src){ AP.a.removeAttribute('src'); try{ AP.a.load(); }catch(e){} }
   AP.list = apDayChapters(app.activePlanId, AP.day);
   AP.ready = AP.list.length > 0;
   var box = document.getElementById('r-audio-err');
