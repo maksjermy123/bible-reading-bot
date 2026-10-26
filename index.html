@@ -602,7 +602,14 @@ function saveApp(){try{localStorage.setItem('bapp3',JSON.stringify(app));}catch(
 var BIBLE_CACHE_VER='v1';
 /* Версия приложения для футера: повышать при значимых изменениях
    (модель чтения, новые экраны). Формат: мажор.минор.патч. */
-var APP_VERSION='1.5.5';
+var APP_VERSION='1.5.6';
+/* v1.5.6: IANA-пояс устройства ("Europe/Helsinki" и т.п.). Сохраняем его
+   ВМЕСТЕ с локальным временем напоминания: бэкенд сам вычисляет «сколько
+   сейчас в этом поясе» (zoneinfo) и учитывает переходы на зимнее/летнее
+   время. Раньше конвертация в МСК делалась один раз при сохранении, и после
+   перевода часов в Европе напоминания уезжали на час (кейс владельца,
+   25.10.2026). */
+var DEVICE_TZ=(function(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'Europe/Moscow';}catch(e){return 'Europe/Moscow';}})();
 async function loadBible(){
   if(bible)return;
   var raw=null;
@@ -1081,17 +1088,17 @@ async function startPlan(){
   if(!selPlanId)return;
   var timeEl=document.getElementById('setup-time');
   var time=timeEl?timeEl.value:'08:00';
-  var msk=localTimeToMsk(time);
+  var ntime=parseLocalTime(time);
   if(!app.settings)app.settings={};
-  app.settings.notifyTime=time;app.settings.notifyHourMsk=msk.hour;app.settings.notifyMinuteMsk=msk.minute;
+  app.settings.notifyTime=time;app.settings.notifyHourMsk=ntime.hour;app.settings.notifyMinuteMsk=ntime.minute;app.settings.notifyTz=DEVICE_TZ;
   app.activePlanId=selPlanId;
-  app.progress[selPlanId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],pericopePos:{},notifyTime:time,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings.notifyOn!==false};
+  app.progress[selPlanId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],pericopePos:{},notifyTime:time,notifyHourMsk:ntime.hour,notifyMinuteMsk:ntime.minute,notifyTz:DEVICE_TZ,notifyOn:app.settings.notifyOn!==false};
   if(isAudioPlanId(selPlanId)){
     var _asel=document.getElementById('setup-audio-ver');
     app.progress[selPlanId].audioSlug=(_asel&&_asel.value)?_asel.value:AUDIO_DEFAULT;
   }
   saveApp();
-  if(userId){try{var _r0=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:selPlanId,title:(getPlan(selPlanId)||{}).title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.settings.notifyOn!==false,init_data:tgInitData})});syncBadge(_r0.ok);}catch(e){syncBadge(false);}}
+  if(userId){try{var _r0=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:selPlanId,title:(getPlan(selPlanId)||{}).title,notify_hour:ntime.hour,notify_minute:ntime.minute,notify_tz:DEVICE_TZ,notify_on:app.settings.notifyOn!==false,init_data:tgInitData})});syncBadge(_r0.ok);}catch(e){syncBadge(false);}}
   haptic('success');viewDay=null;goPage('pg-read');renderRead();
 }
 function continuePlan(id){haptic('light');app.activePlanId=id;saveApp();viewDay=null;goPage('pg-read');renderRead();}
@@ -1172,11 +1179,26 @@ function getPlan(id){
   return p;
 }
 
-function localTimeToMsk(timeStr){
-  var parts=timeStr.split(':').map(Number);
-  var now=new Date();
-  var localDate=new Date(now.getFullYear(),now.getMonth(),now.getDate(),parts[0],parts[1],0);
-  return {hour:(localDate.getUTCHours()+3)%24,minute:localDate.getUTCMinutes()};
+/* v1.5.6: parseLocalTime — время напоминания больше НЕ конвертируется в МСК
+   при сохранении. Раньше localTimeToMsk() фиксировал МСК-эквивалент один раз
+   на момент сохранения; после перевода часов уведомления шли по старому
+   времени. Теперь храним локальное время КАК ЕСТЬ + пояс устройства
+   (DEVICE_TZ) — см. ntPayload(). mskToLocalTime() ниже остаётся для
+   отображения легаси-строк, сохранённых до обновления (там лежит МСК). */
+function parseLocalTime(timeStr){
+  var parts=(timeStr||'08:00').split(':').map(Number);
+  return {hour:parts[0]||0,minute:parts[1]||0};
+}
+/* v1.5.6: нормализует настройки напоминания плана к payload-формату
+   (локальное настенное время + пояс). Старые строки localStorage хранят
+   МСК-время без пояса — конвертируем в локальное на лету; после первого же
+   сохранения у строки появится notifyTz и конвертация станет не нужна. */
+function ntPayload(p){
+  var h=(p&&p.notifyHourMsk!=null)?p.notifyHourMsk:8;
+  var m=(p&&p.notifyMinuteMsk!=null)?p.notifyMinuteMsk:0;
+  var tz=(p&&p.notifyTz)||DEVICE_TZ;
+  if(!(p&&p.notifyTz)){var c=mskToLocalTime(h,m).split(':');h=+c[0];m=+c[1];}
+  return {notify_hour:h,notify_minute:m,notify_tz:tz};
 }
 function mskToLocalTime(mskHour,mskMinute){
   var now=new Date();
@@ -1647,7 +1669,8 @@ async function flushPending(){
         syncBadge(true);sent=true;
       } else if(d&&d.error==='not registered'){
         try{
-          await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:it.plan_id,title:(getPlan(it.plan_id)||{}).title,notify_hour_msk:(app.progress[it.plan_id]||{}).notifyHourMsk,notify_minute_msk:(app.progress[it.plan_id]||{}).notifyMinuteMsk,notify_on:app.progress[it.plan_id]?app.progress[it.plan_id].notifyOn!==false:true,init_data:tgInitData})});
+          var _np=ntPayload(app.progress[it.plan_id]||{});
+          await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:it.plan_id,title:(getPlan(it.plan_id)||{}).title,notify_hour:_np.notify_hour,notify_minute:_np.notify_minute,notify_tz:_np.notify_tz,notify_on:app.progress[it.plan_id]?app.progress[it.plan_id].notifyOn!==false:true,init_data:tgInitData})});
           var r2=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:it.plan_id,day_number:it.day_number,local_date:today(),init_data:tgInitData})});
           var d2=await r2.json();
           if(d2&&d2.ok){if(app.progress[it.plan_id]&&d2.streak!=null){app.progress[it.plan_id].streak=d2.streak;app.progress[it.plan_id].maxStreak=d2.max_streak;saveApp();}syncBadge(true);sent=true;}
@@ -2128,9 +2151,9 @@ async function startCona(){
   if(!conaSel.length)return;
   var timeEl=document.getElementById('cona-time');
   var time=timeEl?timeEl.value:'08:00';
-  var msk=localTimeToMsk(time);
+  var ntime=parseLocalTime(time);
   if(!app.settings)app.settings={};
-  app.settings.notifyTime=time;app.settings.notifyHourMsk=msk.hour;app.settings.notifyMinuteMsk=msk.minute;
+  app.settings.notifyTime=time;app.settings.notifyHourMsk=ntime.hour;app.settings.notifyMinuteMsk=ntime.minute;app.settings.notifyTz=DEVICE_TZ;
   var vsel=document.getElementById('cona-ver');
   var slug=(vsel&&vsel.value&&audioVer(vsel.value))?vsel.value:AUDIO_DEFAULT;
   /* Книги в каноническом порядке (ВЗ затем НЗ) независимо от порядка тапов —
@@ -2162,7 +2185,7 @@ async function startCona(){
         var _r1=await fetch(BACKEND+'/plan/set_days',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:id,days_done:prog.daysDone,init_data:tgInitData})});
         syncBadge(_r1.ok);
       }else{
-        var _r0=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:id,title:title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.settings.notifyOn!==false,init_data:tgInitData})});
+        var _r0=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:id,title:title,notify_hour:ntime.hour,notify_minute:ntime.minute,notify_tz:DEVICE_TZ,notify_on:app.settings.notifyOn!==false,init_data:tgInitData})});
         syncBadge(_r0.ok);
       }
     }catch(e){syncBadge(false);}
@@ -2251,7 +2274,8 @@ async function markRead(){
            там localStorage чистится ЦЕЛИКОМ и сознательно, а не по одному
            плану на основании единственного неудачного запроса. */
         try{
-          await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,title:(getPlan(app.activePlanId)||{}).title,notify_hour_msk:prog.notifyHourMsk,notify_minute_msk:prog.notifyMinuteMsk,notify_on:prog.notifyOn!==false,init_data:tgInitData})});
+          var _nph=ntPayload(prog);
+          await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,title:(getPlan(app.activePlanId)||{}).title,notify_hour:_nph.notify_hour,notify_minute:_nph.notify_minute,notify_tz:_nph.notify_tz,notify_on:prog.notifyOn!==false,init_data:tgInitData})});
           var r2=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:app.activePlanId,day_number:vd,local_date:t,init_data:tgInitData})});
           var data2=await r2.json();
           if(data2.ok){prog.streak=data2.streak;prog.maxStreak=data2.max_streak;saveApp();renderRead();syncBadge(true);}
@@ -2711,13 +2735,13 @@ async function startCustom(){
      и в общие настройки, как это делает startPlan() для готовых планов. */
   var timeElC=document.getElementById('con-time');
   var defTime=(timeElC&&timeElC.value)?timeElC.value:((app.settings&&app.settings.notifyTime)||'08:00');
-  var msk=localTimeToMsk(defTime);
+  var ntime=parseLocalTime(defTime);
   if(!app.settings)app.settings={};
-  app.settings.notifyTime=defTime;app.settings.notifyHourMsk=msk.hour;app.settings.notifyMinuteMsk=msk.minute;
-  app.progress[planId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],pericopePos:{},notifyTime:defTime,notifyHourMsk:msk.hour,notifyMinuteMsk:msk.minute,notifyOn:app.settings?app.settings.notifyOn!==false:true};
+  app.settings.notifyTime=defTime;app.settings.notifyHourMsk=ntime.hour;app.settings.notifyMinuteMsk=ntime.minute;app.settings.notifyTz=DEVICE_TZ;
+  app.progress[planId]={startDate:today(),streak:0,maxStreak:0,lastRead:null,daysDone:[],pericopePos:{},notifyTime:defTime,notifyHourMsk:ntime.hour,notifyMinuteMsk:ntime.minute,notifyTz:DEVICE_TZ,notifyOn:app.settings?app.settings.notifyOn!==false:true};
   saveApp();haptic('success');viewDay=null;goPage('pg-read');renderRead();
   if(userId){
-    try{var _r2=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,title:title,notify_hour_msk:msk.hour,notify_minute_msk:msk.minute,notify_on:app.progress[planId].notifyOn,init_data:tgInitData})});syncBadge(_r2.ok);}catch(e){syncBadge(false);}
+    try{var _r2=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,title:title,notify_hour:ntime.hour,notify_minute:ntime.minute,notify_tz:DEVICE_TZ,notify_on:app.progress[planId].notifyOn,init_data:tgInitData})});syncBadge(_r2.ok);}catch(e){syncBadge(false);}
   }
 }
 
@@ -2780,8 +2804,13 @@ function _ensureCfgProg(){
       var r0=_serverPlansRows[i];
       if(r0.plan_id===cfgPlanId){
         p.notifyOn=r0.notify_on!==false;
+        p.notifyTz=r0.notify_tz||null;
         p.notifyHourMsk=(r0.notify_hour_msk!=null)?r0.notify_hour_msk:8;
         p.notifyMinuteMsk=(r0.notify_minute_msk!=null)?r0.notify_minute_msk:0;
+        /* Легаси-строка (без пояса): на сервере лежит МСК-время — для показа
+           переводим в локальное; после первого же сохранения строка получит
+           notify_tz и будет хранить локальное время как есть. */
+        if(!p.notifyTz){var _c0=mskToLocalTime(p.notifyHourMsk,p.notifyMinuteMsk).split(':');p.notifyHourMsk=+_c0[0];p.notifyMinuteMsk=+_c0[1];}
         p.notifyTime=(p.notifyHourMsk<10?'0':'')+p.notifyHourMsk+':'+(p.notifyMinuteMsk<10?'0':'')+p.notifyMinuteMsk;
       }
     }
@@ -2833,8 +2862,11 @@ function renderCfg(){
   if(!prog&&serverRow){
     var sh=(serverRow.notify_hour_msk!=null)?serverRow.notify_hour_msk:8;
     var sm=(serverRow.notify_minute_msk!=null)?serverRow.notify_minute_msk:0;
+    var stz=serverRow.notify_tz||null;
+    if(!stz){var _c1=mskToLocalTime(sh,sm).split(':');sh=+_c1[0];sm=+_c1[1];}
     prog={serverOnly:true,daysDone:[],
       notifyOn:serverRow.notify_on!==false,
+      notifyTz:stz,
       notifyHourMsk:sh,notifyMinuteMsk:sm,
       notifyTime:(sh<10?'0':'')+sh+':'+(sm<10?'0':'')+sm};
   }
@@ -2848,7 +2880,13 @@ var vnb=document.getElementById('cfg-vn-tog');if(vnb)vnb.className='tog'+(showVe
   var fi=document.getElementById('font-ind');if(fi)fi.style.left=(fontIdx/(FS.length-1)*100-4)+'%';
   cfgAudioFill(prog);
   var tz=document.getElementById('cfg-tz-note');
-  if(tz){var off=-new Date().getTimezoneOffset()/60;tz.textContent='Время указано по твоему часовому поясу (UTC'+(off>=0?'+':'')+off+')';}
+  if(tz){
+    if(prog&&!prog.notifyTz){
+      tz.textContent='Пока не закреплён ваш пояс: показано пересчитанное из МСК время. Пересохраните время — и оно закрепится за '+DEVICE_TZ+' с автопереходом зима/лето.';
+    } else {
+      tz.textContent='Время по поясу твоего устройства ('+DEVICE_TZ+') — переходы на зимнее/летнее время учитываются автоматически.';
+    }
+  }
   var st0=document.getElementById('cfg-sync-st');if(st0)st0.style.display='none'; /* статус от прошлого плана не висит над новым */
   /* СЕРВЕРНЫЙ статус напоминания выбранного плана (v1.5.5, диагностика
      «напоминание аудиоплана не приходит»): /plan/status отдаёт notify-поля
@@ -2870,11 +2908,15 @@ var vnb=document.getElementById('cfg-vn-tog');if(vnb)vnb.className='tog'+(showVe
       var son=srow.notify_on!==false;
       var shh=(srow.notify_hour_msk!=null)?srow.notify_hour_msk:8;
       var smm=(srow.notify_minute_msk!=null)?srow.notify_minute_msk:0;
-      var smsk=(shh<10?'0':'')+shh+':'+(smm<10?'0':'')+smm;
-      var sloc=mskToLocalTime(shh,smm);
+      var swall=(shh<10?'0':'')+shh+':'+(smm<10?'0':'')+smm;
       sst.style.display='block';
       sst.style.color=son?'var(--acc)':'#c0392b';
-      sst.textContent='🖥 Сервер: '+(son?'напоминание включено':'напоминание ВЫКЛЮЧЕНО')+', время '+smsk+' МСК'+(sloc&&sloc!==smsk?(' ('+sloc+' по вашему времени)'):'');
+      if(srow.notify_tz){
+        sst.textContent='🖥 Сервер: '+(son?'напоминание включено':'напоминание ВЫКЛЮЧЕНО')+', время '+swall+' ('+srow.notify_tz+')';
+      } else {
+        var sloc=mskToLocalTime(shh,smm);
+        sst.textContent='🖥 Сервер: '+(son?'напоминание включено':'напоминание ВЫКЛЮЧЕНО')+', время '+swall+' МСК'+(sloc&&sloc!==swall?(' ('+sloc+' у вас)'):'')+' — пересохраните время, чтобы закрепить ваш пояс';
+      }
     }
   }
 }
@@ -2893,9 +2935,10 @@ function cfgSaveTime(v){
   if(!cfgPlanId)return;
   var prog=_ensureCfgProg();
   prog.notifyTime=v;
-  var msk=localTimeToMsk(v);
-  prog.notifyHourMsk=msk.hour;
-  prog.notifyMinuteMsk=msk.minute;
+  var nt=parseLocalTime(v);
+  prog.notifyHourMsk=nt.hour;
+  prog.notifyMinuteMsk=nt.minute;
+  prog.notifyTz=DEVICE_TZ;
   saveApp();syncNotify();haptic('light');pushState();
 }
 /* Debounce сохранения времени напоминания на сервере.
@@ -2919,8 +2962,7 @@ var _notifySyncTimers={}; // planId -> timeout handle (per-план, а не о�
 function syncNotify(){
   var planId=cfgPlanId;if(!planId||!app.progress[planId])return;
   var prog=app.progress[planId];
-  var mskHour=prog.notifyHourMsk!==undefined?prog.notifyHourMsk:8;
-  var mskMinute=prog.notifyMinuteMsk!==undefined?prog.notifyMinuteMsk:0;
+  var np=ntPayload(prog);
   var notifyOn=prog.notifyOn!==false;
   saveApp();
   if(!userId) return;
@@ -2933,7 +2975,7 @@ function syncNotify(){
        и напоминание физически не сохраняется (случай с аудиопланом и 9:00).
        register создаёт недостающую строку, а для существующей обновляет
        ТОЛЬКО notify-поля (гарантия бэкенда) — прогресс не трогается. */
-    fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,title:(_anyPlanTitle(planId)||''),notify_hour_msk:mskHour,notify_minute_msk:mskMinute,notify_on:notifyOn,init_data:tgInitData})}).then(function(r){_notifySyncDone(planId,r.ok);}).catch(function(){_notifySyncDone(planId,false);});
+    fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:planId,title:(_anyPlanTitle(planId)||''),notify_hour:np.notify_hour,notify_minute:np.notify_minute,notify_tz:np.notify_tz,notify_on:notifyOn,init_data:tgInitData})}).then(function(r){_notifySyncDone(planId,r.ok);}).catch(function(){_notifySyncDone(planId,false);});
   },700);
 }
 /* Видимый итог сохранения времени напоминания (экран Настроек):
