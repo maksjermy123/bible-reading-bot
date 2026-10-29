@@ -602,7 +602,7 @@ function saveApp(){try{localStorage.setItem('bapp3',JSON.stringify(app));}catch(
 var BIBLE_CACHE_VER='v1';
 /* Версия приложения для футера: повышать при значимых изменениях
    (модель чтения, новые экраны). Формат: мажор.минор.патч. */
-var APP_VERSION='1.5.7';
+var APP_VERSION='1.5.8';
 /* v1.5.6: IANA-пояс устройства ("Europe/Helsinki" и т.п.). Сохраняем его
    ВМЕСТЕ с локальным временем напоминания: бэкенд сам вычисляет «сколько
    сейчас в этом поясе» (zoneinfo) и учитывает переходы на зимнее/летнее
@@ -3355,7 +3355,7 @@ async function init(){
    проверка) — повторные init() не дублируют футер. */
 var FOOT_PAGES=['pg-sel','pg-read','pg-seq','pg-bm','pg-cfg','pg-done'];
 function initFoot(){
-  var h='<div class="app-foot">Версия '+APP_VERSION+' · Создано при поддержке телеграм-канала <a href="https://t.me/Chtenie_Preobrazenie" target="_blank" rel="noopener">«От чтения к Преображению»</a></div>';
+  var h='<div class="app-foot">Версия '+APP_VERSION+' · Создано при поддержке телеграм-канала <a href="https://t.me/Chtenie_Preobrazenie" target="_blank" rel="noopener">«От чтения к Преображению»</a><br>Техподдержка - <a href="https://t.me/MaksErem" target="_blank" rel="noopener">@MaksErem</a></div>';
   for(var i=0;i<FOOT_PAGES.length;i++){
     var pg=document.getElementById(FOOT_PAGES[i]);
     if(pg&&!pg.querySelector('.app-foot'))pg.insertAdjacentHTML('beforeend',h);
