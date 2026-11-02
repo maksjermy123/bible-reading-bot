@@ -278,7 +278,7 @@ body.apf-on .pg.on{padding-bottom:calc(var(--apf-h,92px) + 8px)}
 <div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div id="con-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="con-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="con-not-tog" onclick="conTogNot()"></button></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Выбрать план</button><button class="btn btn-out" onclick="conEditId=null;conChrono=false;goPage('pg-sel');renderSel()">Вернуться</button></div>
 <div class="pg" id="pg-cona"><div class="hdr"><h1 id="cona-title">🎧 Аудио-план</h1></div><div id="cona-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="cona-ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="cona-nt-books"></div></div><div class="sec">Длительность (дней)</div><div style="display:flex;gap:6px;margin-bottom:8px"><button class="cona-chip" onclick="conaSetDays(30)">30</button><button class="cona-chip" onclick="conaSetDays(90)">90</button><button class="cona-chip" onclick="conaSetDays(180)">180</button><button class="cona-chip" onclick="conaSetDays(365)">365</button></div><div class="dur-row"><input type="number" id="cona-days" min="1" max="1000" value="365" oninput="conaUpdatePrev()"></div><div class="sec">Озвучка</div><select id="cona-ver" onchange="conaUpdatePrev()" style="width:100%;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"></select><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="cona-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="cona-not-tog" onclick="conTogNot2()"></button></div><div class="prev-box" id="cona-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-cona" onclick="startCona()" disabled>Начать слушать</button><button class="btn btn-out" onclick="conaEditId=null;goPage('pg-sel');renderSel()">Вернуться</button></div>
 <div class="pg" id="pg-setup"><div class="hdr"><h1 id="setup-title">📖 План</h1></div><div class="prev-box" id="setup-meta" style="margin-bottom:14px"></div><div class="sec" id="setup-audio-wrap" style="display:none">Озвучка
-<select id="setup-audio-ver" onchange="setupAudioPick()" style="width:100%;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"></select></div><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="setup-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="setup-not-tog" onclick="setupTogNot()"></button></div><button class="btn btn-acc" id="btn-setup" onclick="startPlan()">Выбрать план</button><button class="btn btn-out" onclick="setupBack()">Вернуться</button></div>
+<select id="setup-audio-ver" onchange="setupAudioPick()" style="width:100%;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"></select></div><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="setup-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="setup-not-tog" onclick="setupTogNot()"></button></div><button class="btn btn-acc" onclick="startPlan()">Выбрать план</button><button class="btn btn-out" onclick="setupBack()">Вернуться</button></div>
 
 <div class="pg" id="pg-bm"><div class="hdr"><h1>⭐ Закладки</h1></div><div id="bm-list"></div><div id="bm-empty" style="display:none;text-align:center;padding:36px;color:var(--txt2);font-size:14px">Нет закладок.<br>Нажми ⭐ во время чтения.</div></div>
 <div class="pg" id="pg-cfg"><div class="hdr"><h1>⚙️ Настройки</h1></div><div class="cfg-box"><h3>🔔 Напоминания</h3><div id="cfg-plan-empty" style="font-size:12px;color:var(--txt2);margin-bottom:10px;display:none">Сначала выбери план на вкладке «Планы»</div><select id="cfg-plan-sel" onchange="cfgSelectPlan(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px;margin-bottom:12px"></select><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span id="cfg-not-lbl">Напоминания включены</span><button class="tog on" id="cfg-not-tog" onclick="cfgTogNot()"></button></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">🕐</span><input type="time" id="cfg-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:15px" onchange="cfgSaveTime(this.value)"></div><div id="cfg-tz-note" style="font-size:11px;color:var(--txt2);margin-top:6px"></div><div id="cfg-server-st" style="font-size:11px;margin-top:6px;display:none"></div><div id="cfg-sync-st" style="font-size:11px;margin-top:6px;display:none;font-weight:600"></div></div><div class="cfg-box" id="cfg-audio-wrap" style="display:none"><h3>🎧 Озвучка</h3><select id="cfg-audio-ver" onchange="cfgAudioPick(this.value)" style="width:100%;padding:9px 10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:13px"></select><div style="font-size:11px;color:var(--txt2);margin-top:6px">Прогресс дней не зависит от озвучки</div></div><div class="cfg-box"><h3>🎨 Тема</h3><div class="th-grid" style="grid-template-columns:repeat(3,1fr)"><button onclick="setTheme('auto')" id="th-auto" class="th-btn"><div>🌗</div>Авто</button><button onclick="setTheme('sepia')" id="th-sepia" class="th-btn sel"><div>☀️</div>Светлая</button><button onclick="setTheme('dark')" id="th-dark" class="th-btn"><div>🌙</div>Тёмная</button></div><div class="tog-row" style="border:none;padding:0;margin-bottom:10px"><span>Номера стихов</span><button class="tog on" id="cfg-vn-tog" onclick="cfgTogVn()"></button></div><div style="display:flex;align-items:center;gap:10px"><button class="fb" style="width:38px;height:38px" onclick="chFont(-1)">A−</button><div id="font-track" style="flex:1;height:28px;display:flex;align-items:center;position:relative;touch-action:none;cursor:pointer"><div style="width:100%;height:3px;background:var(--brd);border-radius:2px;position:relative"><div id="font-ind" style="position:absolute;top:-5px;width:13px;height:13px;background:var(--acc);border-radius:50%;transition:left .2s"></div></div></div><button class="fb" style="width:38px;height:38px" onclick="chFont(1)">A+</button></div></div></div>
@@ -349,10 +349,34 @@ var VC={"Бытие":[31,25,24,26,32,22,24,22,29,32,32,20,18,24,21,16,27,33,38,1
 /* ==================== АУДИО-ПЛАН: ЧАСТЬ 1. ДАННЫЕ И ГЕНЕРАТОРЫ ==================== */
 /* ---------- ЧАСТЬ 1. ДАННЫЕ И ГЕНЕРАТОРЫ ---------- */
 
-var AUDIO_VER = 'v3';
-var AUDIO_BASE = 'https://4bbl.ru/data/';           /* CDN с mp3-файлами */
-var AUDIO_SITE = 'https://bible.by/audio/';         /* сайт-источник (фолбэк + атрибуция на экране дня аудиоплана) */
+var AUDIO_VER = 'v4';
+var AUDIO_SITE = 'https://bible.by/audio/';         /* сайт-источник (атрибуция + человекочитаемый фолбэк на экране дня аудиоплана) */
 var AUDIO_DEFAULT = 'syn-bondarenko';               /* озвучка по умолчанию */
+
+/* v1.5.9: КАСКАД ЗЕРКАЛ. Прежний единый CDN 4bbl.ru умер (NS Beget не отвечают),
+   файлы перенесены на GitHub raw. AUDIO_MIRRORS[slug] — упорядоченный список
+   источников; apError перебирает их при сбое, пока какой-то не сыграет.
+   t:'gh'  — base + slug/bb/cc.mp3 (ветка main — полный зеркал-архив);
+   t:'ghb' — base + bb/cc.mp3 (ветка-зеркало: корень ветки = слаг);
+   t:'ob'  — base + {код}-{глава 3-зн}.mp3, коды OB_CODES (CDN mp3.only.bible);
+   t:'map' — маркер: URL из ленивой карты путей (CDN predanie.ru). */
+var AUDIO_MIRRORS = {
+  'syn-bondarenko': [
+    { t:'gh',  u:'https://raw.githubusercontent.com/maksjermy123/bible-audio/main/' },
+    { t:'ob',  u:'https://mp3.only.bible/v3/ru/rst/bondarenko/' },
+    { t:'map', u:'https://raw.githubusercontent.com/maksjermy123/bible-audio/main/audio-map-predanie.json' }
+  ],
+  'bti-prozorovsky': [
+    { t:'ghb', u:'https://raw.githubusercontent.com/maksjermy123/bible-audio/bti-prozorovsky/' },
+    { t:'ob',  u:'https://mp3.only.bible/v3/ru/bti/sem-pro/' }
+  ],
+  'syn-prudovskiy': [
+    { t:'ob',  u:'https://mp3.only.bible/v3/ru/rst/prudovsky/' }
+  ]
+};
+var PREDAIE_CDN = 'https://predanie.clients-cdnnow.ru/';
+/* Коды книг only.bible → bb (русский синодальный порядок BOOK_NUM) */
+var OB_CODES = {'01':'gen','02':'exo','03':'lev','04':'num','05':'deu','06':'jos','07':'jdg','08':'rut','09':'1sa','10':'2sa','11':'1ki','12':'2ki','13':'1ch','14':'2ch','15':'ezr','16':'neh','17':'est','18':'job','19':'psa','20':'pro','21':'ecc','22':'sng','23':'isa','24':'jer','25':'lam','26':'ezk','27':'dan','28':'hos','29':'jol','30':'amo','31':'oba','32':'jon','33':'mic','34':'nam','35':'hab','36':'zep','37':'hag','38':'zec','39':'mal','40':'mat','41':'mrk','42':'luk','43':'jhn','44':'act','45':'jas','46':'1pe','47':'2pe','48':'1jn','49':'2jn','50':'3jn','51':'jud','52':'rom','53':'1co','54':'2co','55':'gal','56':'eph','57':'php','58':'col','59':'1th','60':'2th','61':'1ti','62':'2ti','63':'tit','64':'phm','65':'heb','66':'rev'};
 
 /* Каталог аудио-версий. Поля:
    slug     — код версии в URL bible.by и папки на 4bbl.ru (совпадают);
@@ -362,8 +386,12 @@ var AUDIO_DEFAULT = 'syn-bondarenko';               /* озвучка по ум�
 var AUDIO_VERSIONS = [
   { slug:'syn-bondarenko',  tr:'Синодальный',      narrator:'Александр Бондаренко', music:true,
     note:'1–2 Паралипоменон и Песнь Песней читает Игорь Козлов' },
-  { slug:'syn-jbl',         tr:'Синодальный',      narrator:'«Свет на Востоке»',    music:false },
-  { slug:'bti-prozorovsky', tr:'ИПБ (Кулаковых)',  narrator:'Виктор Прозоровский',  music:false }
+  { slug:'syn-prudovskiy',  tr:'Синодальный',      narrator:'Илья Прудовский',      music:false,
+    note:'Православная редакция, канонические книги; резервная озвучка' },
+  { slug:'bti-prozorovsky', tr:'ИПБ (Кулаковых)',  narrator:'Никита Семёнов-Прозоровский', music:false,
+    note:'℗ Институт перевода Библии в Заокском' },
+  { slug:'syn-jbl',         tr:'Синодальный',      narrator:'«Свет на Востоке»',    music:false, dead:true,
+    note:'временно недоступна: прежний источник 4bbl.ru не работает' }
 ];
 
 /* Индивидуальные дыры версий (slug → {книга: [главы]}). На 19.10.2026 пусто:
@@ -383,12 +411,46 @@ var AUDIO_CHAPTERS = {'Бытие':50,'Исход':40,'Левит':27,'Числ�
   '1 Тимофею':6,'2 Тимофею':4,'Титу':3,'Филимону':1,'Евреям':13,'Иаков':5,'1 Петра':5,'2 Петра':3,
   '1 Иоанна':5,'2 Иоанна':1,'3 Иоанна':1,'Иуда':1,'Откровение':22};
 
-/* Прямая ссылка на mp3-файл главы. Паттерн подтверждён на всех версиях каталога:
-   https://4bbl.ru/data/{slug}/{книга 2-значная}/{глава 2-значная}.mp3 */
+/* Прямая ссылка на mp3-файл главы (первичный источник — GitHub raw).
+   Паттерн подтверждён на полном каноне: syn-bondarenko 1189/1189 и
+   bti-prozorovsky 1189/1189 (хеши сверены). raw отдаёт CORS * и Range —
+   стриминг и перемотка работают из мини-аппа напрямую. */
 function audioUrl(book, ch, slug){
   var n = BOOK_NUM[book]; if(!n || !AUDIO_CHAPTERS[book] || ch < 1 || ch > AUDIO_CHAPTERS[book]) return null;
   var p = function(x){ return (x < 10 ? '0' : '') + x; };
-  return AUDIO_BASE + slug + '/' + p(n) + '/' + p(ch) + '.mp3';
+  return 'https://raw.githubusercontent.com/maksjermy123/bible-audio/main/' + slug + '/' + p(n) + '/' + p(ch) + '.mp3';
+}
+
+/* Каскад URL главы по всем зеркалам слага (см. AUDIO_MIRRORS).
+   t:'map' кладёт маркер {map: url} — настоящий URL apError достанет из карты
+   при первом сбое. Если у слага зеркал нет — вернётся null. */
+function audioUrls(book, ch, slug){
+  var n = BOOK_NUM[book];
+  var ms = AUDIO_MIRRORS[slug];
+  if(!n || !ms) return null;
+  var p2 = function(x){ return (x < 10 ? '0' : '') + x; };
+  var p3 = function(x){ return (x < 100 ? '0' : '') + p2(x); };
+  var out = [];
+  for(var i = 0; i < ms.length; i++){
+    var m = ms[i];
+    if(m.t === 'gh') out.push(m.u + slug + '/' + p2(n) + '/' + p2(ch) + '.mp3');
+    else if(m.t === 'ghb') out.push(m.u + p2(n) + '/' + p2(ch) + '.mp3');
+    else if(m.t === 'ob'){ var code = OB_CODES[p2(n)]; if(code) out.push(m.u + code + '-' + p3(ch) + '.mp3'); }
+    else if(m.t === 'map') out.push({ map: m.u });
+  }
+  return out;
+}
+
+/* Карта путей predanie (зеркало №3 syn-bondarenko): тянется один раз,
+   только если каскад дошёл до этого зеркала */
+var _apPredMap = null;
+function apPredMap(url, cb){
+  if(_apPredMap) return cb(_apPredMap);
+  try{
+    fetch(url).then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(j){ _apPredMap = (j && typeof j === 'object') ? j : {}; cb(_apPredMap); })
+      .catch(function(){ _apPredMap = {}; cb(_apPredMap); });
+  }catch(e){ _apPredMap = {}; cb(_apPredMap); }
 }
 
 /* Страница главы на bible.by — человекочитаемый фолбэк при ошибке файла */
@@ -603,12 +665,6 @@ var BIBLE_CACHE_VER='v1';
 /* Версия приложения для футера: повышать при значимых изменениях
    (модель чтения, новые экраны). Формат: мажор.минор.патч. */
 var APP_VERSION='1.5.9';
-/* v1.5.9: мгновенный отклик кнопок, стартующих план (startCona/startPlan):
-   раньше на холодном бэкенде POST /plan/register отвечал секунды (до ~30 с на
-   бесплатном Render), кнопка оставалась активной и страница «ничего не
-   делала» — выглядело как сбой. Теперь кнопка сразу уходит в loading
-   («Сохраняем…», двойной тап заблокирован), и после ответа происходит
-   переход к плану. Регистрация на бэкенде не менялась. */
 /* v1.5.6: IANA-пояс устройства ("Europe/Helsinki" и т.п.). Сохраняем его
    ВМЕСТЕ с локальным временем напоминания: бэкенд сам вычисляет «сколько
    сейчас в этом поясе» (zoneinfo) и учитывает переходы на зимнее/летнее
@@ -1104,11 +1160,7 @@ async function startPlan(){
     app.progress[selPlanId].audioSlug=(_asel&&_asel.value)?_asel.value:AUDIO_DEFAULT;
   }
   saveApp();
-  /* v1.5.9: мгновенный отклик (см. комментарий у APP_VERSION) */
-  var _sbtn=document.getElementById('btn-setup');
-  if(_sbtn){_sbtn.disabled=true;_sbtn.textContent='Сохраняем…';haptic('light');}
   if(userId){try{var _r0=await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:selPlanId,title:(getPlan(selPlanId)||{}).title,notify_hour:ntime.hour,notify_minute:ntime.minute,notify_tz:DEVICE_TZ,notify_on:app.settings.notifyOn!==false,init_data:tgInitData})});syncBadge(_r0.ok);}catch(e){syncBadge(false);}}
-  if(_sbtn){_sbtn.disabled=false;_sbtn.textContent='Выбрать план';}
   haptic('success');viewDay=null;goPage('pg-read');renderRead();
 }
 function continuePlan(id){haptic('light');app.activePlanId=id;saveApp();viewDay=null;goPage('pg-read');renderRead();}
@@ -1809,6 +1861,7 @@ function apDayChapters(planId, day){
     for(var c = r.c1; c <= r.c2; c++){
       out.push({ book:r.book, ch:c,
         url:audioUrl(r.book, c, slug0), page:audioPageUrl(r.book, c, slug0),
+        urls:audioUrls(r.book, c, slug0),
         ok:audioChapterAvailable(slug0, r.book, c) });
     }
   }
@@ -1877,12 +1930,38 @@ function apNext(){
 }
 function apPrev(){ if(AP.idx > 0){ apSavePos(0); apPlay(AP.idx - 1); } else if(AP.a){ AP.a.currentTime = 0; } }
 
-/* Ошибка загрузки файла (404/сеть): пометить главу, дать фолбэк на bible.by
-   и кнопку следующей главы. Для выбранных 3 озвучек штатных дыр нет —
-   сработает только при сбое сети или удалении файла источником. */
+/* Ошибка загрузки файла (404/сеть): КАСКАД ЗЕРКАЛ — перебираем it.urls
+   (AUDIO_MIRRORS[slug]) по одному, пока какой-то источник не сыграет.
+   it.failn хранит индекс играющего источника. Маркер {map: url} — зеркало
+   с картой путей (predanie): карта тянется лениво, один раз. Зеркала
+   кончились — пометить главу, дать фолбэк на bible.by и кнопку следующей. */
 function apError(){
   var it = AP.list[AP.idx];
-  if(it) it.failed = true;
+  if(!it) return;
+  var urls = it.urls || [];
+  var next = (it.failn || 0) + 1;
+  var tryNext = function(){
+    if(next >= urls.length){ apFail(it); return; }
+    var u = urls[next];
+    if(u && u.map){
+      apPredMap(u.map, function(map){
+        var p = map && map[BOOK_NUM[it.book] + '/' + it.ch];
+        if(p){ it.failn = next; AP.a.src = PREDAIE_CDN + p; AP.a.playbackRate = AP.speed || 1; AP.a.play(); }
+        else { next++; tryNext(); }
+      });
+      return;
+    }
+    next++;
+    if(!u){ tryNext(); return; }
+    it.failn = next - 1;
+    AP.a.src = u;
+    AP.a.playbackRate = AP.speed || 1;
+    AP.a.play();
+  };
+  tryNext();
+}
+function apFail(it){
+  it.failed = true;
   apRender();
   var box = document.getElementById('r-audio-err');
   if(box && it){
@@ -1937,8 +2016,8 @@ function apRender(){
   for(var vi = 0; vi < AUDIO_VERSIONS.length; vi++){
     var vv = AUDIO_VERSIONS[vi];
     if(vv.tr !== lastTr){ h += '<optgroup label="' + vv.tr + '">'; lastTr = vv.tr; }
-    h += '<option value="' + vv.slug + '"' + (vv.slug === curSlug ? ' selected' : '') + '>' +
-      vv.narrator + (vv.music ? ' (с музыкой)' : '') + '</option>';
+    h += '<option value="' + vv.slug + '"' + (vv.slug === curSlug ? ' selected' : '') + (vv.dead ? ' disabled' : '') + '>' +
+      vv.narrator + (vv.music ? ' (с музыкой)' : '') + (vv.dead ? ' — недоступна' : '') + '</option>';
     if(vi === AUDIO_VERSIONS.length - 1 || AUDIO_VERSIONS[vi + 1].tr !== vv.tr) h += '</optgroup>';
   }
   h += '</select></div>';
@@ -2034,8 +2113,8 @@ function setupAudioFill(p){
   for(var i=0;i<AUDIO_VERSIONS.length;i++){
     var v=AUDIO_VERSIONS[i];
     if(v.tr!==lastTr){h+='<optgroup label="'+v.tr+'">';lastTr=v.tr;}
-    h+='<option value="'+v.slug+'"'+(v.slug===cur?' selected':'')+'>'
-      +v.narrator+(v.music?' (с музыкой)':'')+'</option>';
+    h+='<option value="'+v.slug+'"'+(v.slug===cur?' selected':'')+(v.dead?' disabled':'')+'>'
+      +v.narrator+(v.music?' (с музыкой)':'')+(v.dead?' — недоступна':'')+'</option>';
     if(i===AUDIO_VERSIONS.length-1||AUDIO_VERSIONS[i+1].tr!==v.tr)h+='</optgroup>';
   }
   sel.innerHTML=h;
@@ -2052,8 +2131,8 @@ function cfgAudioFill(prog){
   for(var i=0;i<AUDIO_VERSIONS.length;i++){
     var v=AUDIO_VERSIONS[i];
     if(v.tr!==lastTr){h+='<optgroup label="'+v.tr+'">';lastTr=v.tr;}
-    h+='<option value="'+v.slug+'"'+(v.slug===cur?' selected':'')+'>'
-      +v.narrator+(v.music?' (с музыкой)':'')+'</option>';
+    h+='<option value="'+v.slug+'"'+(v.slug===cur?' selected':'')+(v.dead?' disabled':'')+'>'
+      +v.narrator+(v.music?' (с музыкой)':'')+(v.dead?' — недоступна':'')+'</option>';
     if(i===AUDIO_VERSIONS.length-1||AUDIO_VERSIONS[i+1].tr!==v.tr)h+='</optgroup>';
   }
   sel.innerHTML=h;
@@ -2096,8 +2175,8 @@ function conaInit(){
     for(var i=0;i<AUDIO_VERSIONS.length;i++){
       var v=AUDIO_VERSIONS[i];
       if(v.tr!==lastTr){h+='<optgroup label="'+v.tr+'">';lastTr=v.tr;}
-      h+='<option value="'+v.slug+'"'+(v.slug===cur?' selected':'')+'>'
-        +v.narrator+(v.music?' (с музыкой)':'')+'</option>';
+      h+='<option value="'+v.slug+'"'+(v.slug===cur?' selected':'')+(v.dead?' disabled':'')+'>'
+        +v.narrator+(v.music?' (с музыкой)':'')+(v.dead?' — недоступна':'')+'</option>';
       if(i===AUDIO_VERSIONS.length-1||AUDIO_VERSIONS[i+1].tr!==v.tr)h+='</optgroup>';
     }
     vsel.innerHTML=h;
@@ -2189,9 +2268,6 @@ async function startCona(){
      адаптируются под новые параметры (как у «Своего плана» при правке). */
   prog.daysDone=(prog.daysDone||[]).filter(function(d){return d<=schedule.length;});
   saveApp();
-  /* v1.5.9: мгновенный отклик (см. комментарий у APP_VERSION) */
-  var _cbtn=document.getElementById('btn-cona');
-  if(_cbtn){_cbtn.disabled=true;_cbtn.textContent='Сохраняем…';haptic('light');}
   if(userId){
     try{
       if(editing){
@@ -2203,7 +2279,6 @@ async function startCona(){
       }
     }catch(e){syncBadge(false);}
   }
-  if(_cbtn){_cbtn.disabled=false;_cbtn.textContent=conaEditId?'Сохранить изменения':'Начать слушать';}
   conaEditId=null;
   haptic('success');
   app.activePlanId=id;saveApp();
