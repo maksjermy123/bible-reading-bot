@@ -62,7 +62,12 @@ body{background:var(--bg);color:var(--txt);font-family:var(--fui);min-height:100
 .streak-btn.mode-catchup .streak-n{color:var(--acc)}
 .streak-btn.mode-ahead .streak-n{color:var(--acc)}
 .streak-btn.mode-broken .streak-n{color:var(--txt2)}
-.ico-btn{width:34px;height:34px;border-radius:9px;background:var(--card);border:1px solid var(--brd);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+.ico-btn{width:34px;height:34px;border-radius:9px;background:var(--card);border:1px solid var(--brd);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--txt);padding:0}
+.ico-btn svg{width:19px;height:19px;display:block}
+#streak-ico{display:flex;align-items:center}
+#streak-ico svg{width:20px;height:20px;display:block}
+.streak-btn.mode-catchup #streak-ico,.streak-btn.mode-ahead #streak-ico{color:var(--acc)}
+.streak-btn.mode-broken #streak-ico{color:var(--txt2)}
 .stats-box{background:var(--card);border:1px solid var(--brd);border-radius:var(--rad);padding:12px;margin-bottom:8px}
 .sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
 .si{text-align:center}
@@ -273,7 +278,7 @@ body.apf-on .pg.on{padding-bottom:calc(var(--apf-h,92px) + 8px)}
 <div id="pg-load"><div class="spin">📖</div><div style="font-size:15px;color:var(--acc);font-weight:600">Загружаем Библию...</div><div style="font-size:12px;color:var(--txt2)">Пожалуйста, подождите</div></div>
 <div class="pg" id="pg-ob"><div class="ob-wrap"><div class="ob-em" id="ob-em">📖</div><div class="ob-t" id="ob-t">Читай Библию каждый день</div><div class="ob-tx" id="ob-tx">Выбери план по силам и читай Слово Божье каждый день</div><div class="ob-dots"><div class="od on" id="od0"></div><div class="od" id="od1"></div><div class="od" id="od2"></div></div><button class="btn btn-acc" onclick="obNext()">Далее</button></div></div>
 <div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="plan-list"></div><div class="card" style="cursor:pointer" onclick="goPage('pg-seq');initSeq()"><div class="card-top"><div class="card-ico">📜</div><div class="card-info"><div class="card-title">Свободное чтение</div><div class="card-meta">Свободное чтение, без графика</div></div><div class="badge">Гибкий</div></div></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span class="chan-ico">📻</span><span class="chan-txt">Канал<b>«От чтения к Преображению»</b></span><span class="chan-arrow">→</span></a></div>
-<div class="pg" id="pg-read"><div class="topbar"><button class="streak-btn" id="streak-badge" onclick="toggleStats()"><span style="font-size:20px" id="streak-ico">🔥</span><span class="streak-n" id="r-streak">0</span><span class="streak-l" id="r-streak-l">дней подряд</span></button><div style="display:flex;gap:5px"><button class="ico-btn" onclick="cycleTheme()" id="theme-btn">☀️</button><button class="ico-btn" onclick="goPage('pg-cfg')">⚙️</button></div></div><div id="stats-panel" style="display:none"><div class="stats-box"><div class="sg"><div class="si"><div class="sv" id="s-pct">0%</div><div class="sk">выполнено</div></div><div class="si"><div class="sv" id="s-done">0</div><div class="sk">дней готово</div></div><div class="si"><div class="sv" id="s-left">0</div><div class="sk">осталось</div></div><div class="si"><div class="sv" id="s-streak">0</div><div class="sk">дней подряд</div></div><div class="si"><div class="sv" id="s-max">0</div><div class="sk">рекорд</div></div><div class="si"><div class="sv" id="s-start">—</div><div class="sk">начат</div></div></div><div class="pb"><div class="pf" id="s-bar" style="width:0%"></div></div><div class="pl" id="s-plan-t"></div><button class="sec-tog" onclick="toggleCal()">📅 Календарь <span id="cal-arr">▼</span></button><div id="cal-wrap" style="display:none"><div class="cal-grid" id="cal-grid"></div></div></div></div><div class="cstat" id="r-cstat"></div><div class="pb" style="margin-bottom:10px"><div class="pf" id="r-bar" style="width:0%"></div></div><div class="day-nav"><button class="nav-btn" id="btn-prev" onclick="goDay(-1)">←</button><div class="day-info"><div class="day-n" id="r-day-n">День 1</div><div class="day-d" id="r-day-d"></div></div><button class="nav-btn" id="btn-next" onclick="goDay(1)">→</button></div><div id="r-audio" style="display:none;margin:10px 0"></div><div id="to-today" style="margin-bottom:10px;display:none"><button onclick="goToday()" style="width:100%;font-size:15px;font-weight:800;color:#fff;background:var(--acc);border:none;border-radius:10px;padding:13px;cursor:pointer;font-family:var(--fui);box-shadow:0 3px 12px rgba(0,0,0,.18)">📖 К непрочитанному →</button></div><div class="ref-lbl" id="r-ref-lbl"><span id="r-ref">—</span><button class="ico-btn" onclick="addBm()">⭐</button></div><div class="tabs" id="r-tabs"></div><div class="sc" id="r-sc"></div><div class="font-row" id="r-font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button><button class="read-btn alt" id="r-more-btn" style="display:none" type="button">📚 Хочу прочесть следующий день</button><a class="tlink" id="r-tlink" target="_blank"><span style="font-size:16px">📚</span> Читать другой перевод</a><div class="phrase" id="r-phrase"></div></div>
+<div class="pg" id="pg-read"><div class="topbar"><button class="streak-btn" id="streak-badge" onclick="toggleStats()"><span id="streak-ico"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor" stroke="none"><path d="M12 2c2 3.5 5 5.6 5 9.5A5 5 0 0 1 7 11.5c0-1.6.6-2.9 1.5-4.2.3 1.1 1 1.9 2 2.3C10 7 10.6 4.3 12 2z"/></svg></span><span class="streak-n" id="r-streak">0</span><span class="streak-l" id="r-streak-l">дней подряд</span></button><div style="display:flex;gap:5px"><button class="ico-btn" onclick="cycleTheme()" id="theme-btn">☀️</button><button class="ico-btn" onclick="goPage('pg-cfg')" aria-label="Настройки"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div></div><div id="stats-panel" style="display:none"><div class="stats-box"><div class="sg"><div class="si"><div class="sv" id="s-pct">0%</div><div class="sk">выполнено</div></div><div class="si"><div class="sv" id="s-done">0</div><div class="sk">дней готово</div></div><div class="si"><div class="sv" id="s-left">0</div><div class="sk">осталось</div></div><div class="si"><div class="sv" id="s-streak">0</div><div class="sk">дней подряд</div></div><div class="si"><div class="sv" id="s-max">0</div><div class="sk">рекорд</div></div><div class="si"><div class="sv" id="s-start">—</div><div class="sk">начат</div></div></div><div class="pb"><div class="pf" id="s-bar" style="width:0%"></div></div><div class="pl" id="s-plan-t"></div><button class="sec-tog" onclick="toggleCal()">📅 Календарь <span id="cal-arr">▼</span></button><div id="cal-wrap" style="display:none"><div class="cal-grid" id="cal-grid"></div></div></div></div><div class="cstat" id="r-cstat"></div><div class="pb" style="margin-bottom:10px"><div class="pf" id="r-bar" style="width:0%"></div></div><div class="day-nav"><button class="nav-btn" id="btn-prev" onclick="goDay(-1)">←</button><div class="day-info"><div class="day-n" id="r-day-n">День 1</div><div class="day-d" id="r-day-d"></div></div><button class="nav-btn" id="btn-next" onclick="goDay(1)">→</button></div><div id="r-audio" style="display:none;margin:10px 0"></div><div id="to-today" style="margin-bottom:10px;display:none"><button onclick="goToday()" style="width:100%;font-size:15px;font-weight:800;color:#fff;background:var(--acc);border:none;border-radius:10px;padding:13px;cursor:pointer;font-family:var(--fui);box-shadow:0 3px 12px rgba(0,0,0,.18)">📖 К непрочитанному →</button></div><div class="ref-lbl" id="r-ref-lbl"><span id="r-ref">—</span><button class="ico-btn" onclick="addBm()" aria-label="В закладки"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></div><div class="tabs" id="r-tabs"></div><div class="sc" id="r-sc"></div><div class="font-row" id="r-font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><button class="read-btn" id="r-read-btn" onclick="markRead()">✓ Прочитал</button><button class="read-btn alt" id="r-more-btn" style="display:none" type="button">📚 Хочу прочесть следующий день</button><a class="tlink" id="r-tlink" target="_blank"><span style="font-size:16px">📚</span> Читать другой перевод</a><div class="phrase" id="r-phrase"></div></div>
 <div class="pg" id="pg-seq"><div class="hdr"><h1>📜 Свободное чтение</h1></div><div class="seq-nav"><select class="seq-sel" id="seq-book" onchange="seqBook()"></select><select class="seq-sel" id="seq-ch" onchange="seqRender()"></select></div><div class="sc" id="seq-sc"></div><div class="font-row"><button class="fb" onclick="chFont(-1)">A−</button><span style="font-size:11px;color:var(--txt2)">Шрифт</span><button class="fb" onclick="chFont(1)">A+</button></div><div style="display:flex;gap:8px;margin-top:6px"><button class="btn btn-out" style="margin-top:0;flex:1" onclick="seqPrev()">← Назад</button><button class="btn btn-acc" style="margin-top:0;flex:1" onclick="seqNext()">Далее →</button></div><button class="btn btn-out" style="margin-top:8px" onclick="addSeqBm()">⭐ Закладка</button><button class="home-lnk" onclick="goPage('pg-sel')">← На главную</button></div>
 <div class="pg" id="pg-con"><div class="hdr"><h1 id="con-title">✏️ Свой план</h1></div><div id="con-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="nt-books"></div></div><div class="sec">Длительность (дней)</div><div class="dur-row"><input type="number" id="con-days" min="1" max="1000" value="30" oninput="updatePrev()"></div><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="con-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="con-not-tog" onclick="conTogNot()"></button></div><div class="prev-box" id="con-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-con" onclick="startCustom()" disabled>Выбрать план</button><button class="btn btn-out" onclick="conEditId=null;conChrono=false;goPage('pg-sel');renderSel()">Вернуться</button></div>
 <div class="pg" id="pg-cona"><div class="hdr"><h1 id="cona-title">🎧 Аудио-план</h1></div><div id="cona-books-wrap"><div class="sec">Ветхий Завет</div><div class="bg-grid" id="cona-ot-books"></div><div class="sec">Новый Завет</div><div class="bg-grid" id="cona-nt-books"></div></div><div class="sec">Длительность (дней)</div><div style="display:flex;gap:6px;margin-bottom:8px"><button class="cona-chip" onclick="conaSetDays(30)">30</button><button class="cona-chip" onclick="conaSetDays(90)">90</button><button class="cona-chip" onclick="conaSetDays(180)">180</button><button class="cona-chip" onclick="conaSetDays(365)">365</button></div><div class="dur-row"><input type="number" id="cona-days" min="1" max="1000" value="365" oninput="conaUpdatePrev()"></div><div class="sec">Озвучка</div><select id="cona-ver" onchange="conaUpdatePrev()" style="width:100%;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"></select><div class="sec">Время напоминания</div><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🕐</span><input type="time" id="cona-time" value="08:00" style="flex:1;padding:10px;border:1px solid var(--brd);border-radius:9px;background:var(--card);color:var(--txt);font-family:var(--fui);font-size:14px"><span style="font-size:12px;color:var(--txt2)">местное</span></div><div class="tog-row"><span>Получать напоминания</span><button class="tog on" id="cona-not-tog" onclick="conTogNot2()"></button></div><div class="prev-box" id="cona-prev">Выбери книги и укажи длительность</div><button class="btn btn-acc" id="btn-cona" onclick="startCona()" disabled>Начать слушать</button><button class="btn btn-out" onclick="conaEditId=null;goPage('pg-sel');renderSel()">Вернуться</button></div>
@@ -668,7 +673,7 @@ function saveApp(){try{localStorage.setItem('bapp3',JSON.stringify(app));}catch(
 var BIBLE_CACHE_VER='v1';
 /* Версия приложения для футера: повышать при значимых изменениях
    (модель чтения, новые экраны). Формат: мажор.минор.патч. */
-var APP_VERSION='1.5.10';
+var APP_VERSION='1.5.11';
 /* v1.5.6: IANA-пояс устройства ("Europe/Helsinki" и т.п.). Сохраняем его
    ВМЕСТЕ с локальным временем напоминания: бэкенд сам вычисляет «сколько
    сейчас в этом поясе» (zoneinfo) и учитывает переходы на зимнее/летнее
@@ -840,8 +845,26 @@ function startChronoPlan(){
   conChrono=true;conEditId=null;goPage('pg-con');initCon();
 }
 
+/* v1.5.11: иконки интерфейса — инлайн-SVG вместо emoji. Причина: на части
+   Android-WebView (Xiaomi 14T / HyperOS) emoji в кнопках топбара падали в
+   цветные квадраты (нет фолбэка на цветной emoji-шрифт для глифов ☀️⚙️⏩).
+   SVG рендерится одинаково на iOS и Android и красится через currentColor
+   под тему (светлая/тёмная). Нижняя навигация не тронута — там emoji
+   отображаются нормально на всех устройствах. */
+var ICO=function(){var s=function(inner,fill){return '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"'+(fill?' fill="currentColor" stroke="none"':' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"')+'>'+inner+'</svg>';};return{
+ sun:s('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>'),
+ moon:s('<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',true),
+ auto:s('<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/>'),
+ gear:s('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>'),
+ star:s('<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',true),
+ flame:s('<path d="M12 2c2 3.5 5 5.6 5 9.5A5 5 0 0 1 7 11.5c0-1.6.6-2.9 1.5-4.2.3 1.1 1 1.9 2 2.3C10 7 10.6 4.3 12 2z"/>',true),
+ target:s('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>'),
+ ff:s('<polygon points="13 19 22 12 13 5 13 19"/><polygon points="2 19 11 12 2 5 2 19"/>',true),
+ zzz:s('<path d="M14 3h6l-6 6h6"/><path d="M8 10h5l-5 5h5"/><path d="M3 16h4l-4 4h4"/>'),
+ sprout:s('<path d="M12 21v-7"/><path d="M12 14C12 10 9 8 5 8c0 4 3 6 7 6z"/><path d="M12 12c0-3 2.2-4.5 5.5-4.5 0 3.2-2.4 4.5-5.5 4.5z"/>')
+};}();
 var THEMES=['sepia','dark'];
-var THEME_ICO={sepia:'☀️',dark:'🌙'};
+var THEME_ICO={sepia:ICO.sun,dark:ICO.moon};
 /* У кого была выбрана удалённая тема "Ночная" - автоматический переход на "Тёмную".
    У кого была чисто-белая "Светлая" (light) - переход на новую "Светлую" (sepia). */
 if(theme==='night'){theme='dark';try{localStorage.setItem('theme','dark');}catch(e){}}
@@ -852,7 +875,7 @@ function applyTheme(){
   else if(theme==='light')theme='sepia'; /* чисто-белая "Светлая" удалена */
   document.body.className=theme==='dark'?'dark':theme==='sepia'?'sepia':'';
   var b=document.getElementById('theme-btn');
-  if(b)b.textContent=themeMode==='auto'?'🌗':(THEME_ICO[theme]||'☀️');
+  if(b)b.innerHTML=themeMode==='auto'?ICO.auto:(THEME_ICO[theme]||ICO.sun);
   localStorage.setItem('theme',theme);
   localStorage.setItem('themeMode',themeMode);
 }
@@ -1364,29 +1387,29 @@ function renderStreakBadge(streak,lag,ahead,maxStreak){
   btn.classList.remove('mode-active','mode-catchup','mode-broken','mode-ahead');
   if(lag>0){
     btn.classList.add('mode-catchup');
-    ico.textContent='🎯';
+    ico.innerHTML=ICO.target;
     n.textContent=lag;
     l.textContent=dayWord(lag)+' позади графика';
   } else if(ahead>0){
     /* Чтение «впрок»: долга нет, но уже отмечены дни будущего — показываем
        опережение вместо стрика (самая свежая и мотивирующая информация). */
     btn.classList.add('mode-ahead');
-    ico.textContent='⏩';
+    ico.innerHTML=ICO.ff;
     n.textContent=ahead;
     l.textContent=dayWord(ahead)+' вперёд графика';
   } else if(streak>0){
     btn.classList.add('mode-active');
-    ico.textContent='🔥';
+    ico.innerHTML=ICO.flame;
     n.textContent=streak;
     l.textContent=swWord(streak);
   } else if(maxStreak>0){
     btn.classList.add('mode-broken');
-    ico.textContent='💤';
+    ico.innerHTML=ICO.zzz;
     n.textContent=maxStreak;
     l.textContent='рекорд — начни снова';
   } else {
     btn.classList.add('mode-broken');
-    ico.textContent='🌱';
+    ico.innerHTML=ICO.sprout;
     n.textContent='';
     l.textContent='Сделай первый шаг сегодня';
   }
