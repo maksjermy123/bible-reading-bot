@@ -673,7 +673,7 @@ function saveApp(){try{localStorage.setItem('bapp3',JSON.stringify(app));}catch(
 var BIBLE_CACHE_VER='v1';
 /* Версия приложения для футера: повышать при значимых изменениях
    (модель чтения, новые экраны). Формат: мажор.минор.патч. */
-var APP_VERSION='1.5.13';
+var APP_VERSION='1.5.14';
 /* v1.5.6: IANA-пояс устройства ("Europe/Helsinki" и т.п.). Сохраняем его
    ВМЕСТЕ с локальным временем напоминания: бэкенд сам вычисляет «сколько
    сейчас в этом поясе» (zoneinfo) и учитывает переходы на зимнее/летнее
@@ -1793,7 +1793,7 @@ async function flushPending(){
 
 /* Состояние плеера и позиция прослушивания (localStorage, офлайн).
    speed — скорость воспроизведения, одна на все планы (audio_speed_v1). */
-var AP = { a:null, planId:null, day:null, idx:0, list:[], ready:false, speed:1, ex:false }; /* ex: док развёрнут; по умолчанию МИНИ-бар (v1.5.2) — дорожки не перекрывает */
+var AP = { a:null, planId:null, day:null, idx:0, list:[], ready:false, speed:1, ex:false, srcSetAt:0 }; /* ex: док развёрнут; по умолчанию МИНИ-бар (v1.5.2) — дорожки не перекрывает */
 /* iOS/HTMLMediaElement: audio.volume ТОЛЬКО ДЛЯ ЧТЕНИЯ — Apple не позволяет JS
    менять громкость воспроизведения (ползунок на iPhone физически не работает,
    кроме того у CDN 4bbl.ru нет CORS-заголовков, значит WebAudio-Gain тоже
@@ -1952,10 +1952,60 @@ function apEnsure(){
   AP.a.playbackRate = AP.speed;
   AP.a.volume = apVolGet() / 100;
   AP.a.addEventListener('ended', apNext);
-  AP.a.addEventListener('error', apError);
+  AP.a.addEventListener('error', apOnErr);
+  AP.a.addEventListener('playing', apHeal);
   AP.a.addEventListener('timeupdate', function(){
     if(AP.a && !AP.a.paused) apTick();
   });
+}
+
+/* v1.5.14: ложные «Глава … недоступна в этой озвучке» при ⏮/⏭ во время
+   игры. Причина 1: у плеера ОДИН Audio-элемент, и error всегда валился на
+   ТЕКУЩУЮ дорожку (AP.list[AP.idx]) — а смена src не отменяет уже
+   поставленную в очередь задачу события от ПРЕДЫДУЩЕГО файла (часть
+   WebView шлёт error и просто при прерывании загрузки). Чужая ошибка
+   надувала failn новой дорожки и перезапускала её с зеркала. Причина 2:
+   it.failn не сбрасывался после успешного старта — после пары таких
+   «наведённых» сбоев каскад считал зеркала исчерпанными и при любом
+   мелькнувшем сетевом сбое (raw 429, лимит mp3.only.bible — 2 потока)
+   сразу показывал apFail, хотя файлы живы. */
+/* Единая точка смены src: запоминает момент — по нему apOnErr отличает
+   запоздалый error прерванной загрузки от ошибки нового файла. */
+function apSetSrc(u){
+  AP.srcSetAt = Date.now();
+  AP.a.src = u;
+}
+/* play() с глушением AbortError: при быстром ⏮/⏭ промис прерывается —
+   это норма, а не ошибка. */
+function apPlaySafe(){
+  try{ var pr = AP.a.play(); if(pr && pr.catch) pr.catch(function(){}); }catch(e){}
+}
+/* Файл РЕАЛЬНО играет — дорожка здорова: сбросить каскадное состояние и
+   спрятать плашку ошибки (вернувшись на «недоступную» главу, она после
+   успешного старта снова считается доступной). */
+function apHeal(){
+  var it = AP.list[AP.idx];
+  if(it){ it.failn = 0; delete it.failed; }
+  var box = document.getElementById('r-audio-err');
+  if(box && box.style.display !== 'none'){ box.style.display = 'none'; box.innerHTML = ''; }
+}
+var _apErrRecheck = null;
+function apOnErr(){
+  /* error меньше чем через 350 мс после смены src — почти наверняка
+     запоздалый error прерванной загрузки: реальная ошибка нового файла не
+     может прийти быстрее сетевого RTT. Не игнорируем безвозвратно, а
+     перепроверяем: если ошибка осталась на элементе и так ничего и не
+     загрузилось (readyState < 2) — это была настоящая ошибка текущего
+     файла, запускаем каскад. */
+  if(Date.now() - (AP.srcSetAt || 0) < 350){
+    if(_apErrRecheck) clearTimeout(_apErrRecheck);
+    _apErrRecheck = setTimeout(function(){
+      _apErrRecheck = null;
+      if(AP.a && AP.a.error && AP.a.readyState < 2) apError();
+    }, 420);
+    return;
+  }
+  apError();
 }
 var _apLastSave = 0;
 function apTick(){
@@ -1988,10 +2038,13 @@ function apPlay(idx){
   if(!it.ok || !it.url){ apError(); return; }
   apEnsure();
   var pos = apLoadPos()[AP.planId];
-  AP.a.src = it.url;
+  /* v1.5.14: старт всегда с первичного зеркала и с ЧИСТЫМ каскадом —
+     старый failn/failed от прошлых сбоев больше не тянется за дорожкой */
+  it.failn = 0; delete it.failed;
+  apSetSrc(it.url);
   AP.a.playbackRate = AP.speed || 1; /* скорость сохраняется при смене дорожки */
   AP.a.currentTime = (pos && pos.day === AP.day && pos.idx === idx && pos.sec > 5) ? pos.sec : 0;
-  AP.a.play();
+  apPlaySafe();
   haptic('light');
   apRender();
 }
@@ -2029,7 +2082,10 @@ function apPrev(){ if(AP.idx > 0){ apSavePos(0); apPlay(AP.idx - 1); } else if(A
    (AUDIO_MIRRORS[slug]) по одному, пока какой-то источник не сыграет.
    it.failn хранит индекс играющего источника. Маркер {map: url} — зеркало
    с картой путей (predanie): карта тянется лениво, один раз. Зеркала
-   кончились — пометить главу, дать фолбэк на bible.by и кнопку следующей. */
+   кончились — пометить главу, дать фолбэк на bible.by и кнопку следующей.
+   Из event-слушателя зовётся ТОЛЬКО через apOnErr (гвард запоздалых
+   error от старого src, v1.5.14); напрямую — из apPlay для дорожек
+   без файла. */
 function apError(){
   var it = AP.list[AP.idx];
   if(!it) return;
@@ -2041,7 +2097,7 @@ function apError(){
     if(u && u.map){
       apPredMap(u.map, function(map){
         var p = map && map[BOOK_NUM[it.book] + '/' + it.ch];
-        if(p){ it.failn = next; AP.a.src = PREDAIE_CDN + p; AP.a.playbackRate = AP.speed || 1; AP.a.play(); }
+        if(p){ it.failn = next; apSetSrc(PREDAIE_CDN + p); AP.a.playbackRate = AP.speed || 1; apPlaySafe(); }
         else { next++; tryNext(); }
       });
       return;
@@ -2049,9 +2105,9 @@ function apError(){
     next++;
     if(!u){ tryNext(); return; }
     it.failn = next - 1;
-    AP.a.src = u;
+    apSetSrc(u);
     AP.a.playbackRate = AP.speed || 1;
-    AP.a.play();
+    apPlaySafe();
   };
   tryNext();
 }
