@@ -274,7 +274,7 @@ body.apf-on .pg.on{padding-bottom:calc(var(--apf-h,92px) + 8px)}
 </style>
 </head>
 <body>
-<div id="sync-warn" onclick="dismissSyncWarn()" title="Последние изменения не сохранились на сервере. Локально ничего не потеряно — попробуем ещё раз, как только появится связь. Нажми, чтобы скрыть." style="display:none;position:fixed;top:10px;right:10px;z-index:9999;background:#fff3cd;color:#856404;border:1px solid #ffe08a;border-radius:20px;padding:5px 11px;font-size:12px;font-weight:700;font-family:var(--fui);box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;display:flex;align-items:center;gap:4px">⚠️ не синхронизировано</div>
+<div id="sync-warn" onclick="dismissSyncWarn()" title="Последние изменения не сохранились на сервере. Локально ничего не потеряно — попробуем ещё раз, как только появится связь. Нажми, чтобы скрыть." style="display:none;position:fixed;top:10px;right:10px;z-index:9999;background:#fff3cd;color:#856404;border:1px solid #ffe08a;border-radius:20px;padding:5px 11px;font-size:12px;font-weight:700;font-family:var(--fui);box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;align-items:center;gap:4px">⚠️ не синхронизировано</div>
 <div id="pg-load"><div class="spin">📖</div><div style="font-size:15px;color:var(--acc);font-weight:600">Загружаем Библию...</div><div style="font-size:12px;color:var(--txt2)">Пожалуйста, подождите</div></div>
 <div class="pg" id="pg-ob"><div class="ob-wrap"><div class="ob-em" id="ob-em">📖</div><div class="ob-t" id="ob-t">Читай Библию каждый день</div><div class="ob-tx" id="ob-tx">Выбери план по силам и читай Слово Божье каждый день</div><div class="ob-dots"><div class="od on" id="od0"></div><div class="od" id="od1"></div><div class="od" id="od2"></div></div><button class="btn btn-acc" onclick="obNext()">Далее</button></div></div>
 <div class="pg" id="pg-sel"><div class="hdr"><h1>📖 План чтения Библии</h1><p>Выбери план по силам</p></div><div id="plan-list"></div><div class="card" style="cursor:pointer" onclick="goPage('pg-seq');initSeq()"><div class="card-top"><div class="card-ico">📜</div><div class="card-info"><div class="card-title">Свободное чтение</div><div class="card-meta">Свободное чтение, без графика</div></div><div class="badge">Гибкий</div></div></div><a class="chan-ban" href="https://t.me/Chtenie_Preobrazenie" target="_blank"><span class="chan-ico">📻</span><span class="chan-txt">Канал<b>«От чтения к Преображению»</b></span><span class="chan-arrow">→</span></a></div>
@@ -673,7 +673,7 @@ function saveApp(){try{localStorage.setItem('bapp3',JSON.stringify(app));}catch(
 var BIBLE_CACHE_VER='v1';
 /* Версия приложения для футера: повышать при значимых изменениях
    (модель чтения, новые экраны). Формат: мажор.минор.патч. */
-var APP_VERSION='1.5.12';
+var APP_VERSION='1.5.13';
 /* v1.5.6: IANA-пояс устройства ("Europe/Helsinki" и т.п.). Сохраняем его
    ВМЕСТЕ с локальным временем напоминания: бэкенд сам вычисляет «сколько
    сейчас в этом поясе» (zoneinfo) и учитывает переходы на зимнее/летнее
@@ -2493,6 +2493,13 @@ async function markRead(){
         pendRead(app.activePlanId,vd);schedPendRetry();
       }
     }catch(e){pendRead(app.activePlanId,vd);schedPendRetry();}
+  } else {
+    /* v1.5.13: локальный режим (клавиатурная web_app-кнопка «Открыть план»
+       открывает апп без initData — см. init()): отметка существует только
+       локально. Кладём в персистентную очередь 'bpend' — иначе первый же
+       syncBackend() при следующем открытии С initData перезатрёт локальные
+       daysDone серверными и день потеряется. flushPending() доставит. */
+    pendRead(app.activePlanId,vd);
   }
 }
 
@@ -3435,6 +3442,11 @@ document.addEventListener('touchend',function(e){
    решению владельца — см. комментарий в markRead: откат ненадёжен из-за
    гонки с ответом /plan/read и union-склейки дней на сервере. */
 function openBotForRegistration(){
+  /* v1.5.13: открытие без initData (клавиатурная web_app-кнопка):
+     tg.openTelegramLink здесь молча не срабатывает (Xiaomi 14T — только
+     вибрация), а чат с ботом находится ПРЯМО ПОД аппом (кнопка нажата из
+     него) — просто закрываем вебвью, пользователь уже там, где нужно. */
+  if(!userId&&tg&&tg.close){try{tg.close();return;}catch(e){}}
   try{
     if(tg&&tg.openTelegramLink) tg.openTelegramLink(BIBLE_BOT_CHAT);
     else window.location.href=BIBLE_BOT_CHAT;
@@ -3470,14 +3482,27 @@ async function init(){
      проверками аккаунта - они нужны на любом экране и не должны зависеть
      от того, какая ветка init() выполнится. */
   var plansEarly=loadPlansPeri().catch(function(e){console.error('Plans:',e);});
-  if(!userId){renderAccountGate();return;}
+  /* v1.5.13: reply-клавиатурная web_app-кнопка «Открыть план» (в боту рядом
+     с «Поделиться с другом») открывает мини-апп БЕЗ initData — так устроен
+     Telegram: KeyboardButton.web_app initData не передаёт (в отличие от
+     инлайн-кнопки в напоминании/приветствии, где initData есть). Поэтому
+     нажатие кнопки ИЗ чата с ботом всегда упиралось в гейт «Сначала открой
+     бота и нажми «Старт»», а кнопка «Открыть бота →» на нём делала только
+     вибрацию (tg.openTelegramLink в этом контексте молча не срабатывает).
+     Теперь: есть локальный онбординг — открываем сегодняшнее чтение/прослушивание
+     от локального состояния (гейт не нужен: человек УЖЕ в чате с ботом,
+     иначе этой кнопки у него нет; чтение и плеер офлайн полностью работают).
+     Отметки дней в этом режиме кладутся в очередь 'bpend' (см. markRead) и
+     уедут на сервер при следующем открытии с initData. Нет онбординга — гейт
+     (новичку «Старт» действительно нужен, иначе напоминания не придут). */
+  if(!userId&&!(app&&app.onboarded)){renderAccountGate();return;}
   /* Локальный фолбэк: если человек уже работал с приложением (onboarded,
      есть план), недоступность бэкенда не должна блокировать чтение -
      прогресс синхронизируется позже, когда связь появится (sync-warn уже
      показывает предупреждение). Гейт "Сначала открой бота" показываем
      только тем, кто реально не зарегистрирован ИЛИ никогда здесь не был. */
-  var acc=await fetchAccountStatus();
-  if(!acc||!acc.registered){
+  var acc=userId?await fetchAccountStatus():null;
+  if(userId&&(!acc||!acc.registered)){
     // Небольшая пауза и одна повторная проверка — на Android неявный
     // /start от Telegram мог ещё не долететь до вебхука в момент самого
     // первого запроса. Не хотим показать гейт человеку, который через
