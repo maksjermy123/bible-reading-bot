@@ -673,7 +673,7 @@ function saveApp(){try{localStorage.setItem('bapp3',JSON.stringify(app));}catch(
 var BIBLE_CACHE_VER='v1';
 /* Версия приложения для футера: повышать при значимых изменениях
    (модель чтения, новые экраны). Формат: мажор.минор.патч. */
-var APP_VERSION='1.5.14';
+var APP_VERSION='1.5.15';
 /* v1.5.6: IANA-пояс устройства ("Europe/Helsinki" и т.п.). Сохраняем его
    ВМЕСТЕ с локальным временем напоминания: бэкенд сам вычисляет «сколько
    сейчас в этом поясе» (zoneinfo) и учитывает переходы на зимнее/летнее
@@ -1743,7 +1743,11 @@ function pendStore(q){try{localStorage.setItem('bpend',JSON.stringify(q));}catch
 function pendRead(planId,day){
   var q=pendQueue();
   for(var i=0;i<q.length;i++){if(q[i].plan_id===planId&&q[i].day_number===day)return;}
-  q.push({plan_id:planId,day_number:day,ts:Date.now()});
+  /* v1.5.15: local_date запоминаем в момент ОТМЕТКИ, а не доставки: отметка,
+     долетевшая утром после вечерней сессии, должна засчитаться за ВЧЕРАШНИЙ
+     день — иначе рвётся стрик (сервер считает дату доставки) и «вчера»
+     превращается в «сегодня». Сервер старую дату бэкфиллит без отката серии. */
+  q.push({plan_id:planId,day_number:day,ts:Date.now(),local_date:today()});
   pendStore(q);syncBadge(false);schedPendRetry();
 }
 var _pendTm=null;
@@ -1759,7 +1763,7 @@ async function flushPending(){
   for(var i=0;i<q.length;i++){
     var it=q[i];var sent=false;
     try{
-      var r=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:it.plan_id,day_number:it.day_number,local_date:today(),init_data:tgInitData})});
+      var r=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},keepalive:true,body:JSON.stringify({user_id:userId,plan_id:it.plan_id,day_number:it.day_number,local_date:it.local_date||today(),init_data:tgInitData})});
       var d=await r.json();
       if(d&&d.ok){
         /* Стрик в прогрессе правим ТОЛЬКО серверным ответом: локальное
@@ -1775,7 +1779,7 @@ async function flushPending(){
         try{
           var _np=ntPayload(app.progress[it.plan_id]||{});
           await fetch(BACKEND+'/plan/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:it.plan_id,title:(getPlan(it.plan_id)||{}).title,notify_hour:_np.notify_hour,notify_minute:_np.notify_minute,notify_tz:_np.notify_tz,notify_on:app.progress[it.plan_id]?app.progress[it.plan_id].notifyOn!==false:true,init_data:tgInitData})});
-          var r2=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,plan_id:it.plan_id,day_number:it.day_number,local_date:today(),init_data:tgInitData})});
+          var r2=await fetch(BACKEND+'/plan/read',{method:'POST',headers:{'Content-Type':'application/json'},keepalive:true,body:JSON.stringify({user_id:userId,plan_id:it.plan_id,day_number:it.day_number,local_date:it.local_date||today(),init_data:tgInitData})});
           var d2=await r2.json();
           if(d2&&d2.ok){if(app.progress[it.plan_id]&&d2.streak!=null){app.progress[it.plan_id].streak=d2.streak;app.progress[it.plan_id].maxStreak=d2.max_streak;saveApp();}syncBadge(true);sent=true;}
         }catch(e2){}
@@ -3414,9 +3418,16 @@ async function syncCanonicalDaysDone(){
    закрыли, а сервер так и не узнал о дне (напоминание «отстаёшь», стрик 1).
    Пока очередь непуста — ретраи каждые 20 с + попытка при каждом возврате
    в мини-апп и по событию online. */
-document.addEventListener('visibilitychange',function(){if(!document.hidden&&userId&&pendQueue().length)flushPending();});
+document.addEventListener('visibilitychange',function(){if(userId&&pendQueue().length)flushPending();}); /* v1.5.15: и на скрытие тоже — отметка уходит, пока вебвью ещё живо */
 window.addEventListener('online',function(){if(userId&&pendQueue().length)flushPending();});
 setInterval(function(){if(!document.hidden&&userId&&pendQueue().length)flushPending();},60000);
+/* v1.5.15: отметка, сделанная вечером перед закрытием аппа, обязана уйти той
+   же ночью — иначе утреннее напоминание считает день непрочитанным и шлёт
+   ложное «отстаёшь на 1 день» (кейс владельца 10.11: день 63 прочтён в 22:00,
+   бэкенд увидел его только в 9:05, напоминание в 9:00 уже обвинило).
+   keepalive позволяет запросу дожить после закрытия вебвью, пока просыпается
+   Render free-тариф (30-60 с). */
+window.addEventListener('pagehide',function(){if(userId&&pendQueue().length)flushPending();});
 
 function showToast(msg){
   var t=document.getElementById('toast');if(!t)return;
