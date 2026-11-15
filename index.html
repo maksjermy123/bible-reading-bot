@@ -586,6 +586,33 @@ var tg=window.Telegram&&window.Telegram.WebApp;
 var tgInitData=(tg&&tg.initData)?tg.initData:'';
 if(tg){tg.ready();tg.expand();}
 var userId=tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user?tg.initDataUnsafe.user.id:null;
+/* v1.5.17: КЛАВИАТУРНАЯ web_app-кнопка «Открыть план» initData НЕ передаёт
+   (документированное поведение Telegram: «It is empty if the Web App was
+   launched from a keyboard button»), а сервер считает дни по canonical
+   plan_progress, куда пишет только подписанный /plan/read. Раньше отметка,
+   сделанная в таком запуске, застревала в очереди 'bpend' до ближайшего
+   запуска С initData (кнопка в уведомлении) — и утреннее напоминание
+   считало день непрочитанным: ложное «Вчерашний день ещё не отмечен —
+   продолжай с дня N» (кейс владельца 15.11: день 68 прочтён в 7:30 через
+   клавиатурную кнопку, напоминание в 9:00 его не увидело; тот же механизм —
+   в кейсе 10.11). Теперь последний валидный initData кэшируется здесь, в
+   localStorage, и восстанавливается в запусках без initData: клавиатурная
+   сессия становится полноценной — отметки летят на сервер сразу, очередь
+   'bpend' дожимается, /state синхронизируется. Подпись initData постоянна
+   (HMAC токеном бота), ограничена только давностью: INIT_DATA_MAX_AGE_SECONDS
+   на бэке поднят до 7 суток, так что кэша хватает на неделю клавиатурных
+   запусков; любой запуск с initData обновляет кэш. Если сервер отверг
+   устаревший кэш (401), поведение прежнее: отметки ждут в 'bpend' и уедут
+   при первом запуске с initData — данные не теряются. */
+try{
+  if(tgInitData&&userId){
+    localStorage.setItem('init_data_v1',JSON.stringify({d:tgInitData,u:userId,ts:Date.now()}));
+  } else if(!tgInitData){
+    var _idc=null;
+    try{_idc=JSON.parse(localStorage.getItem('init_data_v1')||'null');}catch(_e){_idc=null;}
+    if(_idc&&_idc.d&&_idc.u){tgInitData=_idc.d;userId=_idc.u;}
+  }
+}catch(e){}
 var BIBLE_BOT_CHAT='https://t.me/mybible_reading_bot';
 var _accountRegisteredCache=null; // null=ещё не проверяли, иначе true/false
 
@@ -673,7 +700,7 @@ function saveApp(){try{localStorage.setItem('bapp3',JSON.stringify(app));}catch(
 var BIBLE_CACHE_VER='v1';
 /* Версия приложения для футера: повышать при значимых изменениях
    (модель чтения, новые экраны). Формат: мажор.минор.патч. */
-var APP_VERSION='1.5.16';
+var APP_VERSION='1.5.17';
 /* v1.5.6: IANA-пояс устройства ("Europe/Helsinki" и т.п.). Сохраняем его
    ВМЕСТЕ с локальным временем напоминания: бэкенд сам вычисляет «сколько
    сейчас в этом поясе» (zoneinfo) и учитывает переходы на зимнее/летнее
@@ -3560,7 +3587,9 @@ async function init(){
      от локального состояния (гейт не нужен: человек УЖЕ в чате с ботом,
      иначе этой кнопки у него нет; чтение и плеер офлайн полностью работают).
      Отметки дней в этом режиме кладутся в очередь 'bpend' (см. markRead) и
-     уедут на сервер при следующем открытии с initData. Нет онбординга — гейт
+     уедут на сервер при следующем открытии с initData — либо раньше: v1.5.17
+     восстанавливает initData из кэша и клавиатурная сессия синхронизируется
+     сразу. Нет онбординга — гейт
      (новичку «Старт» действительно нужен, иначе напоминания не придут). */
   if(!userId&&!(app&&app.onboarded)){renderAccountGate();return;}
   /* Локальный фолбэк: если человек уже работал с приложением (onboarded,
